@@ -1,7 +1,7 @@
 src/AutoLeveling.cpp
 src/AutoLeveling.h
 src/Constants
-.vscodes
+.vscode
 test
 EEPROM_data.txt
 
