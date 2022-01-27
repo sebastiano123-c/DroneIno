@@ -139,9 +139,25 @@ void AutoLeveling::setGyroscopeRegisters(){
 
 void AutoLeveling::calibrateGyroscope(){
   for (calInt = 0; calInt < 1250 ; calInt ++){                           //Wait 5 seconds before continuing.
-    PORTD |= B11110000;                                                     //Set digital port 4, 5, 6 and 7 high.
+    #if PINMAP == OFF
+      PORTD |= B11110000;                                                       //Set digital outputs 4,5,6 and 7 high.
+    #elif PINMAP == ESP32
+      digitalWrite(PIN_ESC_1, HIGH);
+      digitalWrite(PIN_ESC_2, HIGH);
+      digitalWrite(PIN_ESC_3, HIGH);
+      digitalWrite(PIN_ESC_4, HIGH);
+    #endif
+
     delayMicroseconds(1000);                                                //Wait 1000us.
-    PORTD &= B00001111;                                                     //Set digital port 4, 5, 6 and 7 low.
+    #if PINMAP == OFF
+      PORTD |= B00001111;                                                       //Set digital outputs 4,5,6 and 7 high.
+    #elif PINMAP == ESP32
+      digitalWrite(PIN_ESC_1, LOW);
+      digitalWrite(PIN_ESC_2, LOW);
+      digitalWrite(PIN_ESC_3, LOW);
+      digitalWrite(PIN_ESC_4, LOW);
+    #endif
+
     delayMicroseconds(3000);                                                //Wait 3000us.
   }
 
@@ -153,9 +169,24 @@ void AutoLeveling::calibrateGyroscope(){
     gyroAxisCalibration[2] += gyroAxis[2];                                       //Ad pitch value to gyroPitchCal.
     gyroAxisCalibration[3] += gyroAxis[3];                                       //Ad yaw value to gyroYawCal.
     //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while calibrating the gyro.
-    PORTD |= B11110000;                                                     //Set digital port 4, 5, 6 and 7 high.
+    #if PINMAP == OFF
+      PORTD |= B11110000;                                                       //Set digital outputs 4,5,6 and 7 high.
+    #elif PINMAP == ESP32
+      digitalWrite(PIN_ESC_1, HIGH);
+      digitalWrite(PIN_ESC_2, HIGH);
+      digitalWrite(PIN_ESC_3, HIGH);
+      digitalWrite(PIN_ESC_4, HIGH);
+    #endif
+
     delayMicroseconds(1000);                                                //Wait 1000us.
-    PORTD &= B00001111;                                                     //Set digital port 4, 5, 6 and 7 low.
+    #if PINMAP == OFF
+      PORTD |= B00001111;                                                       //Set digital outputs 4,5,6 and 7 high.
+    #elif PINMAP == ESP32
+      digitalWrite(PIN_ESC_1, LOW);
+      digitalWrite(PIN_ESC_2, LOW);
+      digitalWrite(PIN_ESC_3, LOW);
+      digitalWrite(PIN_ESC_4, LOW);
+    #endif
     delay(3);                                                               //Wait 3 milliseconds before the next loop.
   }
   //Now that we have 2000 measures, we need to devide by 2000 to get the average gyro offset.
@@ -171,9 +202,25 @@ void AutoLeveling::waitController(){
     receiverInputChannel4 = convertReceiverChannel(4);                 //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
     start ++;                                                               //While waiting increment start whith every loop.
     //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while waiting for the receiver inputs.
-    PORTD |= B11110000;                                                     //Set digital port 4, 5, 6 and 7 high.
+    #if PINMAP == OFF
+      PORTD |= B11110000;                                                       //Set digital outputs 4,5,6 and 7 high.
+    #elif PINMAP == ESP32
+      digitalWrite(PIN_ESC_1, HIGH);
+      digitalWrite(PIN_ESC_2, HIGH);
+      digitalWrite(PIN_ESC_3, HIGH);
+      digitalWrite(PIN_ESC_4, HIGH);
+    #endif
+
     delayMicroseconds(1000);                                                //Wait 1000us.
-    PORTD &= B00001111;                                                     //Set digital port 4, 5, 6 and 7 low.
+    #if PINMAP == OFF
+      PORTD |= B00001111;                                                       //Set digital outputs 4,5,6 and 7 high.
+    #elif PINMAP == ESP32
+      digitalWrite(PIN_ESC_1, LOW);
+      digitalWrite(PIN_ESC_2, LOW);
+      digitalWrite(PIN_ESC_3, LOW);
+      digitalWrite(PIN_ESC_4, LOW);
+    #endif
+
     delay(3);                                                               //Wait 3 milliseconds before the next loop.
     if(start == 125){                                                       //Every 125 loops (500ms).
       digitalWrite(PIN_BATTERY_LED, !digitalRead(12));                                   //Change the led status.
@@ -230,7 +277,7 @@ void AutoLeveling::setAutoLevelParameters(){
   }
 }
 
-void AutoLeveling::startAutoLeveling(){
+void AutoLeveling::droneStart(){
   start = 2;
 
   anglePitch = anglePitchAcc;                                          //Set the gyro pitch angle equal to the accelerometer pitch angle when the quadcopter is started.
@@ -368,21 +415,52 @@ void AutoLeveling::setEscPulses(){
   while(micros() - loopTimer < 4000);                                      //We wait until 4000us are passed.
   loopTimer = micros();                                                    //Set the timer for the next loop.
 
-  PORTD |= B11110000;                                                       //Set digital outputs 4,5,6 and 7 high.
-  timerChannel1 = esc1 + loopTimer;                                     //Calculate the time of the faling edge of the esc-1 pulse.
-  timerChannel2 = esc2 + loopTimer;                                     //Calculate the time of the faling edge of the esc-2 pulse.
-  timerChannel3 = esc3 + loopTimer;                                     //Calculate the time of the faling edge of the esc-3 pulse.
-  timerChannel4 = esc4 + loopTimer;                                     //Calculate the time of the faling edge of the esc-4 pulse.
+  #if PINMAP == OFF
+    PORTD |= B11110000;                                                       //Set digital outputs 4,5,6 and 7 high.
+  #elif PINMAP == ESP32
+    digitalWrite(PIN_ESC_1, HIGH);
+    digitalWrite(PIN_ESC_2, HIGH);
+    digitalWrite(PIN_ESC_3, HIGH);
+    digitalWrite(PIN_ESC_4, HIGH);
+  #endif
+  
+  timerChannel1 = esc1 + loopTimer;                                     //Calculate the time of the falling edge of the esc-1 pulse.
+  timerChannel2 = esc2 + loopTimer;                                     //Calculate the time of the falling edge of the esc-2 pulse.
+  timerChannel3 = esc3 + loopTimer;                                     //Calculate the time of the falling edge of the esc-3 pulse.
+  timerChannel4 = esc4 + loopTimer;                                     //Calculate the time of the falling edge of the esc-4 pulse.
   
   //There is always 1000us of spare time. So let's do something usefull that is very time consuming.
   //Get the current gyro and receiver data and scale it to degrees per second for the pid calculations.
   readGyroscopeStatus();
 
-  while(PORTD >= 16){                                                       //Stay in this loop until output 4,5,6 and 7 are low.
-    escLoopTimer = micros();                                              //Read the current time.
-    if(timerChannel1 <= escLoopTimer)PORTD &= B11101111;                //Set digital output 4 to low if the time is expired.
-    if(timerChannel2 <= escLoopTimer)PORTD &= B11011111;                //Set digital output 5 to low if the time is expired.
-    if(timerChannel3 <= escLoopTimer)PORTD &= B10111111;                //Set digital output 6 to low if the time is expired.
-    if(timerChannel4 <= escLoopTimer)PORTD &= B01111111;                //Set digital output 7 to low if the time is expired.
-  }
+  #if PINMAP == OFF
+    while(PORTD >= 16){                                                       //Stay in this loop until output 4,5,6 and 7 are low.
+      escLoopTimer = micros();                                              //Read the current time.
+      if(timerChannel1 <= escLoopTimer)PORTD &= B11101111;                //Set digital output 4 to low if the time is expired.
+      if(timerChannel2 <= escLoopTimer)PORTD &= B11011111;                //Set digital output 5 to low if the time is expired.
+      if(timerChannel3 <= escLoopTimer)PORTD &= B10111111;                //Set digital output 6 to low if the time is expired.
+      if(timerChannel4 <= escLoopTimer)PORTD &= B01111111;                //Set digital output 7 to low if the time is expired.
+    }                                                      
+  #elif PINMAP == ESP32
+    int ii_counter = 4;
+    while(ii_counter != 0){
+      escLoopTimer = micros();                                              //Read the current time.
+      if(timerChannel1 <= escLoopTimer){                                    //Set digital output 4 to low if the time is expired.
+        digitalWrite(PIN_ESC_1, LOW);
+        ii_counter = ii_counter - 1;
+      }                
+      if(timerChannel2 <= escLoopTimer){                                    //Set digital output 4 to low if the time is expired.
+        digitalWrite(PIN_ESC_2, LOW);
+        ii_counter = ii_counter - 1;
+      }     
+      if(timerChannel3 <= escLoopTimer){                                    //Set digital output 4 to low if the time is expired.
+        digitalWrite(PIN_ESC_3, LOW);
+        ii_counter = ii_counter - 1;
+      }      
+      if(timerChannel4 <= escLoopTimer){                                    //Set digital output 4 to low if the time is expired.
+        digitalWrite(PIN_ESC_4, LOW);
+        ii_counter = ii_counter - 1;
+      }         
+    }
+  #endif
 }

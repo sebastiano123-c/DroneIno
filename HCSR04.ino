@@ -1,5 +1,3 @@
-#include "HCSR04.h"
-
 void dangerAlert() {
   // Clears the trigPin condition
   digitalWrite(PIN_PROXIMITY_SENSOR_TRIG, LOW);

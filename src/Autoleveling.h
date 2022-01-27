@@ -4,7 +4,7 @@
   #include <Wire.h>                          //Include the Wire.h library so we can communicate with the gyro.
   #include <EEPROM.h>                        //Include the EEPROM.h library so we can store information onto the EEPROM
   #include "../Config.h"
-  #include "Constants.h"
+  #include "Models.h"
 
   class AutoLeveling {
 
@@ -31,8 +31,8 @@
       long accX, accY, accZ, accTotalVector;
       unsigned long loopTimer;
       unsigned long timerChannel1, timerChannel2, timerChannel3, timerChannel4, escTimer, escLoopTimer;
-      double accAxis[4], gyroAxis[4];   
-      double gyroAxisCalibration[4];   
+      int16_t accAxis[4], gyroAxis[4];   
+      int16_t gyroAxisCalibration[4];   
       double gyroPitch, gyroRoll, gyroYaw;
 
       void begin();          
@@ -44,7 +44,7 @@
       int convertReceiverChannel(byte function);
       void waitController();
       void setAutoLevelParameters();
-      void startAutoLeveling();
+      void droneStart();
       void setPID();
       void calculatePID();
       void batteryVoltageCompensation();

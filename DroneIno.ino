@@ -1,91 +1,110 @@
-// DroneIno
+// DroneIno32
 // @author: Sebastiano Cocchi
-#include "Config.h"
-// #include "src/Models.h"
 
+#include "Config.h"
+#include "src/Models.h"
 #include <Arduino.h>
 #include <Wire.h>                          //Include the Wire.h library so we can communicate with the gyro.
 #include <EEPROM.h>                        //Include the EEPROM.h library so we can store information onto the EEPROM
-#include "SPI.h" //Why? Because library supports SPI and I2C connection
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BMP280.h>
+#include <SPI.h>                           
+// #include <Adafruit_Sensor.h>
+// #include <Adafruit_BMP280.h>
+// #include <HCSR04.h>
 
-#include "src/Autoleveling.h"
+byte lastChannel1, lastChannel2, lastChannel3, lastChannel4;
+byte eepromData[36];
+byte highByte, lowByte;
+boolean gyroAnglesSet;
+volatile int receiverInputChannel1, receiverInputChannel2, receiverInputChannel3, receiverInputChannel4;
+int16_t counterChannel1, counterChannel2, counterChannel3, counterChannel4, loopCounter;
+int16_t esc1, esc2, esc3, esc4;
+int16_t throttle;
+int16_t calInt, start, gyroAddress;
+int16_t receiverInput[5];
+int16_t temperature;
+int16_t vibrationCounter;
+int16_t accAxis[4], gyroAxis[4];   
+float angleRollAcc, anglePitchAcc, anglePitch, angleRoll;
+float rollLevelAdjust, pitchLevelAdjust;
+float batteryVoltage;
 
-// sensors functions
-#include "Initialize.h"
-#include "HCSR04.h"
-#include "BMP280.h"
-#include "AutoLevel.h"
-// #include "ISR.h"
+long accX, accY, accZ, accTotalVector;
+unsigned long timerChannel1, timerChannel2, timerChannel3, timerChannel4, escTimer, escLoopTimer;
+unsigned long timer1, timer2, timer3, timer4, currentTime, loopTimer;
+double gyroAxisCalibration[4];   
 
-#include "Globals.h"
+// Battery voltage constants:
+// 65 is the voltage compensation for the diode.
+// The voltage measured is assigned to a value between 0 and 4095, 
+// in which 0 V corresponds to 0, and 3.3 V corresponds to 4095.
+// Any voltage between 0 V and 3.3 V will be given the corresponding value in between.
+float maximumBatteryVoltage = 11.1; // (V)
+float fromVoltToTick = 3.3/4096;
 
-// start the autoleveling
-AutoLeveling myAutoLev(autoLeveling);                                       //Start the gyro
+//pid
+float pidIMemRoll, pidRollSetpoint, gyroRollInput, pidOutputRoll, pidLastRollDError;
+float pidIMemPitch, pidPitchSetpoint, gyroPitchInput, pidOutputPitch, pidLastPitchDError;
+float pidIMemYaw, pidYawSetpoint, gyroYawInput, pidOutputYaw, pidLastYawDError;
+float pidErrorTemp;
 
-#if ALTITUDE_SENSOR == BMP280
-    //Setup connection of the sensor
-    Adafruit_BMP280 bmp; // I2C
-#endif
+//gyro contant for communication
+const int gyroFrequency = 250; // (Hz)
+const float gyroSensibility = 65.5; //
+float travelCoeff = 1/((float)gyroFrequency * gyroSensibility);
+float convDegToRad = 180.0 / PI;
+float travelCoeffToRad = travelCoeff / convDegToRad;
+
+byte rawAX[2], rawAY[2], rawAZ[2];
+byte rawGX[2], rawGY[2], rawGZ[2];
+
+//PWM constants
+const int freq = 500;               //30000;
+const int pwmChannel1 = 1;
+const int pwmChannel2 = 2;
+const int pwmChannel3 = 3;
+const int pwmChannel4 = 4;
+const int resolution = 11;          //8;
+const int MAX_DUTY_CYCLE = (int)(pow(2, resolution) - 1);
+
+// #if ALTITUDE_SENSOR == BMP280
+//     Adafruit_BMP280 bmp; // I2C 
+// #endif
 
 void setup(){
-  initialize(myAutoLev, bmp);
+  initialize();                                                                //function at initialize.ino
 }
 
 // Loop
 void loop(){
-  readPresTempAlt(bmp);
-  dangerAlert();
-  autoLevelLoop(myAutoLev);
-}
 
-//This routine is called every time input 8, 9, 10 or 11 changed state. This is used to read the receiver signals. 
-ISR(PCINT0_vect){
-  currentTime = micros();
-  //Channel 1=========================================
-  if(PINB & B00000001){                                                     //Is input 8 high?
-    if(lastChannel1 == 0){                                                //Input 8 changed from 0 to 1.
-      lastChannel1 = 1;                                                   //Remember current input state.
-      timer1 = currentTime;                                               //Set timer1 to currentTime.
-    }
-  }
-  else if(lastChannel1 == 1){                                             //Input 8 is not high and changed from 1 to 0.
-    lastChannel1 = 0;                                                     //Remember current input state.
-    myAutoLev.receiverInput[1] = currentTime - timer1;                             //Channel 1 is currentTime - timer1.
-  }
-  //Channel 2=========================================
-  if(PINB & B00000010 ){                                                    //Is input 9 high?
-    if(lastChannel2 == 0){                                                //Input 9 changed from 0 to 1.
-      lastChannel2 = 1;                                                   //Remember current input state.
-      timer2 = currentTime;                                               //Set timer2 to currentTime.
-    }
-  }
-  else if(lastChannel2 == 1){                                             //Input 9 is not high and changed from 1 to 0.
-    lastChannel2 = 0;                                                     //Remember current input state.
-    myAutoLev.receiverInput[2] = currentTime - timer2;                             //Channel 2 is currentTime - timer2.
-  }
-  //Channel 3=========================================
-  if(PINB & B00000100 ){                                                    //Is input 10 high?
-    if(lastChannel3 == 0){                                                //Input 10 changed from 0 to 1.
-      lastChannel3 = 1;                                                   //Remember current input state.
-      timer3 = currentTime;                                               //Set timer3 to currentTime.
-    }
-  }
-  else if(lastChannel3 == 1){                                             //Input 10 is not high and changed from 1 to 0.
-    lastChannel3 = 0;                                                     //Remember current input state.
-    myAutoLev.receiverInput[3] = currentTime - timer3;                             //Channel 3 is currentTime - timer3.
+  // #if ALTITUDE_SENSOR == BMP290
+  //   readPresTempAlt();
+  // #endif
 
-  }
-  //Channel 4=========================================
-  if(PINB & B00001000 ){                                                    //Is input 11 high?
-    if(lastChannel4 == 0){                                                //Input 11 changed from 0 to 1.
-      lastChannel4 = 1;                                                   //Remember current input state.
-      timer4 = currentTime;                                               //Set timer4 to currentTime.
-    }
-  }
-  else if(lastChannel4 == 1){                                             //Input 11 is not high and changed from 1 to 0.
-    lastChannel4 = 0;                                                     //Remember current input state.
-    myAutoLev.receiverInput[4] = currentTime - timer4;                             //Channel 4 is currentTime - timer4.
-  }
+  // #if PROXIMITY_SENSOR == HCSR04
+  //   dangerAlert();
+  // #endif
+
+  //read gyro
+  readGyroscopeStatus();
+
+  //calculate the gyro values
+  calculateAnglePRY();
+
+  //print gyro status
+  //printGyroscopeStatus();
+
+  //For starting the motors: throttle low and yaw left (step 1).
+  if(receiverInputChannel3 < 1050 && receiverInputChannel4 < 1050) start = 1;//When yaw stick is back in the center position start the motors (step 2).
+  if(start == 1 && receiverInputChannel3 < 1050 && receiverInputChannel4 > 1450)   droneStart();
+  if(start == 2 &&  receiverInputChannel3 < 1050 &&  receiverInputChannel4 > 1950) start = 0; //Stopping the motors: throttle low and yaw right.
+
+  // calculate PID
+  calculatePID();
+
+  // the battery voltage can affect the efficiency 
+  //batteryVoltageCompensation();
+
+  // create ESC pulses
+  setEscPulses();
 }
