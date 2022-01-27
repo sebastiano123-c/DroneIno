@@ -1,3 +1,4 @@
+<!-- image -->
 <pre align=center>
     |                      |   
     |                      |   
@@ -15,11 +16,17 @@
     |                      |   
     |                      |   
 </pre>
-<h1 align="center"> 
-DroneIno
+
+<!-- title -->
+<h1 align="center">
+  <b> 
+    DroneIno
+  </b>
 </h1>
 <h3 align="center"> 
-Arduino code for DIY quadcopter drones using ESP32 board.
+  <i>
+    Arduino code for DIY quadcopter drones using ESP32 board.
+  </i>
 </h3>
 <br>
 
@@ -44,20 +51,22 @@ CIRCUITAL SCHEMATIC HERE
 - ESP32 D1 R32 -->
 
 # Features
-- Autoleveling
+- Autoleveling: the drone corrects spurious drifts using the gyroscope signals.
 
 # Documentation
 ## Pinmap
-Pinmap is declaired [here](https://github.com/sebastiano123-c/DroneIno/tree/main/src).
-Write your Config.h file.
+Check that your pinmap correspond to the predefined [pinmap.ESP32.h](https://github.com/sebastiano123-c/DroneIno/tree/main/src/pinmaps/pinmap.ESP32.h), otherwise change it.
+
+## Configuration
+Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/Config.h) file where you can adjust the PID parameters and others constants.
 
 ## Setup
 Upload the [setup](https://github.com/sebastiano123-c/DroneIno/tree/main/Setup) sketch to your board and run it.
 
 ## Calibration
-If it succeeds, upload the [calibration](https://github.com/sebastiano123-c/DroneIno/tree/main/Calibration) sketch. Sending the following characters to the serial monitor allows you to
+If the setup sketch exits with succeed, upload the [calibration](https://github.com/sebastiano123-c/DroneIno/tree/main/Calibration) sketch. Send the following characters to the serial monitor:
 * **r** to check if the transmitter signal is decoded correctly; move the trim and check that:
-  * throttle: dowm 1000us| up    2000us;
+  * throttle: down 1000us| up    2000us;
   * roll:     left 1000us| right 2000us;
   * pitch:    left 1000us| right 2000us;
   * yaw:      left 1000us| right 2000us;
@@ -68,25 +77,32 @@ If it succeeds, upload the [calibration](https://github.com/sebastiano123-c/Dron
   * nose up: positive angle;
   * left up: positive angle;
   * yaw right: positive angle;
-* **1**, **2**, **3** or **4** to check the rotation direction (see figure below):
+* **1**, **2**, **3** or **4** to check the rotation direction (see figure at the top):
   * 1: CCW;
   * 2: CW;
   * 3: CCW;
   * 4: CW;  
 * **5** to use all the motors.
- 
+
+If the motors rotate in the opposite direction, just exchange one of the three cables between the ESC and the motor.
+
 ### ESCs calibration
 Calibrate the ESCs without propellers.
 You'd be better to find out how to calibrate your ESCs.
-Usually it is done like [this](https://www.youtube.com/watch?v=l8rjjvAZvHM).
+Usually this is done as in [this](https://www.youtube.com/watch?v=l8rjjvAZvHM) video.
 
 ### Propellers calibration
 With calibration sketch calibrate the propellers.
 Send the number of the motor to the serial and read the accelerometer measurements which are printed on the serial.
 Try to lower these numbers by adding some scotch.
 
+### Flight controller
+Finally, upload the [DroneIno](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno.ino) flight-controller.
+
 # Roadmap
-Future improvements which are not yet implemented:
+As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.
+
+Future improvements:
 - use other boards
 - altitude hold
 - GPS
