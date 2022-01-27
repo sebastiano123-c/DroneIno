@@ -24,7 +24,8 @@ Arduino code for DIY quadcopter drones using ESP32 board.
 <br>
 
 # Disclaimer
-The code is not well tested yet, use it only if you are an expert.
+The code is not well tested yet, use it if you are an expert at your own risk.
+Test it first without propellers.
 
 # Description
 Based on the [YMFC-AL](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
