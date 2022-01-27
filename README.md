@@ -34,6 +34,21 @@
 The code is not well tested yet, use it if you are an expert at your own risk.
 Test it first without propellers.
 
+# Table of contents
+- [Disclaimer](#disclaimer)
+- [Table of contents](#table-of-contents)
+- [Description](#description)
+- [Features](#features)
+- [Documentation](#documentation)
+  - [Pinmap](#pinmap)
+  - [Configuration](#configuration)
+  - [Setup](#setup)
+  - [Calibration](#calibration)
+    - [ESCs calibration](#escs-calibration)
+    - [Propellers calibration](#propellers-calibration)
+  - [Flight controller](#flight-controller)
+- [Roadmap](#roadmap)
+
 # Description
 Based on the [YMFC-AL](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
 * ESP32 D1 R32;
@@ -96,7 +111,7 @@ With calibration sketch calibrate the propellers.
 Send the number of the motor to the serial and read the accelerometer measurements which are printed on the serial.
 Try to lower these numbers by adding some scotch.
 
-### Flight controller
+## Flight controller
 Finally, upload the [DroneIno](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno.ino) flight-controller.
 
 # Roadmap
