@@ -693,7 +693,7 @@ void wait_sticks_zero(){
   }
 }
 
-//Checck if the receiver values are valid within 10 seconds
+//Check if the receiver values are valid within 10 seconds
 void wait_for_receiver(){
   byte zero = 0;
   timer = millis() + 10000;
