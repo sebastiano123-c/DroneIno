@@ -1,25 +1,12 @@
-#define GYRO_CONFIG             0x1B
-#define ACCEL_CONFIG            0x1C
-
-#define ACCEL_XOUT_H            0x3B
-#define ACCEL_YOUT_H            0x3D
-#define ACCEL_ZOUT_H            0x3F
-#define GYRO_XOUT_H             0x43
-#define GYRO_YOUT_H             0x45
-#define GYRO_ZOUT_H             0x47
-
-#define PWR_MGMT_1              0x6B
-#define PWR_MGMT_2              0x6C
-
 void setupMPU(){
   Wire.setClock(WIRE_CLOCK);
   Wire.begin();
-  Wire.beginTransmission(gyroAddress);                        //Start communication with the MPU-6050.
+  Wire.beginTransmission(gyroAddress);                             //Start communication with the MPU-6050.
   int error = Wire.endTransmission();                              //End the transmission and register the exit status.
-  while (error != 0) {                                          //Stay in this loop because the MPU-6050 did not respond.
-    error = 1;                                                  //Set the error status to 1.
+  while (error != 0) {                                             //Stay in this loop because the MPU-6050 did not respond.
+    error = 1;                                                     //Set the error status to 1.
     digitalWrite(PIN_BATTERY_LED, !digitalRead(PIN_BATTERY_LED));
-    delay(40);                                                   //Simulate a 250Hz refresc rate as like the main loop.
+    vTaskDelay(40/portTICK_PERIOD_MS);                             //Simulate a 250Hz refresc rate as like the main loop.
     Serial.print("MPU6050 ERROR at address: ");
     Serial.println(gyroAddress);
   }
@@ -27,40 +14,39 @@ void setupMPU(){
 }
 
 void setGyroscopeRegisters(){
-    //Setup the MPU-6050
+  //Setup the MPU-6050
   if(eepromData[31] == 1){
     Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search.
-    Wire.write(0x6B);                                            //We want to write to the PWR_MGMT_1 register (6B hex)
-    Wire.write(0x00);                                            //Set the register bits as 00000000 to activate the gyro
-    Wire.endTransmission();                                      //End the transmission with the gyro.
+    Wire.write(PWR_MGMT_1);                                     //We want to write to the PWR_MGMT_1 register (6B hex)
+    Wire.write(0x00);                                           //Set the register bits as 00000000 to activate the gyro
+    Wire.endTransmission();                                     //End the transmission with the gyro.
 
     Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search.
-    Wire.write(0x1B);                                            //We want to write to the GYRO_CONFIG register (1B hex)
-    Wire.write(0x08);                                            //Set the register bits as 00001000 (500dps full scale)
-    Wire.endTransmission();                                      //End the transmission with the gyro
+    Wire.write(GYRO_CONFIG);                                    //We want to write to the GYRO_CONFIG register (1B hex)
+    Wire.write(GYRO_REGISTERS_BITS);                            //Set the register bits as 00001000 (500dps full scale)
+    Wire.endTransmission();                                     //End the transmission with the gyro
 
     Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search.
-    Wire.write(0x1C);                                            //We want to write to the ACCEL_CONFIG register (1A hex)
-    Wire.write(0x10);                                            //Set the register bits as 00010000 (+/- 8g full scale range)
-    Wire.endTransmission();                                      //End the transmission with the gyro
+    Wire.write(ACCEL_CONFIG);                                   //We want to write to the ACCEL_CONFIG register (1A hex)
+    Wire.write(ACC_REGISTERS_BITS);                             //Set the register bits as 00010000 (+/- 8g full scale range)
+    Wire.endTransmission();                                     //End the transmission with the gyro
 
     //Let's perform a random register check to see if the values are written correct
     Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search
-    Wire.write(0x1B);                                            //Start reading @ register 0x1B
-    Wire.endTransmission();                                      //End the transmission
+    Wire.write(GYRO_CONFIG);                                    //Start reading @ register GYRO_CONFIG
+    Wire.endTransmission();                                     //End the transmission
     Wire.requestFrom(gyroAddress, 1);                           //Request 1 bytes from the gyro
-    while(Wire.available() < 1);                                 //Wait until the 6 bytes are received
-    if(Wire.read() != 0x08){                                     //Check if the value is 0x08
-      digitalWrite(PIN_BATTERY_LED, HIGH);                                     //Turn on the warning led
-      while(1)vTaskDelay(10/portTICK_PERIOD_MS);                                         //Stay in this loop for ever
+    while(Wire.available() < 1);                                //Wait until the 6 bytes are received
+    if(Wire.read() != GYRO_REGISTERS_BITS){                     //Check if the value is 0x08
+      digitalWrite(PIN_BATTERY_LED, HIGH);                      //Turn on the warning led
+      while(1)vTaskDelay(10/portTICK_PERIOD_MS);                //Stay in this loop for ever
     }
 
     Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search
-    Wire.write(0x1A);                                            //We want to write to the CONFIG register (1A hex)
-    Wire.write(0x03);                                            //Set the register bits as 00000011 (Set Digital Low Pass Filter to ~43Hz)
-    Wire.endTransmission();                                      //End the transmission with the gyro    
-
-  }  
+    Wire.write(0x1A);                                           //We want to write to the CONFIG register (1A hex)
+    Wire.write(DIGITAL_LOW_PASS_FILTER);                        //Set the register bits as 00000011 (Set Digital Low Pass Filter to ~43Hz)
+    Wire.endTransmission();                                     //End the transmission with the gyro    
+  } 
 }
 
 void calibrateGyroscope(){

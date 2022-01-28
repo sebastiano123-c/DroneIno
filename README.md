@@ -37,6 +37,7 @@ Test it first without propellers.
 # Table of contents
 - [Disclaimer](#disclaimer)
 - [Table of contents](#table-of-contents)
+- [Usage](#usage)
 - [Description](#description)
 - [Features](#features)
 - [Documentation](#documentation)
@@ -48,6 +49,12 @@ Test it first without propellers.
     - [Propellers calibration](#propellers-calibration)
   - [Flight controller](#flight-controller)
 - [Roadmap](#roadmap)
+
+# Usage
+Clone this repo
+<pre><code>git clone git@github.com:sebastiano123-c/DroneIno.git
+</code></pre>
+or download the .zip file.
 
 # Description
 Based on the [YMFC-AL](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
@@ -66,14 +73,15 @@ CIRCUITAL SCHEMATIC HERE
 - ESP32 D1 R32 -->
 
 # Features
-- Autoleveling: the drone corrects spurious drifts using the gyroscope signals.
+- Autoleveling
+<!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 # Documentation
 ## Pinmap
-Check that your pinmap correspond to the predefined [pinmap.ESP32.h](https://github.com/sebastiano123-c/DroneIno/tree/main/src/pinmaps/pinmap.ESP32.h), otherwise change it.
+Check that your pinmap correspond to the predefined [pinmap.ESP32.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/pinmaps/pinmap.ESP32.h), otherwise change it.
 
 ## Configuration
-Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/Config.h) file where you can adjust the PID parameters and others constants.
+Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/Config.h) file where you can adjust the PID parameters and others constants.
 
 ## Setup
 Upload the [setup](https://github.com/sebastiano123-c/DroneIno/tree/main/Setup) sketch to your board and run it.
@@ -112,7 +120,7 @@ Send the number of the motor to the serial and read the accelerometer measuremen
 Try to lower these numbers by adding some scotch.
 
 ## Flight controller
-Finally, upload the [DroneIno](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno.ino) flight-controller.
+Finally, upload the [DroneIno](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno) flight-controller.
 
 # Roadmap
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.

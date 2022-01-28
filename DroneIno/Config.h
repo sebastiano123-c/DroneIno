@@ -13,6 +13,9 @@
 // AUTOLEVELING
 #define AUTO_LEVELING               true                    // true, false
 
+// GYROSCOPE
+#define GYROSCOPE                   MPU6050                 // unique for now
+
 // ALTITUDE SENSOR
 #define ALTITUDE_SENSOR             OFF                     // OFF, BMP280, BME280
 

@@ -7,13 +7,9 @@
 #include <Wire.h>                          //Include the Wire.h library so we can communicate with the gyro.
 #include <EEPROM.h>                        //Include the EEPROM.h library so we can store information onto the EEPROM
 #include <SPI.h>                           
-// #include <Adafruit_Sensor.h>
-// #include <Adafruit_BMP280.h>
-// #include <HCSR04.h>
 
 byte lastChannel1, lastChannel2, lastChannel3, lastChannel4;
 byte eepromData[36];
-byte highByte, lowByte;
 boolean gyroAnglesSet;
 volatile int receiverInputChannel1, receiverInputChannel2, receiverInputChannel3, receiverInputChannel4;
 int16_t counterChannel1, counterChannel2, counterChannel3, counterChannel4, loopCounter;
@@ -22,7 +18,6 @@ int16_t throttle;
 int16_t calInt, start, gyroAddress;
 int16_t receiverInput[5];
 int16_t temperature;
-int16_t vibrationCounter;
 int16_t accAxis[4], gyroAxis[4];   
 float angleRollAcc, anglePitchAcc, anglePitch, angleRoll;
 float rollLevelAdjust, pitchLevelAdjust;
