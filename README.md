@@ -30,33 +30,42 @@
 </h3>
 <br>
 
-# Disclaimer
+<h2>
+<b><ins><i>Disclaimer</i></ins></b>
+</h2>
 The code is not well tested yet, use it if you are an expert at your own risk.
+
 Test it first without propellers.
 
-# Table of contents
-- [Disclaimer](#disclaimer)
-- [Table of contents](#table-of-contents)
-- [Usage](#usage)
-- [Description](#description)
-- [Features](#features)
-- [Documentation](#documentation)
-  - [Pinmap](#pinmap)
-  - [Configuration](#configuration)
-  - [Setup](#setup)
-  - [Calibration](#calibration)
-    - [ESCs calibration](#escs-calibration)
-    - [Propellers calibration](#propellers-calibration)
-  - [Flight controller](#flight-controller)
-- [Roadmap](#roadmap)
+Read carefully this brief documentation before starting to fly.
+Make sure to do all the passages described here below.
 
-# Usage
+# **Table of contents**
+- [**Table of contents**](#table-of-contents)
+- [**Usage**](#usage)
+- [**Description**](#description)
+- [**Features**](#features)
+- [**Documentation**](#documentation)
+  - [**Pinmap**](#pinmap)
+  - [**Configuration**](#configuration)
+  - [**Setup**](#setup)
+  - [**Calibration**](#calibration)
+    - [**ESCs calibration**](#escs-calibration)
+    - [**Propellers calibration**](#propellers-calibration)
+  - [**Flight controller**](#flight-controller)
+  - [**PID tuning**](#pid-tuning)
+    - [**Step 1: reset variables**](#step-1-reset-variables)
+    - [**Step 2: yaw tuning**](#step-2-yaw-tuning)
+    - [**Step 3: roll/pitch tuning**](#step-3-rollpitch-tuning)
+- [**Roadmap**](#roadmap)
+
+# **Usage**
 Clone this repo
 <pre><code>git clone git@github.com:sebastiano123-c/DroneIno.git
 </code></pre>
 or download the .zip file.
 
-# Description
+# **Description**
 Based on the [YMFC-AL](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
 * ESP32 D1 R32;
 * a gyroscope MPU6050;
@@ -72,21 +81,21 @@ CIRCUITAL SCHEMATIC HERE
 # Boards
 - ESP32 D1 R32 -->
 
-# Features
+# **Features**
 - Autoleveling
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
-# Documentation
-## Pinmap
+# **Documentation**
+## **Pinmap**
 Check that your pinmap correspond to the predefined [pinmap.ESP32.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/pinmaps/pinmap.ESP32.h), otherwise change it.
 
-## Configuration
+## **Configuration**
 Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/Config.h) file where you can adjust the PID parameters and others constants.
 
-## Setup
+## **Setup**
 Upload the [setup](https://github.com/sebastiano123-c/DroneIno/tree/main/Setup) sketch to your board and run it.
 
-## Calibration
+## **Calibration**
 If the setup sketch exits with succeed, upload the [calibration](https://github.com/sebastiano123-c/DroneIno/tree/main/Calibration) sketch. Send the following characters to the serial monitor:
 * **r** to check if the transmitter signal is decoded correctly; move the trim and check that:
   * throttle: down 1000us| up    2000us;
@@ -109,20 +118,67 @@ If the setup sketch exits with succeed, upload the [calibration](https://github.
 
 If the motors rotate in the opposite direction, just exchange one of the three cables between the ESC and the motor.
 
-### ESCs calibration
+### **ESCs calibration**
 Calibrate the ESCs without propellers.
 You'd be better to find out how to calibrate your ESCs.
 Usually this is done as in [this](https://www.youtube.com/watch?v=l8rjjvAZvHM) video.
 
-### Propellers calibration
+### **Propellers calibration**
 With calibration sketch calibrate the propellers.
 Send the number of the motor to the serial and read the accelerometer measurements which are printed on the serial.
 Try to lower these numbers by adding some scotch.
 
-## Flight controller
+## **Flight controller**
 Finally, upload the [DroneIno](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno) flight-controller.
 
-# Roadmap
+<ins>_Try first without the propellers!_</ins>
+
+## **PID tuning**
+PID may be different from case to case and plays a very important role in the flight stability.
+PID controls:
+- roll movement ;
+- pitch movement;
+- yaw movement.
+
+<ins>_In the next steps hold the quadcopter with your hand._</ins>
+  
+### **Step 1: reset variables**
+Go in the Config.h file and set
+<pre>
+PID_P_GAIN_ROLL             0.0                     
+PID_I_GAIN_ROLL             0.0                    
+PID_D_GAIN_ROLL             0.0           
+PID_MAX_ROLL                400
+
+PID_P_GAIN_YAW              0.0                     
+PID_I_GAIN_YAW              0.0                    
+PID_D_GAIN_YAW              0.0        
+PID_MAX_YAW                 400  
+</pre>
+
+### **Step 2: yaw tuning**
+Increment the yaw **D** parameter in steps of 2.0, upload the sketch and start the drone. Hold _**firmly**_ in your hand the copter, possibly stay on a soft surface, like a carpet.
+Move the throttle until it seems to take fly and test its movements while the drone is still in safe in your hand.
+Increment the **D** until the drone scrambles. Reduce the **D** at the value it acts quietly.
+
+Do the same with the **P**, incrementing in steps of 0.5.
+
+### **Step 3: roll/pitch tuning**
+This part must be done in an open space, like your garden.
+You can try to fly your drone and look at its behavior.
+
+<ins>_Stay low, the throttle can act violently at this point_</ins>
+
+Increment the roll **D** parameter in steps of 2.0, upload the sketch and start the drone. 
+
+You may observe that the copter acts unpredictably.
+Increment the value until this behavior reduces.
+
+Do the same with the **P**, incrementing in steps of 0.2.
+
+After a while you may observe that the behaviour depends widely on the PID parameters, and you may find your own way to set properly these parameters.
+
+# **Roadmap**
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.
 
 Future improvements:
