@@ -46,6 +46,9 @@ Make sure to do all the passages described here below.
 - [**Description**](#description)
 - [**Features**](#features)
 - [**Documentation**](#documentation)
+  - [**Circuit scheme**](#circuit-scheme)
+    - [**Power supply**](#power-supply)
+    - [**Pin connection**](#pin-connection)
   - [**Pinmap**](#pinmap)
   - [**Configuration**](#configuration)
   - [**Setup**](#setup)
@@ -86,6 +89,50 @@ CIRCUITAL SCHEMATIC HERE
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 # **Documentation**
+## **Circuit scheme**
+### **Power supply**
+Using the resistances (Ohms) R1 = 330, R2 = 1K and R3 = 1.5K and the diode D1 (1N4001 or similar) build the following power supply.
+<pre>
+                                 /--R3-------------|-------->GPIO-02 ESP32
+                                 |                 |
+________________________         |                 R1    
+|11.1V, 2200mAh,   VCC+|<----D1--|--->Vin ESP32    |
+|3C, LiPo BATTERY  GND-|<--------------------------|-------->GND ESP32
+::::::::BATTERY:::::::::
+</pre>
+
+### **Pin connection**
+The pin connection goes as follows.
+<pre>
+      -----------------------------------------      LEGEND:
+      | ------------------------------------- |      X = disconnected  
+      | | --------------------------------- | |      <--> = connected 
+      | | | ----------------------------- | | |      +VIN & -GND connect w/ESP32
+      | | | |   _____________________   | | | |      === = 3-5A cables           
+      | | | |   |*IO03         IO39*|   | | | |   _________                 
+      | | | |   |*IO01         IO38*|   | | | |-->|*INPUT |======/     \ 
+      | | | |   |*IO26         IO34*|   | | |   X |+VIN   |======| M1  |            
+      | | | |   |*IO25         IO04*|   | | |     |-GND   |======\ CCW /             
+      | | | --->|*IO17         IO02*|   | | |     ::ESC1:::                       
+      | | ----->|*IO16              |   | | |     _________           
+      | ------->|*IO27          VIN+|   | | |---->|*INPUT |======/     \            
+      --------->|*IO14          GND-|   | |     X |+VIN   |======| M2  |            
+_______         |               GND-|   | |       |-GND   |======\ CW  /           
+| CH1*|<------->|*IO12           5V*|   | |       ::ESC2:::            
+| CH2*|<------->|*IO13          3V3*|   | |       _________            
+| CH3*|<------->|*IO05          RST*|   | |------>|*INPUT |======/     \            
+| CH4*|<------->|*IO23           5V*|   |       X |+VIN   |======| M3  |          
+| VIN+|   LED<->|*IO19           OD*|   |         |-GND   |======\ CCW /          
+| GND-|   (R1)  |*IO18              |   |         ::ESC3:::              
+receiver        |-GND   (not in     |   |         _________      
+_______         |*RST     scale)    |   |-------->|*INPUT |======/     \
+| SDA*|<------->|*SDA               |           X |+VIN   |======| M4  |
+| SCL*|<------->|*SCL               |             |-GND   |======\ CW  /
+| VCC+|         :::::ESP32 D1 R32::::             ::ESC4:::
+| GND-|
+MPU6050
+</pre>
+
 ## **Pinmap**
 Check that your pinmap correspond to the predefined [pinmap.ESP32.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/pinmaps/pinmap.ESP32.h), otherwise change it.
 
