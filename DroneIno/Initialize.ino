@@ -2,7 +2,7 @@
 // @author: Sebastiano Cocchi
 
 void initialize(){
-  Serial.begin(BAUD_RATE);
+  // Serial.begin(BAUD_RATE);
   EEPROM.begin(EEPROM_SIZE);
   vTaskDelay(50/portTICK_PERIOD_MS);
 
@@ -17,17 +17,16 @@ void initialize(){
   //Start the I2C as master.
   setupMPU();                                                         
     
-  // LED pinmode
-  pinMode(PIN_BATTERY_LED, OUTPUT);
-  pinMode(PIN_DIGITAL_13, OUTPUT);
+  // LED 
+  ledcSetup(pwmLedChannel, freq, resolution);
+  ledcAttachPin(PIN_BATTERY_LED, pwmLedChannel);
 
-  // ESCs pinmode
-  pinMode(PIN_ESC_1, OUTPUT);
-  pinMode(PIN_ESC_2, OUTPUT);
-  pinMode(PIN_ESC_3, OUTPUT);
-  pinMode(PIN_ESC_4, OUTPUT);
-  
-  //     ledc PWM setups
+  //FLY LED
+  ledcSetup(pwmLedFlyChannel, freq, resolution);
+  ledcAttachPin(PIN_DIGITAL_13, pwmLedFlyChannel);//pwmLedFlyChannel
+
+  // ESCs pinmode  
+  //     ledc ESC PWM setups
   ledcSetup(pwmChannel1, freq, resolution);
   ledcSetup(pwmChannel2, freq, resolution);
   ledcSetup(pwmChannel3, freq, resolution);
@@ -52,7 +51,8 @@ void initialize(){
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_4), myISR, CHANGE);
 
   //Use the led on the Arduino for startup indication.
-  digitalWrite(PIN_BATTERY_LED, HIGH);                                                    //Turn on the warning led.
+  ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                                                    //Turn on the warning led.
+  ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE); 
 
   //Check the EEPROM signature to make sure that the setup program is executed.
   while(eepromData[33] != 'J' || eepromData[34] != 'M' || eepromData[35] != 'B') vTaskDelay(10/portTICK_PERIOD_MS);
@@ -63,40 +63,42 @@ void initialize(){
 
   setGyroscopeRegisters();                                                     //Set the specific gyro registers.
 
+  ledcWrite(pwmLedFlyChannel, 0); 
   for (calInt = 0; calInt < 1250 ; calInt ++){                           //Wait 5 seconds before continuing.
-    ledcWrite(PIN_ESC_1, 1000);
-    ledcWrite(PIN_ESC_2, 1000);
-    ledcWrite(PIN_ESC_3, 1000);
-    ledcWrite(PIN_ESC_4, 1000);
+    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
     
     vTaskDelay(1/portTICK_PERIOD_MS);                                                //Wait 1000us.
-    ledcWrite(PIN_ESC_1, 0);
-    ledcWrite(PIN_ESC_2, 0);
-    ledcWrite(PIN_ESC_3, 0);
-    ledcWrite(PIN_ESC_4, 0);                                                     //Set digital port 4, 5, 6 and 7 low.
+    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                                     //Set digital port 4, 5, 6 and 7 low.
     vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
   }
 
   //Let's take multiple gyro data samples so we can determine the average gyro offset (calibration).
   for (calInt = 0; calInt < 2000 ; calInt ++){                           //Take 2000 readings for calibration.
-    if(calInt % 15 == 0) digitalWrite(PIN_BATTERY_LED, !digitalRead(PIN_BATTERY_LED));                //Change the led status to indicate calibration.
+    if(calInt % 15 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //Change the led status to indicate calibration.
+    else ledcWrite(pwmLedChannel, 0);
     readGyroscopeStatus();                                                        //Read the gyro output.
     gyroAxisCalibration[1] += gyroAxis[1];                                       //Ad roll value to gyro_roll_cal.
     gyroAxisCalibration[2] += gyroAxis[2];                                       //Ad pitch value to gyro_pitch_cal.
     gyroAxisCalibration[3] += gyroAxis[3];                                       //Ad yaw value to gyro_yaw_cal.
 
     //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while calibrating the gyro.
-    ledcWrite(PIN_ESC_1, 1000);
-    ledcWrite(PIN_ESC_2, 1000);
-    ledcWrite(PIN_ESC_3, 1000);
-    ledcWrite(PIN_ESC_4, 1000);
+    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
     
     vTaskDelay(1/portTICK_PERIOD_MS);                                                //Wait 1000us.
     
-    ledcWrite(PIN_ESC_1, 0);
-    ledcWrite(PIN_ESC_2, 0);
-    ledcWrite(PIN_ESC_3, 0);
-    ledcWrite(PIN_ESC_4, 0);                                                     //Set digital port 4, 5, 6 and 7 low.
+    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                         //Set digital port 4, 5, 6 and 7 low.
     vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
   }
   //Now that we have 2000 measures, we need to devide by 2000 to get the average gyro offset.
@@ -110,33 +112,34 @@ void initialize(){
     receiverInputChannel4 = convertReceiverChannel(4);                 //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
     start ++;                                                               //While waiting increment start whith every loop.
     //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while waiting for the receiver inputs.
-    ledcWrite(PIN_ESC_1, 1000);
-    ledcWrite(PIN_ESC_2, 1000);
-    ledcWrite(PIN_ESC_3, 1000);
-    ledcWrite(PIN_ESC_4, 1000);
+    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
     
     vTaskDelay(1/portTICK_PERIOD_MS);                                                //Wait 1000us.
-    ledcWrite(PIN_ESC_1, 0);
-    ledcWrite(PIN_ESC_2, 0);
-    ledcWrite(PIN_ESC_3, 0);
-    ledcWrite(PIN_ESC_4, 0);                                                     //Set digital port 4, 5, 6 and 7 low.
+    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                                     //Set digital port 4, 5, 6 and 7 low.
     vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
 
     if(start == 125){                                                       //Every 125 loops (500ms).
-      digitalWrite(PIN_BATTERY_LED, !digitalRead(PIN_BATTERY_LED));                                   //Change the led status.
+      if(calInt % 15 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //Change the led status to indicate calibration.
+      else ledcWrite(pwmLedChannel, 0);
       start = 0;                                                            //Start again at 0.
     }
   }
   start = 0;                                                                //Set start back to 0.
 
   //Load the battery voltage to the battery_voltage variable.
-  getBatteryVoltage();
+  initBattery();
 
   //Set the timer for the next loop.
   loopTimer = micros();                                            
 
   //When everything is done, turn off the led.
-  digitalWrite(PIN_BATTERY_LED, LOW);                               //Turn off the warning led.                                               
+  ledcWrite(pwmLedChannel, 0);                               //Turn off the warning led.                                               
 }
 
 void waitController(){
@@ -146,21 +149,21 @@ void waitController(){
     receiverInputChannel4 = convertReceiverChannel(4);       //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
     start ++;                                                //While waiting increment start whith every loop.
     //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while waiting for the receiver inputs.
-    ledcWrite(PIN_ESC_1, 1000);
-    ledcWrite(PIN_ESC_2, 1000);
-    ledcWrite(PIN_ESC_3, 1000);
-    ledcWrite(PIN_ESC_4, 1000);
+    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
 
     vTaskDelay(1/portTICK_PERIOD_MS);                          //Wait 1000us.
  
-    ledcWrite(PIN_ESC_1, 0);
-    ledcWrite(PIN_ESC_2, 0);
-    ledcWrite(PIN_ESC_3, 0);
-    ledcWrite(PIN_ESC_4, 0);
+    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);
 
     vTaskDelay(3/portTICK_PERIOD_MS);                          //Wait 3 milliseconds before the next loop.
     if(start == 125){                                          //Every 125 loops (500ms).
-      digitalWrite(PIN_BATTERY_LED, !digitalRead(PIN_BATTERY_LED));//blink
+      ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //blink
       start = 0;                                               //Start again at 0.
     }
   }                                                             

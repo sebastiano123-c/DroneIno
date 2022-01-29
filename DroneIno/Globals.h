@@ -18,14 +18,6 @@ unsigned long timerChannel1, timerChannel2, timerChannel3, timerChannel4, escTim
 unsigned long timer1, timer2, timer3, timer4, currentTime, loopTimer;
 double gyroAxisCalibration[4];   
 
-// Battery voltage constants:
-// 65 is the voltage compensation for the diode.
-// The voltage measured is assigned to a value between 0 and 4095, 
-// in which 0 V corresponds to 0, and 3.3 V corresponds to 4095.
-// Any voltage between 0 V and 3.3 V will be given the corresponding value in between.
-float maximumBatteryVoltage = 11.1; // (V)
-float fromVoltToTick = 3.3/4096;
-
 //pid
 float pidIMemRoll, pidRollSetpoint, gyroRollInput, pidOutputRoll, pidLastRollDError;
 float pidIMemPitch, pidPitchSetpoint, gyroPitchInput, pidOutputPitch, pidLastPitchDError;
@@ -33,7 +25,7 @@ float pidIMemYaw, pidYawSetpoint, gyroYawInput, pidOutputYaw, pidLastYawDError;
 float pidErrorTemp;
 
 //gyro contant for communication
-const int gyroFrequency = 250; // (Hz)
+const int gyroFrequency = 250;      // (Hz)
 const float gyroSensibility = 65.5; //
 float travelCoeff = 1/((float)gyroFrequency * gyroSensibility);
 float convDegToRad = 180.0 / PI;
@@ -43,10 +35,19 @@ byte rawAX[2], rawAY[2], rawAZ[2];
 byte rawGX[2], rawGY[2], rawGZ[2];
 
 //PWM constants
-const int freq = 500;               //30000;
+const int freq = 500;               //30000; (Hz)
+const int pwmLedChannel = 0;
+const int pwmLedFlyChannel = 5;
 const int pwmChannel1 = 1;
 const int pwmChannel2 = 2;
 const int pwmChannel3 = 3;
 const int pwmChannel4 = 4;
-const int resolution = 11;          //8;
+const int resolution = 11;          //8;    (bits)
 const int MAX_DUTY_CYCLE = (int)(pow(2, resolution) - 1);
+const int HALF_DUTY_CYCLE = (int)(0.5*MAX_DUTY_CYCLE);
+
+//BATTERY
+float Vin = (11100-700)/2.555;           // voltage drop from 11.1V battery voltage to 4.7V with res. R=R2/(R3+R2)=1/2.55 and diode (-700mV)
+float Vout = Vin * 1.5 / (1 + 1.5);
+uint8_t adcBits = 12;                    // gives 2^10=1024 bits of width when measuring the voltage
+float fromVtoBit = pow(2, adcBits)/Vout;

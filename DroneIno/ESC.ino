@@ -78,22 +78,18 @@ void setEscPulses(){
   }
 
   // write to escs
-  ledcWrite(pwmChannel1, esc1);
-  ledcWrite(pwmChannel2, esc2);
-  ledcWrite(pwmChannel3, esc3);
-  ledcWrite(pwmChannel4, esc4);
+  ledcWrite(pwmChannel1, esc1); ///2000*MAX_DUTY_CYCLE
+  ledcWrite(pwmChannel2, esc2); ///2000*MAX_DUTY_CYCLE
+  ledcWrite(pwmChannel3, esc3); ///2000*MAX_DUTY_CYCLE
+  ledcWrite(pwmChannel4, esc4); ///2000*MAX_DUTY_CYCLE
 
-  if(micros() - loopTimer > 4050) digitalWrite(PIN_BATTERY_LED, HIGH);                   //Turn on the LED if the loop time exceeds 4050us.
+  if(micros() - loopTimer > 4050) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                   //Turn on the LED if the loop time exceeds 4050us.
   
   //All the information for controlling the motor's is available.
   //The refresh rate is 250Hz. That means the esc's need there pulse every 4ms.
-  while(micros() - loopTimer < 4000);                                      //We wait until 4000us are passed.
+  while(micros() - loopTimer < 4000) ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  //We wait until 4000us are passed.
+  ledcWrite(pwmLedFlyChannel, 0);
   loopTimer = micros();                                                    //Set the timer for the next loop.
-
-//  digitalWrite(PIN_ESC_1, HIGH);
-//  digitalWrite(PIN_ESC_2, HIGH);
-//  digitalWrite(PIN_ESC_3, HIGH);
-//  digitalWrite(PIN_ESC_4, HIGH);
   
   timerChannel1 = esc1 + loopTimer;                                     //Calculate the time of the falling edge of the esc-1 pulse.
   timerChannel2 = esc2 + loopTimer;                                     //Calculate the time of the falling edge of the esc-2 pulse.

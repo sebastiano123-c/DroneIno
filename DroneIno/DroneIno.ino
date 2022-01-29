@@ -63,7 +63,7 @@ void loop(){
   calculatePID();                           // see PID.ino
 
   // the battery voltage can affect the efficiency 
-  //batteryVoltageCompensation();
+  batteryVoltageCompensation();
 
   // create ESC pulses
   setEscPulses();                           // see ESC.ino

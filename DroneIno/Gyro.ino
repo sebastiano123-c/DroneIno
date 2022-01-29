@@ -5,8 +5,10 @@ void setupMPU(){
   int error = Wire.endTransmission();                              //End the transmission and register the exit status.
   while (error != 0) {                                             //Stay in this loop because the MPU-6050 did not respond.
     error = 1;                                                     //Set the error status to 1.
-    digitalWrite(PIN_BATTERY_LED, !digitalRead(PIN_BATTERY_LED));
+    ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);
     vTaskDelay(40/portTICK_PERIOD_MS);                             //Simulate a 250Hz refresc rate as like the main loop.
+    ledcWrite(pwmLedChannel, 0);
+    vTaskDelay(80/portTICK_PERIOD_MS);                             //Simulate a 250Hz refresc rate as like the main loop.
     Serial.print("MPU6050 ERROR at address: ");
     Serial.println(gyroAddress);
   }
@@ -38,7 +40,7 @@ void setGyroscopeRegisters(){
     Wire.requestFrom(gyroAddress, 1);                           //Request 1 bytes from the gyro
     while(Wire.available() < 1);                                //Wait until the 6 bytes are received
     if(Wire.read() != GYRO_REGISTERS_BITS){                     //Check if the value is 0x08
-      digitalWrite(PIN_BATTERY_LED, HIGH);                      //Turn on the warning led
+      ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                      //Turn on the warning led
       while(1)vTaskDelay(10/portTICK_PERIOD_MS);                //Stay in this loop for ever
     }
 
@@ -54,9 +56,10 @@ void calibrateGyroscope(){
   //Let's take multiple gyro data samples so we can determine the average gyro offset (calibration).
   for (calInt = 0; calInt < 2000 ; calInt ++){                                   //Take 2000 readings for calibration.
     if(calInt % 125 == 0){
-      digitalWrite(PIN_BATTERY_LED, !digitalRead(PIN_BATTERY_LED));   //Change the led status to indicate calibration.
+      ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);   //Change the led status to indicate calibration.
       Serial.print(".");
     }
+    else ledcWrite(pwmLedChannel, 0);
     
     readGyroscopeStatus();                                                                //Read the gyro output.
     
@@ -65,18 +68,18 @@ void calibrateGyroscope(){
     gyroAxisCalibration[3] += gyroAxis[3];                                               //Ad yaw value to gyroAxis[3]Cal.
     //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while calibrating the gyro.
     //Set digital port 4, 5, 6 and 7 high.
-    digitalWrite(PIN_ESC_1, HIGH);
-    digitalWrite(PIN_ESC_2, HIGH);
-    digitalWrite(PIN_ESC_3, HIGH);
-    digitalWrite(PIN_ESC_4, HIGH);
+    ledcWrite(pwmChannel1, 0.5*MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, 0.5*MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, 0.5*MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, 0.5*MAX_DUTY_CYCLE);
     
     vTaskDelay(1/portTICK_PERIOD_MS);                                                        //Wait 1000us.
     
     //Set digital port 4, 5, 6 and 7 low.
-    digitalWrite(PIN_ESC_1, LOW);
-    digitalWrite(PIN_ESC_2, LOW);
-    digitalWrite(PIN_ESC_3, LOW);
-    digitalWrite(PIN_ESC_4, LOW);
+    ledcWrite(pwmChannel1, 0);
+    ledcWrite(pwmChannel2, 0);
+    ledcWrite(pwmChannel3, 0);
+    ledcWrite(pwmChannel4, 0);
     vTaskDelay(3/portTICK_PERIOD_MS);                                                                       //Wait 3 milliseconds before the next loop.
   }
   Serial.println(".");

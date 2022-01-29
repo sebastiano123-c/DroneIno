@@ -88,7 +88,7 @@ CIRCUITAL SCHEMATIC HERE
 
 # **Documentation**
 ## **Circuit scheme**
-The power is supplied by the 11.1V 2200mAh 3C LiPo battery.
+The power is supplied by the 11.1V 2200mAh 3s 20C LiPo battery.
 The battery powers the motors and the ESP32.
 The resistances (Ohms) R2 = 1K and R3 = 1.5K and the diode D1 (1N4001 or similar) handle the current going through the board.
 D1 ensures that the PC is safe while both battery and pc are connected to the ESP32.
@@ -97,8 +97,8 @@ The resistance R1 = 330 is used for the LED.
 LEGEND:                                             +-----+--R3--+     
 X-  = disconnected                                  |     |      |                      
 -+- = sold cables                                   |     R1     |                   __________________ 
--|- = not touching cables                           |  +--|------+---D1--------++====|+VCC |11.1V, 3C | 
-=== = 3-5A cables                                   |  |  +----------------++==||====|-GND |2200mAh   | 
+-|- = not touching cables                           |  +--|------+---D1--------++====|+VCC|11.1V, >= 20C | 
+=== = 3-5A cables                                   |  |  +----------------++==||====|-GND|2200mAh, 3s   | 
                                                     |  |  |                ||  ||    ## LiPo BATTERY ## 
                                                     |  |  |   _________    ||  ||                       
            +----------------------------------------|--|--|-->|°INPUT |====||==||=============/     \
