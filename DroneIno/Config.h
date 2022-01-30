@@ -10,14 +10,11 @@
 #define WIRE_CLOCK                  400000L                 // 100000L, but 400000L is suggested
 #define EEPROM_SIZE                 36
 
-// AUTOLEVELING
-#define AUTO_LEVELING               true                    // true, false
-
 // GYROSCOPE
 #define GYROSCOPE                   MPU6050                 // unique for now
 
 // ALTITUDE SENSOR
-#define ALTITUDE_SENSOR             OFF                     // OFF, BMP280, BME280
+#define ALTITUDE_SENSOR             BMP280                  // OFF, BMP280, BME280
 
 // ULTRASONIC SENSOR
 #define PROXIMITY_SENSOR            OFF                     // OFF, HCSR04

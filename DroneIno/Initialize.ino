@@ -11,19 +11,84 @@ void initialize(){
   for(start = 0; start <= 35; start++) eepromData[start] = EEPROM.read(start);
   start = 0;                                                                //Set start back to zero.
   gyroAddress = eepromData[32];                                           //Store the gyro address in the variable.
-
   //printEEPROM();
 
   //Start the I2C as master.
   setupMPU();                                                         
     
+  // pinmode
+  setupPins();
+
+  //Check the EEPROM signature to make sure that the setup program is executed.
+  while(eepromData[33] != 'J' || eepromData[34] != 'M' || eepromData[35] != 'B') vTaskDelay(10/portTICK_PERIOD_MS);
+
+  //The flight controller needs the MPU-6050 with gyro and accelerometer
+  //If setup is completed without MPU-6050 stop the flight controller program  
+  if(eepromData[31] == 2 || eepromData[31] == 3) vTaskDelay(10/portTICK_PERIOD_MS);
+
+  //Set the specific gyro registers.  
+  setGyroscopeRegisters();                                                     
+
+  // turn off second led
+  ledcWrite(pwmLedFlyChannel, 0);
+
+  // few seconds for calibrating the gyroscope
+  calibrateGyroscope();
+
+  // check Pressure
+  checkAltitudeSensor();
+
+  // wait until the rx is connected
+  waitController();
+
+  //Set start back to 0.
+  start = 0;                                                                
+
+  //Load the battery voltage to the battery_voltage variable.
+  initBattery();
+
+  //Set the timer for the next loop.
+  loopTimer = micros();                                            
+
+  //When everything is done, turn off the led.
+  ledcWrite(pwmLedChannel, 0);                               //Turn off the warning led.                                               
+}
+
+void waitController(){
+  //Wait until the receiver is active and the throtle is set to the lower position.
+  while(receiverInputChannel3 < 990 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400){
+    receiverInputChannel3 = convertReceiverChannel(3);                 //Convert the actual receiver signals for throttle to the standard 1000 - 2000us
+    receiverInputChannel4 = convertReceiverChannel(4);                 //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
+    start ++;                                                               //While waiting increment start whith every loop.
+    //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while waiting for the receiver inputs.
+    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
+    
+    vTaskDelay(1/portTICK_PERIOD_MS);                                                //Wait 1000us.
+    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                                     //Set digital port 4, 5, 6 and 7 low.
+    vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
+
+    if(start == 125){                                                       //Every 125 loops (500ms).
+      if(calInt % 15 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //Change the led status to indicate calibration.
+      else ledcWrite(pwmLedChannel, 0);
+      start = 0;                                                            //Start again at 0.
+    }
+  }                                  
+}
+
+void setupPins(){
   // LED 
   ledcSetup(pwmLedChannel, freq, resolution);
   ledcAttachPin(PIN_BATTERY_LED, pwmLedChannel);
 
   //FLY LED
   ledcSetup(pwmLedFlyChannel, freq, resolution);
-  ledcAttachPin(PIN_DIGITAL_13, pwmLedFlyChannel);//pwmLedFlyChannel
+  ledcAttachPin(PIN_SECOND_LED, pwmLedFlyChannel);//pwmLedFlyChannel
 
   // ESCs pinmode  
   //     ledc ESC PWM setups
@@ -53,120 +118,6 @@ void initialize(){
   //Use the led on the Arduino for startup indication.
   ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                                                    //Turn on the warning led.
   ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE); 
-
-  //Check the EEPROM signature to make sure that the setup program is executed.
-  while(eepromData[33] != 'J' || eepromData[34] != 'M' || eepromData[35] != 'B') vTaskDelay(10/portTICK_PERIOD_MS);
-
-  //The flight controller needs the MPU-6050 with gyro and accelerometer
-  //If setup is completed without MPU-6050 stop the flight controller program  
-  if(eepromData[31] == 2 || eepromData[31] == 3) vTaskDelay(10/portTICK_PERIOD_MS);
-
-  setGyroscopeRegisters();                                                     //Set the specific gyro registers.
-
-  ledcWrite(pwmLedFlyChannel, 0); 
-  for (calInt = 0; calInt < 1250 ; calInt ++){                           //Wait 5 seconds before continuing.
-    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
-    
-    vTaskDelay(1/portTICK_PERIOD_MS);                                                //Wait 1000us.
-    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                                     //Set digital port 4, 5, 6 and 7 low.
-    vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
-  }
-
-  //Let's take multiple gyro data samples so we can determine the average gyro offset (calibration).
-  for (calInt = 0; calInt < 2000 ; calInt ++){                           //Take 2000 readings for calibration.
-    if(calInt % 15 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //Change the led status to indicate calibration.
-    else ledcWrite(pwmLedChannel, 0);
-    readGyroscopeStatus();                                                        //Read the gyro output.
-    gyroAxisCalibration[1] += gyroAxis[1];                                       //Ad roll value to gyro_roll_cal.
-    gyroAxisCalibration[2] += gyroAxis[2];                                       //Ad pitch value to gyro_pitch_cal.
-    gyroAxisCalibration[3] += gyroAxis[3];                                       //Ad yaw value to gyro_yaw_cal.
-
-    //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while calibrating the gyro.
-    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
-    
-    vTaskDelay(1/portTICK_PERIOD_MS);                                                //Wait 1000us.
-    
-    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                         //Set digital port 4, 5, 6 and 7 low.
-    vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
-  }
-  //Now that we have 2000 measures, we need to devide by 2000 to get the average gyro offset.
-  gyroAxisCalibration[1] /= 2000;                                                 //Divide the roll total by 2000.
-  gyroAxisCalibration[2] /= 2000;                                                 //Divide the pitch total by 2000.
-  gyroAxisCalibration[3] /= 2000;                                                 //Divide the yaw total by 2000.
-  
-  //Wait until the receiver is active and the throtle is set to the lower position.
-  while(receiverInputChannel3 < 990 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400){
-    receiverInputChannel3 = convertReceiverChannel(3);                 //Convert the actual receiver signals for throttle to the standard 1000 - 2000us
-    receiverInputChannel4 = convertReceiverChannel(4);                 //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
-    start ++;                                                               //While waiting increment start whith every loop.
-    //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while waiting for the receiver inputs.
-    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
-    
-    vTaskDelay(1/portTICK_PERIOD_MS);                                                //Wait 1000us.
-    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                                     //Set digital port 4, 5, 6 and 7 low.
-    vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
-
-    if(start == 125){                                                       //Every 125 loops (500ms).
-      if(calInt % 15 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //Change the led status to indicate calibration.
-      else ledcWrite(pwmLedChannel, 0);
-      start = 0;                                                            //Start again at 0.
-    }
-  }
-  start = 0;                                                                //Set start back to 0.
-
-  //Load the battery voltage to the battery_voltage variable.
-  initBattery();
-
-  //Set the timer for the next loop.
-  loopTimer = micros();                                            
-
-  //When everything is done, turn off the led.
-  ledcWrite(pwmLedChannel, 0);                               //Turn off the warning led.                                               
-}
-
-void waitController(){
-  //Wait until the receiver is active and the throtle is set to the lower position.
-  while(receiverInputChannel3 < 990 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400){
-    receiverInputChannel3 = convertReceiverChannel(3);       //Convert the actual receiver signals for throttle to the standard 1000 - 2000us
-    receiverInputChannel4 = convertReceiverChannel(4);       //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
-    start ++;                                                //While waiting increment start whith every loop.
-    //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while waiting for the receiver inputs.
-    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
-
-    vTaskDelay(1/portTICK_PERIOD_MS);                          //Wait 1000us.
- 
-    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);
-
-    vTaskDelay(3/portTICK_PERIOD_MS);                          //Wait 3 milliseconds before the next loop.
-    if(start == 125){                                          //Every 125 loops (500ms).
-      ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //blink
-      start = 0;                                               //Start again at 0.
-    }
-  }                                                             
 }
 
 void intro(){

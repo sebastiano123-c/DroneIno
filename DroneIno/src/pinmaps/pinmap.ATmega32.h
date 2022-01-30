@@ -15,7 +15,7 @@
 
 // LED
 #define PIN_BATTERY_LED 12 
-#define PIN_DIGITAL_13 13 
+#define PIN_SECOND_LED 13 
 
 // BATTERY LEVEL
 #define PIN_BATTERY_LEVEL 0

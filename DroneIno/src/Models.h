@@ -18,16 +18,19 @@
 
 // GYROSCOPE SENSOR
 #if GYROSCOPE == MPU6050
-  #include "sensors/sensor.MPU6050.h"
+  #include "sensors/gyroscope.MPU6050.h"
 #endif
 
 // ALTITUDE SENSOR
 #if ALTITUDE_SENSOR == BMP280
-  #include <Adafruit_Sensor.h>
   #include <Adafruit_BMP280.h>
+  #include "sensors\altitude_sensor.BMP280.h"
+#elif
+  #include <Adafruit_BME280.h>
+  #include "sensors\altitude_sensor.BME280.h"
 #endif
 
 // PROXIMITY SENSOR
-#if PROXIMITY_SENSOR == BMP280
+#if PROXIMITY_SENSOR == HCSR04
   #include <HCSR04.h>
 #endif

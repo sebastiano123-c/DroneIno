@@ -23,12 +23,13 @@
 #include <Arduino.h>
 #include <Wire.h>                          //Include the Wire.h library so we can communicate with the gyro.
 #include <EEPROM.h>                        //Include the EEPROM.h library so we can store information onto the EEPROM
-#include <SPI.h>                           
+#include <SPI.h>               
+#include "Constants.h"            
 #include "Globals.h"
 
-// #if ALTITUDE_SENSOR == BMP280
-//     Adafruit_BMP280 bmp; // I2C 
-// #endif
+#if ALTITUDE_SENSOR == BMP280
+    Adafruit_BMP280 bmp; // I2C 
+#endif
 
 void setup(){
   initialize();                            //function at initialize.ino                                    

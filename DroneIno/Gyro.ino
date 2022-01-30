@@ -52,46 +52,48 @@ void setGyroscopeRegisters(){
 }
 
 void calibrateGyroscope(){
-  Serial.print("Calibrating the gyro");
-  //Let's take multiple gyro data samples so we can determine the average gyro offset (calibration).
-  for (calInt = 0; calInt < 2000 ; calInt ++){                                   //Take 2000 readings for calibration.
-    if(calInt % 125 == 0){
-      ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);   //Change the led status to indicate calibration.
-      Serial.print(".");
-    }
-    else ledcWrite(pwmLedChannel, 0);
+for (calInt = 0; calInt < 1250 ; calInt ++){                           //Wait 5 seconds before continuing.
+    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
     
-    readGyroscopeStatus();                                                                //Read the gyro output.
-    
-    gyroAxisCalibration[1] += gyroAxis[1];                                               //Ad roll value to gyroAxis[1]Cal.
-    gyroAxisCalibration[2] += gyroAxis[2];                                               //Ad pitch value to gyroAxis[2]Cal.
-    gyroAxisCalibration[3] += gyroAxis[3];                                               //Ad yaw value to gyroAxis[3]Cal.
-    //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while calibrating the gyro.
-    //Set digital port 4, 5, 6 and 7 high.
-    ledcWrite(pwmChannel1, 0.5*MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, 0.5*MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, 0.5*MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, 0.5*MAX_DUTY_CYCLE);
-    
-    vTaskDelay(1/portTICK_PERIOD_MS);                                                        //Wait 1000us.
-    
-    //Set digital port 4, 5, 6 and 7 low.
-    ledcWrite(pwmChannel1, 0);
-    ledcWrite(pwmChannel2, 0);
-    ledcWrite(pwmChannel3, 0);
-    ledcWrite(pwmChannel4, 0);
-    vTaskDelay(3/portTICK_PERIOD_MS);                                                                       //Wait 3 milliseconds before the next loop.
+    vTaskDelay(1/portTICK_PERIOD_MS);                                                //Wait 1000us.
+    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                                     //Set digital port 4, 5, 6 and 7 low.
+    vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
   }
-  Serial.println(".");
-  //Now that we have 2000 measures, we need to divide by 2000 to get the average gyro offset.
-  gyroAxisCalibration[1] /= 2000;                                                         //Divide the roll total by 2000.
-  gyroAxisCalibration[2] /= 2000;                                                         //Divide the pitch total by 2000.
-  gyroAxisCalibration[3] /= 2000;                                                         //Divide the yaw total by 2000.
-  Serial.println("");
-  Serial.println(gyroAxisCalibration[1]);
-  Serial.println(gyroAxisCalibration[2]);
-  Serial.println(gyroAxisCalibration[3]);
-  vTaskDelay(1000/portTICK_PERIOD_MS); 
+
+  //Let's take multiple gyro data samples so we can determine the average gyro offset (calibration).
+  for (calInt = 0; calInt < 2000 ; calInt ++){                           //Take 2000 readings for calibration.
+    if(calInt % 15 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //Change the led status to indicate calibration.
+    else ledcWrite(pwmLedChannel, 0);
+    readGyroscopeStatus();                                                        //Read the gyro output.
+    gyroAxisCalibration[1] += gyroAxis[1];                                       //Ad roll value to gyro_roll_cal.
+    gyroAxisCalibration[2] += gyroAxis[2];                                       //Ad pitch value to gyro_pitch_cal.
+    gyroAxisCalibration[3] += gyroAxis[3];                                       //Ad yaw value to gyro_yaw_cal.
+
+    //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while calibrating the gyro.
+    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
+    
+    vTaskDelay(1/portTICK_PERIOD_MS);                                                //Wait 1000us.
+    
+    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
+    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                         //Set digital port 4, 5, 6 and 7 low.
+    vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
+  }
+  //Now that we have 2000 measures, we need to devide by 2000 to get the average gyro offset.
+  gyroAxisCalibration[1] /= 2000;                                                 //Divide the roll total by 2000.
+  gyroAxisCalibration[2] /= 2000;                                                 //Divide the pitch total by 2000.
+  gyroAxisCalibration[3] /= 2000;                                                 //Divide the yaw total by 2000.
+  
 }
 
 void calculateAnglePRY(){
@@ -126,10 +128,10 @@ void calculateAnglePRY(){
   anglePitch = anglePitch * 0.9996 + anglePitchAcc * 0.0004;   //Correct the drift of the gyro pitch angle with the accelerometer pitch angle.
   angleRoll = angleRoll * 0.9996 + angleRollAcc * 0.0004;      //Correct the drift of the gyro roll angle with the accelerometer roll angle.
 
-  pitchLevelAdjust = anglePitch * 15;                                    //Calculate the pitch angle correction
-  rollLevelAdjust = angleRoll * 15;                                      //Calculate the roll angle correction
+  pitchLevelAdjust = anglePitch * correctionPitchRoll;                    //Calculate the pitch angle correction
+  rollLevelAdjust = angleRoll * correctionPitchRoll;                      //Calculate the roll angle correction
 
-  if(!AUTO_LEVELING){                                                          //If the quadcopter is not in auto-level mode
+  if(flightMode != 1){                                                    //If the quadcopter is not in auto-level mode
     pitchLevelAdjust = 0;                                                 //Set the pitch angle correction to zero.
     rollLevelAdjust = 0;                                                  //Set the roll angle correcion to zero.
   }
