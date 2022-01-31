@@ -1,12 +1,11 @@
-// correction for the pitch and roll
-const int correctionPitchRoll = 15;
-
 // gyro constants
 const int gyroFrequency = 250;                                      // (Hz)
 const float gyroSensibility = 65.5;                                 
 float travelCoeff = 1/((float)gyroFrequency * gyroSensibility);
 float convDegToRad = 180.0 / PI;
 float travelCoeffToRad = travelCoeff / convDegToRad;
+// correction for the pitch and roll
+const int correctionPitchRoll = 15;
 
 // PWM constants
 const int freq = 500;                                               // (Hz) for what I know, 500 is the best 
@@ -21,18 +20,25 @@ const int MAX_DUTY_CYCLE = (int)(pow(2, resolution) - 1);
 const int HALF_DUTY_CYCLE = (int)(0.5*MAX_DUTY_CYCLE);
 
 // battery
-const int inputBatteryVoltage = 11100;                              // the battery nominal voltage
-const int minBatteryLevel = 3000;                                   // min battery level above which it is better not to reach
+const int maxBatteryLevel = 11100;                              // the battery nominal voltage
+const int minBatteryLevel = 3100;                                   // min battery level above which it is better not to reach
 
 // battery calculations
-float dropTo5V = 1 / (1 + 1.556);                                   // first voltage partitor drop
-float dropTo3V3 = 1.5 / (1 + 1.5);                                  // second voltage partitor drop
-float Vout = (inputBatteryVoltage-700)*dropTo5V* dropTo3V3;         // voltage drop from 11.1V battery voltage to 4.7V with res. R=R2/(R3+R2)=1/2.55 and diode (-700mV)
-float voltageRatio = inputBatteryVoltage / Vout;
-uint8_t adcBits = 12;                                               // gives 2^10=1024 bits of width when measuring the voltage
-float fromVtoBit = pow(2, adcBits)/ Vout;
-const int minBatteryVoltageInBits = minBatteryLevel / voltageRatio * fromVtoBit; // mV
+float res3 = 1.5;
+float res2 = 1;
+float res4 = 1.;
+int diodeDrop = 700;                                                // -0.7V generally
+int esp32LimitVoltage = 3300;                                       // voltage limit of the pins
+float dropTo5V = (res2 + res4) / (res3 + res4 + res2);              // first voltage partitor drop
+float dropTo3V3 = res4 / (res4 + res2);                             // second voltage partitor drop
+float totalDrop = dropTo5V*dropTo3V3;                  // IMPORTANT: this is in my case, you have to calculate YOUR total drop
+uint8_t adcBits = 12;                                               // (bits) of width when measuring the voltage
+float maximumWidth = pow(2., (float)adcBits);
+float fromVtoWidth = maximumWidth / esp32LimitVoltage;
+float maxBatteryLevelDropped = (float)(maxBatteryLevel-diodeDrop) * totalDrop;
+float correctionBattery = esp32LimitVoltage/maxBatteryLevelDropped;
+int minBatteryLevelThreshold = (float)(minBatteryLevel-diodeDrop) * totalDrop / correctionBattery;
 
 // altitude sensor
-const int flightMode = 1;                                           // 1 = auto leveling, 2 = altitude hold
-float pressure = 0.;
+const int flightMode = 1;                                           // 1 = only auto leveling, 2 = altitude hold
+float pressure;

@@ -1,7 +1,15 @@
-void setupMPU(){
+void setupGyroscope(){
+  // set gyro address
+  gyroAddress = GYRO_ADDRESS; 
+  
+  // setup wire
   Wire.setClock(WIRE_CLOCK);
-  Wire.begin();
-  Wire.beginTransmission(gyroAddress);                             //Start communication with the MPU-6050.
+  Wire.begin(PIN_SDA, PIN_SCL);
+  vTaskDelay(40/portTICK_PERIOD_MS);
+
+  Wire.beginTransmission(gyroAddress);
+
+  //Start communication with the MPU-6050.                           
   int error = Wire.endTransmission();                              //End the transmission and register the exit status.
   while (error != 0) {                                             //Stay in this loop because the MPU-6050 did not respond.
     error = 1;                                                     //Set the error status to 1.
@@ -12,7 +20,8 @@ void setupMPU(){
     Serial.print("MPU6050 ERROR at address: ");
     Serial.println(gyroAddress);
   }
-  Serial.println("Gyroscope setup: OK");
+  ledcWrite(pwmLedChannel, 0);
+  if(DEBUG) Serial.println("Gyroscope setup: OK");
 }
 
 void setGyroscopeRegisters(){
@@ -93,10 +102,13 @@ for (calInt = 0; calInt < 1250 ; calInt ++){                           //Wait 5 
   gyroAxisCalibration[1] /= 2000;                                                 //Divide the roll total by 2000.
   gyroAxisCalibration[2] /= 2000;                                                 //Divide the pitch total by 2000.
   gyroAxisCalibration[3] /= 2000;                                                 //Divide the yaw total by 2000.
-  
+  if(DEBUG) Serial.println("calibrateGyroscope: OK");
 }
 
 void calculateAnglePRY(){
+  // first of all, read the gyro!
+  readGyroscopeStatus();
+  
   //65.5 = 1 deg/sec (check the datasheet of the MPU-6050 for more information).
   gyroRollInput = (gyroRollInput * 0.7) + ((gyroAxis[1] / 65.5) * 0.3);   //Gyro pid input is deg/sec.
   gyroPitchInput = (gyroPitchInput * 0.7) + ((gyroAxis[2] / 65.5) * 0.3);//Gyro pid input is deg/sec.
@@ -131,10 +143,12 @@ void calculateAnglePRY(){
   pitchLevelAdjust = anglePitch * correctionPitchRoll;                    //Calculate the pitch angle correction
   rollLevelAdjust = angleRoll * correctionPitchRoll;                      //Calculate the roll angle correction
 
-  if(flightMode != 1){                                                    //If the quadcopter is not in auto-level mode
+  if(!AUTO_LEVELING){                                                    //If the quadcopter is not in auto-level mode
     pitchLevelAdjust = 0;                                                 //Set the pitch angle correction to zero.
     rollLevelAdjust = 0;                                                  //Set the roll angle correcion to zero.
   }
+
+  if(DEBUG) printGyroscopeStatus();                //print gyro status
 }
 
 void printGyroscopeStatus(){

@@ -83,16 +83,18 @@ void setEscPulses(){
   ledcWrite(pwmChannel3, esc3); ///2000*MAX_DUTY_CYCLE
   ledcWrite(pwmChannel4, esc4); ///2000*MAX_DUTY_CYCLE
 
-  if(micros() - loopTimer > 4050) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                   //Turn on the LED if the loop time exceeds 4050us.
+  if(micros() - loopTimer > 4050) //ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);
+  {
+    ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                   //Turn on the LED if the loop time exceeds 4050us.
+    if(DEBUG) {
+      Serial.print("DANGER: LOOP TIMER > 4us: ");
+      Serial.println(micros() - loopTimer );
+    }
+  }
   
   //All the information for controlling the motor's is available.
   //The refresh rate is 250Hz. That means the esc's need there pulse every 4ms.
   while(micros() - loopTimer < 4000) ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  //We wait until 4000us are passed.
   ledcWrite(pwmLedFlyChannel, 0);
   loopTimer = micros();                                                    //Set the timer for the next loop.
-  
-  timerChannel1 = esc1 + loopTimer;                                     //Calculate the time of the falling edge of the esc-1 pulse.
-  timerChannel2 = esc2 + loopTimer;                                     //Calculate the time of the falling edge of the esc-2 pulse.
-  timerChannel3 = esc3 + loopTimer;                                     //Calculate the time of the falling edge of the esc-3 pulse.
-  timerChannel4 = esc4 + loopTimer;                                     //Calculate the time of the falling edge of the esc-4 pulse.
 }

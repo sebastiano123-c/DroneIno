@@ -18,42 +18,27 @@
 // DroneIno32
 // @author: Sebastiano Cocchi
 
-#include "Config.h"
-#include "src/Models.h"
 #include <Arduino.h>
 #include <Wire.h>                          //Include the Wire.h library so we can communicate with the gyro.
 #include <EEPROM.h>                        //Include the EEPROM.h library so we can store information onto the EEPROM
-#include <SPI.h>               
+#include "Config.h"
+#include "src/Models.h"
 #include "Constants.h"            
 #include "Globals.h"
 
 #if ALTITUDE_SENSOR == BMP280
     Adafruit_BMP280 bmp; // I2C 
+#elif ALTITUDE_SENSOR == BME280
+    Adafruit_BME280 bmp; // I2C 
 #endif
 
 void setup(){
   initialize();                            //function at initialize.ino                                    
 }
 
-// Loop
 void loop(){
-
-  // #if ALTITUDE_SENSOR == BMP290
-  //   readPresTempAlt();
-  // #endif
-
-  // #if PROXIMITY_SENSOR == HCSR04
-  //   dangerAlert();
-  // #endif
-
-  //read gyro
-  readGyroscopeStatus();                   // see Gyro.ino
-
   //calculate the gyro values
   calculateAnglePRY();                     // see Gyro.ino
-
-  //print gyro status
-  //printGyroscopeStatus();                // see Gyro.ino
 
   //For starting the motors: throttle low and yaw left (step 1).
   if(receiverInputChannel3 < 1050 && receiverInputChannel4 < 1050) start = 1;//When yaw stick is back in the center position start the motors (step 2).
@@ -64,7 +49,7 @@ void loop(){
   calculatePID();                           // see PID.ino
 
   // the battery voltage can affect the efficiency 
-  batteryVoltageCompensation();
+  batteryVoltageCompensation();             // see Battery.ino
 
   // create ESC pulses
   setEscPulses();                           // see ESC.ino

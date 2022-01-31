@@ -8,9 +8,10 @@ void checkAltitudeSensor(){
     Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n");
     Serial.print("        ID of 0x60 represents a BME 280.\n");
     Serial.print("        ID of 0x61 represents a BME 680.\n");
-    ledcWrite(PIN_BATTERY_LED, MAX_DUTY_CYCLE);
+    ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);
     while (1) vTaskDelay(10/portTICK_PERIOD_MS);
   }
+  ledcWrite(pwmLedChannel, 0);
 
   /* Default settings from datasheet. */
   bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
@@ -21,10 +22,8 @@ void checkAltitudeSensor(){
 
   pressure = bmp.readPressure();
   vTaskDelay(10/portTICK_PERIOD_MS);
-}
 
-void altitudeHold(){
-  
+  if(DEBUG) Serial.println("checkAltitudeSensor: OK");
 }
 
 void readPresTempAlt() {

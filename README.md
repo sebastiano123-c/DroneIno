@@ -74,6 +74,7 @@ Based on the [YMFC-AL](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improv
 * 11.1V 3C LiPo battery (2200mAh or 3800mAh);
 * four 30A ESCs;
 * four brushless motors (around 1000KV).
+To build DroneIno I followed these [videos](https://www.youtube.com/watch?v=XFxqFQwRumc&list=PL0K4VDicBzsibZqfa42DVxC8CGCMB7G2G) explaining how to build the YMFC and I recommend you to do the same.
 
 <!-- <pre>
 CIRCUITAL SCHEMATIC HERE 

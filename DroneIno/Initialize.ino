@@ -2,22 +2,25 @@
 // @author: Sebastiano Cocchi
 
 void initialize(){
-  // Serial.begin(BAUD_RATE);
+  if(DEBUG) Serial.begin(BAUD_RATE);
+
   EEPROM.begin(EEPROM_SIZE);
   vTaskDelay(50/portTICK_PERIOD_MS);
 
-  //intro();
-  
-  for(start = 0; start <= 35; start++) eepromData[start] = EEPROM.read(start);
-  start = 0;                                                                //Set start back to zero.
-  gyroAddress = eepromData[32];                                           //Store the gyro address in the variable.
-  //printEEPROM();
+//  if(DEBUG) intro();
 
-  //Start the I2C as master.
-  setupMPU();                                                         
-    
+  for(start = 0; start <= 35; start++) eepromData[start] = EEPROM.read(start);
+ 
+//  if(DEBUG) printEEPROM();
+  
+  //Set start back to zero.
+  start = 0;                                                                
+       
   // pinmode
   setupPins();
+   
+  //Start the I2C as master.
+  setupGyroscope();                                                         
 
   //Check the EEPROM signature to make sure that the setup program is executed.
   while(eepromData[33] != 'J' || eepromData[34] != 'M' || eepromData[35] != 'B') vTaskDelay(10/portTICK_PERIOD_MS);
@@ -39,7 +42,7 @@ void initialize(){
   checkAltitudeSensor();
 
   // wait until the rx is connected
-  waitController();
+  //waitController();
 
   //Set start back to 0.
   start = 0;                                                                
@@ -59,7 +62,7 @@ void waitController(){
   while(receiverInputChannel3 < 990 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400){
     receiverInputChannel3 = convertReceiverChannel(3);                 //Convert the actual receiver signals for throttle to the standard 1000 - 2000us
     receiverInputChannel4 = convertReceiverChannel(4);                 //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
-    start ++;                                                               //While waiting increment start whith every loop.
+    start ++;                                                          //While waiting increment start whith every loop.
     //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while waiting for the receiver inputs.
     ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
     ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
@@ -78,7 +81,7 @@ void waitController(){
       else ledcWrite(pwmLedChannel, 0);
       start = 0;                                                            //Start again at 0.
     }
-  }                                  
+  }                    
 }
 
 void setupPins(){
@@ -121,7 +124,7 @@ void setupPins(){
 }
 
 void intro(){
-  vTaskDelay(500/portTICK_PERIOD_MS);
+  vTaskDelay(50/portTICK_PERIOD_MS);
   Serial.println();
   Serial.println();
   Serial.println("    |                      |   ");
@@ -139,11 +142,11 @@ void intro(){
   Serial.println(" -------               --------");
   Serial.println("    |                      |   ");
   Serial.println("    |                      |   ");
-  vTaskDelay(1500/portTICK_PERIOD_MS);
+  vTaskDelay(1000/portTICK_PERIOD_MS);
   Serial.println();
   Serial.println("@Author: Sebastiano Cocchi");
   Serial.println();
-  vTaskDelay(1500/portTICK_PERIOD_MS);
+  vTaskDelay(1000/portTICK_PERIOD_MS);
 
 }
 
