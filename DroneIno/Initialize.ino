@@ -7,12 +7,23 @@ void initialize(){
   EEPROM.begin(EEPROM_SIZE);
   vTaskDelay(50/portTICK_PERIOD_MS);
 
-//  if(DEBUG) intro();
+  if(DEBUG) intro();
 
   for(start = 0; start <= 35; start++) eepromData[start] = EEPROM.read(start);
  
-//  if(DEBUG) printEEPROM();
-  
+  if(DEBUG) printEEPROM();
+
+  // fill the configured values for the trims    
+  for (start = 1; start <= 4; start++){
+    byte channel = eepromData[start + 23] & 0b00000111;                   //What channel corresponds with the specific function
+    if(eepromData[start + 23] & 0b10000000) trimCh[start].reverse = 1;    //Reverse channel when most significant bit is set
+    else trimCh[start].reverse = 0;                                       //If the most significant is not set there is no reverse
+
+    trimCh[start].low = (eepromData[channel * 2 + 15] << 8) | eepromData[channel * 2 + 14];    //Store the low value for the specific receiver input channel
+    trimCh[start].center = (eepromData[channel * 2 - 1] << 8) | eepromData[channel * 2 - 2];   //Store the center value for the specific receiver input channel
+    trimCh[start].high = (eepromData[channel * 2 + 7] << 8) | eepromData[channel * 2 + 6];     //Store the high value for the specific receiver input channel
+  }
+
   //Set start back to zero.
   start = 0;                                                                
        
@@ -42,7 +53,7 @@ void initialize(){
   checkAltitudeSensor();
 
   // wait until the rx is connected
-  //waitController();
+  if(!DEBUG) waitController();
 
   //Set start back to 0.
   start = 0;                                                                

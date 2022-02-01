@@ -1,3 +1,7 @@
+
+// DroneIno32
+// @author: Sebastiano Cocchi
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //Terms of use
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -15,42 +19,39 @@
 //are 100% certain of what you are doing.
 ///////////////////////////////////////////////////////////////////////////////////////
 
-// DroneIno32
-// @author: Sebastiano Cocchi
-
 #include <Arduino.h>
-#include <Wire.h>                          //Include the Wire.h library so we can communicate with the gyro.
-#include <EEPROM.h>                        //Include the EEPROM.h library so we can store information onto the EEPROM
+#include <Wire.h>                          
+#include <EEPROM.h>     
 #include "Config.h"
 #include "src/Models.h"
 #include "Constants.h"            
 #include "Globals.h"
 
-#if ALTITUDE_SENSOR == BMP280
-    Adafruit_BMP280 bmp; // I2C 
-#elif ALTITUDE_SENSOR == BME280
-    Adafruit_BME280 bmp; // I2C 
-#endif
-
 void setup(){
-  initialize();                            //function at initialize.ino                                    
+  // init function
+  initialize();                                        // function at initialize.ino                                    
 }
 
 void loop(){
-  //calculate the gyro values
-  calculateAnglePRY();                     // see Gyro.ino
+  //calculate the gyro values for pitch, roll and yaw
+  calculateAnglePRY();                                 // see Gyro.ino
 
-  //For starting the motors: throttle low and yaw left (step 1).
-  if(receiverInputChannel3 < 1050 && receiverInputChannel4 < 1050) start = 1;//When yaw stick is back in the center position start the motors (step 2).
-  if(start == 1 && receiverInputChannel3 < 1050 && receiverInputChannel4 > 1450)   droneStart();
-  if(start == 2 &&  receiverInputChannel3 < 1050 &&  receiverInputChannel4 > 1950) start = 0; //Stopping the motors: throttle low and yaw right.
+  // starting sequence
+  if(receiverInputChannel3 < 1050 &&                   // to start the motors: throttle low and yaw left (step 1).
+     receiverInputChannel4 < 1050) start = 1;          
+  if(start                == 1    &&                   // when yaw stick is back in the center position start the motors (step 2).
+     receiverInputChannel3 < 1050 && 
+     receiverInputChannel4 > 1450) droneStart();       
+  if(start                == 2    &&                   // stopping the motors: throttle low and yaw right.
+     receiverInputChannel3 < 1050 &&  
+     receiverInputChannel4 > 1950) start = 0;          
 
-  // calculate PID
-  calculatePID();                           // see PID.ino
+  // calculate PID values
+  calculatePID();                                      // see PID.ino
 
-  // the battery voltage can affect the efficiency 
-  batteryVoltageCompensation();             // see Battery.ino
+  // battery voltage can affect the efficiency 
+  batteryVoltageCompensation();                        // see Battery.ino
 
   // create ESC pulses
-  setEscPulses();                           // see ESC.ino
+  setEscPulses();                                      // see ESC.ino
 }

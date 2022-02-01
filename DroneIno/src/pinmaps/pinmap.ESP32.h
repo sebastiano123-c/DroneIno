@@ -18,16 +18,19 @@
 #define PIN_RECEIVER_5 4
 
 // LED
-#define PIN_BATTERY_LED 19 
-#define PIN_SECOND_LED 18 
+#define PIN_BATTERY_LED             19 
+#define PIN_SECOND_LED              18 
 
 // BATTERY LEVEL
-#define PIN_BATTERY_LEVEL 2
+#define PIN_BATTERY_LEVEL           2
 
 // PROXIMITY_SENSOR
-#define PIN_PROXIMITY_SENSOR_ECHO 26
-#define PIN_PROXIMITY_SENSOR_TRIG 25
+#define PIN_PROXIMITY_SENSOR_ECHO   26
+#define PIN_PROXIMITY_SENSOR_TRIG   25
 
 // I2C PINS
-#define PIN_SDA 21
-#define PIN_SCL 22
+#define PIN_SDA                     21
+#define PIN_SCL                     22
+
+// board limit voltage of the pins, for ESP32 is 3.mV
+#define BOARD_LIMIT_VOLTAGE         3300

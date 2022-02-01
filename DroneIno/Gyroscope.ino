@@ -165,11 +165,8 @@ void readGyroscopeStatus(){
   getAcc();
   getGyro();
 
-  receiverInputChannel1 = convertReceiverChannel(1);           //Convert the actual receiver signals for pitch to the standard 1000 - 2000us.
-  receiverInputChannel2 = convertReceiverChannel(2);           //Convert the actual receiver signals for roll to the standard 1000 - 2000us.
-  receiverInputChannel3 = convertReceiverChannel(3);           //Convert the actual receiver signals for throttle to the standard 1000 - 2000us.
-  receiverInputChannel4 = convertReceiverChannel(4);           //Convert the actual receiver signals for yaw to the standard 1000 - 2000us.
-
+  convertAllSignals();
+  
   accAxis[1] = rawAX[1] | rawAX[0]<<8;
   accAxis[2] = rawAY[1] | rawAY[0]<<8;
   accAxis[3] = rawAZ[1] | rawAZ[0]<<8;

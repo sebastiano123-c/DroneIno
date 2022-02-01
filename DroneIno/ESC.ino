@@ -14,19 +14,59 @@ void droneStart(){
   pidLastYawDError = 0;
 }
 
-int convertReceiverChannel(byte function){
+int convertReceiverChannel(byte ch){
+  int difference;
+
+  if(trimCh[ch].actual < trimCh[ch].center){            //The actual receiver value is lower than the center value
+    //Limit the lowest value to the value that was detected during setup
+    if(trimCh[ch].actual < trimCh[ch].low)trimCh[ch].actual = trimCh[ch].low;
+
+    //Calculate and scale theactual value to a 1000 - 2000us value
+    difference = ((long)(trimCh[ch].center - trimCh[ch].actual) * (long)500) / (trimCh[ch].center - trimCh[ch].low);
+    
+    switch (trimCh[ch].reverse){
+      case 1: // reversed
+        return 1500 + difference;
+        break;
+      
+      default: // NOT reversed
+        return 1500 - difference;
+    }
+  }
+  else if(trimCh[ch].actual > trimCh[ch].center){     //The actual receiver value is higher than the center value
+
+    //Limit the lowest value to the value that was detected during setup
+    if(trimCh[ch].actual > trimCh[ch].high)trimCh[ch].actual = trimCh[ch].high;
+
+    //Calculate and scale the actual value to a 1000 - 2000us value
+    difference = ((long)(trimCh[ch].actual - trimCh[ch].center) * (long)500) / (trimCh[ch].high - trimCh[ch].center);
+    
+    switch (trimCh[ch].reverse){
+      case 1:
+        return 1500 - difference;
+        break;
+      
+      default:
+        return 1500 + difference;
+    } 
+  }
+  else return 1500;
+}
+
+int convertReceiverChannel1(byte function){
+  /*DEPRECATED*/
   byte channel, reverse;                                                       //First we declare some local variables
   int low, center, high, actual;
   int difference;
 
-  channel = eepromData[function + 23] & 0b00000111;                           //What channel corresponds with the specific function
-  if(eepromData[function + 23] & 0b10000000)reverse = 1;                      //Reverse channel when most significant bit is set
+  channel = eepromData[function + 23] & 0b00000111;                            //What channel corresponds with the specific function
+  if(eepromData[function + 23] & 0b10000000)reverse = 1;                       //Reverse channel when most significant bit is set
   else reverse = 0;                                                            //If the most significant is not set there is no reverse
 
-  actual = receiverInput[channel];                                            //Read the actual receiver value for the corresponding function
-  low = (eepromData[channel * 2 + 15] << 8) | eepromData[channel * 2 + 14];  //Store the low value for the specific receiver input channel
-  center = (eepromData[channel * 2 - 1] << 8) | eepromData[channel * 2 - 2]; //Store the center value for the specific receiver input channel
-  high = (eepromData[channel * 2 + 7] << 8) | eepromData[channel * 2 + 6];   //Store the high value for the specific receiver input channel
+  actual = receiverInput[channel];                                             //Read the actual receiver value for the corresponding function
+  low = (eepromData[channel * 2 + 15] << 8) | eepromData[channel * 2 + 14];    //Store the low value for the specific receiver input channel
+  center = (eepromData[channel * 2 - 1] << 8) | eepromData[channel * 2 - 2];   //Store the center value for the specific receiver input channel
+  high = (eepromData[channel * 2 + 7] << 8) | eepromData[channel * 2 + 6];     //Store the high value for the specific receiver input channel
 
   if(actual < center){                                                         //The actual receiver value is lower than the center value
     if(actual < low)actual = low;                                              //Limit the lowest value to the value that was detected during setup
@@ -34,7 +74,7 @@ int convertReceiverChannel(byte function){
     if(reverse == 1)return 1500 + difference;                                  //If the channel is reversed
     else return 1500 - difference;                                             //If the channel is not reversed
   }
-  else if(actual > center){                                                                        //The actual receiver value is higher than the center value
+  else if(actual > center){                                                    //The actual receiver value is higher than the center value
     if(actual > high)actual = high;                                            //Limit the lowest value to the value that was detected during setup
     difference = ((long)(actual - center) * (long)500) / (high - center);      //Calculate and scale the actual value to a 1000 - 2000us value
     if(reverse == 1)return 1500 - difference;                                  //If the channel is reversed
@@ -46,38 +86,40 @@ int convertReceiverChannel(byte function){
 void setEscPulses(){
   throttle = receiverInputChannel3; //We need the throttle signal as a base signal.
 
-  if (start == 2){                                                          //The motors are started.
-    if (throttle > 1800) throttle = 1800;                                   //We need some room to keep full control at full throttle.
-    esc1 = throttle - pidOutputPitch + pidOutputRoll - pidOutputYaw; //Calculate the pulse for esc 1 (front-right - CCW)
-    esc2 = throttle + pidOutputPitch + pidOutputRoll + pidOutputYaw; //Calculate the pulse for esc 2 (rear-right - CW)
-    esc3 = throttle + pidOutputPitch - pidOutputRoll - pidOutputYaw; //Calculate the pulse for esc 3 (rear-left - CCW)
-    esc4 = throttle - pidOutputPitch - pidOutputRoll + pidOutputYaw; //Calculate the pulse for esc 4 (front-left - CW)
+  switch(start){
+    case 2:
+      if (throttle > 1800) throttle = 1800;                            //We need some room to keep full control at full throttle.
+      esc1 = throttle - pidOutputPitch + pidOutputRoll - pidOutputYaw; //Calculate the pulse for esc 1 (front-right - CCW)
+      esc2 = throttle + pidOutputPitch + pidOutputRoll + pidOutputYaw; //Calculate the pulse for esc 2 (rear-right - CW)
+      esc3 = throttle + pidOutputPitch - pidOutputRoll - pidOutputYaw; //Calculate the pulse for esc 3 (rear-left - CCW)
+      esc4 = throttle - pidOutputPitch - pidOutputRoll + pidOutputYaw; //Calculate the pulse for esc 4 (front-left - CW)
 
-    if (batteryVoltage < 1240 && batteryVoltage > 800){                   //Is the battery connected?
-      esc1 += esc1 * ((1240 - batteryVoltage)/(float)3500);//Compensate the esc-1 pulse for voltage drop.
-      esc2 += esc2 * ((1240 - batteryVoltage)/(float)3500);//Compensate the esc-2 pulse for voltage drop.
-      esc3 += esc3 * ((1240 - batteryVoltage)/(float)3500);//Compensate the esc-3 pulse for voltage drop.
-      esc4 += esc4 * ((1240 - batteryVoltage)/(float)3500);//Compensate the esc-4 pulse for voltage drop.
-    } 
+      if (batteryVoltage < 1240 && batteryVoltage > 800){              //Is the battery connected?
+        esc1 += esc1 * ((1240 - batteryVoltage)/(float)3500);          //Compensate the esc-1 pulse for voltage drop.
+        esc2 += esc2 * ((1240 - batteryVoltage)/(float)3500);          //Compensate the esc-2 pulse for voltage drop.
+        esc3 += esc3 * ((1240 - batteryVoltage)/(float)3500);          //Compensate the esc-3 pulse for voltage drop.
+        esc4 += esc4 * ((1240 - batteryVoltage)/(float)3500);          //Compensate the esc-4 pulse for voltage drop.
+      }
 
-    if (esc1 < 1100) esc1 = 1100;                          //Keep the motors running.
-    if (esc2 < 1100) esc2 = 1100;                          //Keep the motors running.
-    if (esc3 < 1100) esc3 = 1100;                          //Keep the motors running.
-    if (esc4 < 1100) esc4 = 1100;                          //Keep the motors running.
+      if (esc1 < 1100) esc1 = 1100;                                    //Keep the motors running.
+      if (esc2 < 1100) esc2 = 1100;                                    //Keep the motors running.
+      if (esc3 < 1100) esc3 = 1100;                                    //Keep the motors running.
+      if (esc4 < 1100) esc4 = 1100;                                    //Keep the motors running.
 
-    if(esc1 > 2000) esc1 = 2000;                 //Limit the esc-1 pulse to 2000us.
-    if(esc2 > 2000) esc2 = 2000;                 //Limit the esc-2 pulse to 2000us.
-    if(esc3 > 2000) esc3 = 2000;                 //Limit the esc-3 pulse to 2000us.
-    if(esc4 > 2000) esc4 = 2000;                 //Limit the esc-4 pulse to 2000us.  
+      if(esc1 > 2000) esc1 = 2000;                                     //Limit the esc-1 pulse to 2000us.
+      if(esc2 > 2000) esc2 = 2000;                                     //Limit the esc-2 pulse to 2000us.
+      if(esc3 > 2000) esc3 = 2000;                                     //Limit the esc-3 pulse to 2000us.
+      if(esc4 > 2000) esc4 = 2000;                                     //Limit the esc-4 pulse to 2000us.  
+      break;
+    
+    default:
+      esc1 = 1000;                                                      //If start is not 2 keep a 1000us pulse for ess-1.
+      esc2 = 1000;                                                      //If start is not 2 keep a 1000us pulse for ess-2.
+      esc3 = 1000;                                                      //If start is not 2 keep a 1000us pulse for ess-3.
+      esc4 = 1000;                                                      //If start is not 2 keep a 1000us pulse for ess-4.
   }
-  else{
-    esc1 = 1000;                   //If start is not 2 keep a 1000us pulse for ess-1.
-    esc2 = 1000;                   //If start is not 2 keep a 1000us pulse for ess-2.
-    esc3 = 1000;                   //If start is not 2 keep a 1000us pulse for ess-3.
-    esc4 = 1000;                   //If start is not 2 keep a 1000us pulse for ess-4.
-  }
 
-  // write to escs
+  // write to ESCs
   ledcWrite(pwmChannel1, esc1); ///2000*MAX_DUTY_CYCLE
   ledcWrite(pwmChannel2, esc2); ///2000*MAX_DUTY_CYCLE
   ledcWrite(pwmChannel3, esc3); ///2000*MAX_DUTY_CYCLE
@@ -85,7 +127,7 @@ void setEscPulses(){
 
   if(micros() - loopTimer > 4050) //ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);
   {
-    ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                   //Turn on the LED if the loop time exceeds 4050us.
+    ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                           //Turn on the LED if the loop time exceeds 4050us.
     if(DEBUG) {
       Serial.print("DANGER: LOOP TIMER > 4us: ");
       Serial.println(micros() - loopTimer );
@@ -96,5 +138,12 @@ void setEscPulses(){
   //The refresh rate is 250Hz. That means the esc's need there pulse every 4ms.
   while(micros() - loopTimer < 4000) ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  //We wait until 4000us are passed.
   ledcWrite(pwmLedFlyChannel, 0);
-  loopTimer = micros();                                                    //Set the timer for the next loop.
+  loopTimer = micros();                                                 //Set the timer for the next loop.
+}
+
+void convertAllSignals(){
+  receiverInputChannel1 = convertReceiverChannel(1);           //Convert the actual receiver signals for pitch to the standard 1000 - 2000us.
+  receiverInputChannel2 = convertReceiverChannel(2);           //Convert the actual receiver signals for roll to the standard 1000 - 2000us.
+  receiverInputChannel3 = convertReceiverChannel(3);           //Convert the actual receiver signals for throttle to the standard 1000 - 2000us.
+  receiverInputChannel4 = convertReceiverChannel(4);           //Convert the actual receiver signals for yaw to the standard 1000 - 2000us.
 }
