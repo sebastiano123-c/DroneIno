@@ -7,6 +7,9 @@ struct trimPosition{
   int16_t actual;                         // instantaneous receiver value
 } trimCh[5];
 
+// flight mode
+byte flightMode;                                           // 1 = only auto leveling (or nothing if AUTO_LEVELING = false), 2 = altitude hold
+
 // globals
 byte eepromData[36];
 int16_t calInt, start;
@@ -38,6 +41,21 @@ byte rawGX[2], rawGY[2], rawGZ[2];
 
 // battery
 float batteryVoltage;
+
+// altitude sensor
+float pressure;
+float pidErrorGainAltitude;
+uint8_t barometerCounter;
+float actualPressure, actualPressureSlow, actualPressureFast, actualPressureDiff;
+//Altitude PID variables
+float pidIMemAltitude, pidAltitudeSetpoint, pidAltitudeInput, pidOutputAltitude;
+uint8_t parachuteRotatingMemLocation;
+int32_t parachuteBuffer[35], parachuteThrottle;
+float pressureParachutePrevious;
+int32_t pressureRotatingMem[50], pressureTotalAvarage;
+uint8_t pressureRotatingMemLocation;
+uint8_t manualAltitudeChange;
+int16_t manualThrottle;
 
 // instantiate classes
 #if ALTITUDE_SENSOR == BMP280

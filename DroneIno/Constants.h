@@ -35,9 +35,3 @@ float fromVtoWidth = maximumWidth / BOARD_LIMIT_VOLTAGE;
 float maxBatteryLevelDropped = (float)(MAX_BATTERY_VOLTAGE-DIODE_DROP) * totalDrop;
 float correctionBattery = BOARD_LIMIT_VOLTAGE/maxBatteryLevelDropped;
 int minBatteryLevelThreshold = (float)(MIN_BATTERY_VOLTAGE-DIODE_DROP) * totalDrop / correctionBattery;
-
-// altitude sensor
-float pressure;
-
-// flight mode
-const int flightMode = 1;                                           // 1 = only auto leveling, 2 = altitude hold

@@ -4,7 +4,7 @@
 // legend:
 //      * = not available at the moment
 
-// MICROCONTROLLER 
+// MICROCONTROLLER BOARD
 #define PINMAP                      ESP32                   // (OFF*, ATMEGA32*, ESP32) OFF if the board is Arduino Uno (directly write pin)
 
 // DEBUG MODE
@@ -47,3 +47,9 @@
 #define PID_I_GAIN_YAW              0.02                     //Gain setting for the pitch I-controller. //0.02
 #define PID_D_GAIN_YAW              0.0                      //Gain setting for the pitch D-controller.
 #define PID_MAX_YAW                 400                      //Maximum output of the PID-controller (+/-)
+
+//            (ALTITUDE)
+#define PID_P_GAIN_ALTITUDE         1.4                      //Gain setting for the altitude P-controller (default = 1.4).
+#define PID_I_GAIN_ALTITUDE         0.2                      //Gain setting for the altitude I-controller (default = 0.2).
+#define PID_D_GAIN_ALTITUDE         0.75                     //Gain setting for the altitude D-controller (default = 0.75).
+#define PID_MAX_ALTITUDE            400                      //Maximum output of the PID-controller (+/-).

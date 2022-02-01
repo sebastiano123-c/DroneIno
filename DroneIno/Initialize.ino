@@ -2,7 +2,7 @@
 // @author: Sebastiano Cocchi
 
 void initialize(){
-  if(DEBUG) Serial.begin(BAUD_RATE);
+  Serial.begin(BAUD_RATE);
 
   EEPROM.begin(EEPROM_SIZE);
   vTaskDelay(50/portTICK_PERIOD_MS);
@@ -23,6 +23,7 @@ void initialize(){
     trimCh[start].center = (eepromData[channel * 2 - 1] << 8) | eepromData[channel * 2 - 2];   //Store the center value for the specific receiver input channel
     trimCh[start].high = (eepromData[channel * 2 + 7] << 8) | eepromData[channel * 2 + 6];     //Store the high value for the specific receiver input channel
   }
+  trimCh[5] = {reverse : 0b00000000, low : 1000, center: 1500, high : 2000};
 
   //Set start back to zero.
   start = 0;                                                                
@@ -53,19 +54,30 @@ void initialize(){
   checkAltitudeSensor();
 
   // wait until the rx is connected
-  if(!DEBUG) waitController();
-
-  //Set start back to 0.
-  start = 0;                                                                
+  if(!DEBUG) waitController();                                                           
 
   //Load the battery voltage to the battery_voltage variable.
   initBattery();
 
-  //Set the timer for the next loop.
-  loopTimer = micros();                                            
+  //The altitude sensor needs a few readings to stabilize.
+  for (start = 0; start < 100; start++) {                       //This loop runs 100 times.
+    calculateAltitudeHold();                                           //Read and calculate the barometer data.
+    vTaskDelay(4/portTICK_PERIOD_MS);                           //The main program loop also runs 250Hz (4ms per loop).
+  }
+  //Reset the pressure calculations.
+  actualPressure = 0;                                          
+
+  //Set start back to 0.
+  start = 0;   
+
+  // start without any mode (except for autoleveling if true)
+  flightMode = 1;                                         
 
   //When everything is done, turn off the led.
-  ledcWrite(pwmLedChannel, 0);                               //Turn off the warning led.                                               
+  ledcWrite(pwmLedChannel, 0);                               //Turn off the warning led.      
+
+  //Set the timer for the next loop.
+  loopTimer = micros();  
 }
 
 void waitController(){
@@ -122,12 +134,14 @@ void setupPins(){
   pinMode(PIN_RECEIVER_2, INPUT_PULLUP);
   pinMode(PIN_RECEIVER_3, INPUT_PULLUP);
   pinMode(PIN_RECEIVER_4, INPUT_PULLUP);
+  pinMode(PIN_RECEIVER_5, INPUT_PULLUP);
   
   //       event change detector
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_1), myISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_2), myISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_3), myISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_4), myISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_5), myISR, CHANGE);
 
   //Use the led on the Arduino for startup indication.
   ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                                                    //Turn on the warning led.

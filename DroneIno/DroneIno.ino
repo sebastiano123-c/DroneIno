@@ -33,10 +33,14 @@ void setup(){
 }
 
 void loop(){
-  //calculate the gyro values for pitch, roll and yaw
-  calculateAnglePRY();                                 // see Gyro.ino
-
-  // starting sequence
+  // select mode
+  if      (trimCh[5].actual < 1050) flightMode = 1;    // SWC UP: no mode on, (only auto leveling if enabled)
+  else if (trimCh[5].actual < 1550 &&
+           trimCh[5].actual > 1450) flightMode = 2;    // SWC CENTER: altitude hold 
+  else if (trimCh[5].actual < 2050 &&
+           trimCh[5].actual > 1950) flightMode = 3;    // SWC DOWN: GPS*
+  
+  // starting the quadcopter
   if(receiverInputChannel3 < 1050 &&                   // to start the motors: throttle low and yaw left (step 1).
      receiverInputChannel4 < 1050) start = 1;          
   if(start                == 1    &&                   // when yaw stick is back in the center position start the motors (step 2).
@@ -45,6 +49,12 @@ void loop(){
   if(start                == 2    &&                   // stopping the motors: throttle low and yaw right.
      receiverInputChannel3 < 1050 &&  
      receiverInputChannel4 > 1950) start = 0;          
+
+  // calculate the gyroscope values for pitch, roll and yaw
+  calculateAnglePRY();                                 // see Gyro.ino
+  
+  // calculate the altitude hold pressure parameters
+  calculateAltitudeHold();                             // see Altitude.ino
 
   // calculate PID values
   calculatePID();                                      // see PID.ino

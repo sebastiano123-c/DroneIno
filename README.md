@@ -25,7 +25,7 @@
 </h1>
 <h3 align="center"> 
   <i>
-    Arduino code for DIY quadcopter drones using ESP32 board.
+    Arduino code for ESP32 based DIY quadcopter drones.
   </i>
 </h3>
 <br>
@@ -68,12 +68,12 @@ or download the .zip file.
 
 # **Description**
 Based on the [YMFC-AL](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
-* ESP32 D1 R32;
-* a gyroscope MPU6050;
-* a radio controller and a receiver (_e.g._ FlySky);
-* 11.1V 3C LiPo battery (2200mAh or 3800mAh);
+* ESP32 D1 R32 board;
+* gyroscope MPU6050;
+* radio controller and a receiver (_e.g._ FlySky);
+* 11.1V 3S >20C LiPo battery (2200mAh or 3800mAh);
 * four 30A ESCs;
-* four brushless motors (around 1000KV).
+* four brushless DC motors (around 1000KV).
 To build DroneIno I followed these [videos](https://www.youtube.com/watch?v=XFxqFQwRumc&list=PL0K4VDicBzsibZqfa42DVxC8CGCMB7G2G) explaining how to build the YMFC and I recommend you to do the same.
 
 <!-- <pre>
@@ -84,7 +84,8 @@ CIRCUITAL SCHEMATIC HERE
 - ESP32 D1 R32 -->
 
 # **Features**
-- Autoleveling
+- autoleveling
+- altitude hold (developing9
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 # **Documentation**
@@ -132,9 +133,10 @@ X-  = disconnected                                  |     |      |
 | +-------------+--------------------------|--------------+                                            
 +------------------------------------------+                                                                                     
 </pre>
+After building the circuit, place it on the drone and proceed with the following passages.
 
 ## **Pinmap**
-Check that your pinmap correspond to the predefined [pinmap.ESP32.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/pinmaps/pinmap.ESP32.h), otherwise change it.
+Check that your pinmap corresponds to the one defined in the [pinmap](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/pinmaps) folder, otherwise change it.
 
 ## **Configuration**
 Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/Config.h) file where you can adjust the PID parameters and others constants.
@@ -145,7 +147,7 @@ Upload the [setup](https://github.com/sebastiano123-c/DroneIno/tree/main/Setup) 
 ## **Calibration**
 If the setup sketch exits with succeed, upload the [calibration](https://github.com/sebastiano123-c/DroneIno/tree/main/Calibration) sketch. Send the following characters to the serial monitor:
 * **r** to check if the transmitter signal is decoded correctly; move the trim and check that:
-  * throttle: down 1000us| up    2000us;
+  * throttle: low 1000us| full    2000us;
   * roll:     left 1000us| right 2000us;
   * pitch:    left 1000us| right 2000us;
   * yaw:      left 1000us| right 2000us;
@@ -171,7 +173,7 @@ You'd be better to find out how to calibrate your ESCs.
 Usually this is done as in [this](https://www.youtube.com/watch?v=l8rjjvAZvHM) video.
 
 ### **Propellers calibration**
-With calibration sketch calibrate the propellers.
+With calibration sketch still uploaded, calibrate the propellers.
 Send the number of the motor to the serial and read the accelerometer measurements which are printed on the serial.
 Try to lower these numbers by adding some scotch.
 
