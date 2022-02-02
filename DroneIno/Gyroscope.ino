@@ -102,7 +102,7 @@ for (calInt = 0; calInt < 1250 ; calInt ++){                           //Wait 5 
   gyroAxisCalibration[1] /= 2000;                                                 //Divide the roll total by 2000.
   gyroAxisCalibration[2] /= 2000;                                                 //Divide the pitch total by 2000.
   gyroAxisCalibration[3] /= 2000;                                                 //Divide the yaw total by 2000.
-  if(DEBUG) Serial.println("calibrateGyroscope: OK");
+  if(DEBUG) Serial.println("calibrateGyroscope: OK \n calibrating...");
 }
 
 void calculateAnglePRY(){
@@ -148,7 +148,7 @@ void calculateAnglePRY(){
     rollLevelAdjust = 0;                                                  //Set the roll angle correcion to zero.
   }
 
-  if(DEBUG) printGyroscopeStatus();                //print gyro status
+  //if(DEBUG) printGyroscopeStatus();                //print gyro status
 }
 
 void printGyroscopeStatus(){
@@ -162,24 +162,17 @@ void printGyroscopeStatus(){
 
 void readGyroscopeStatus(){
   
-  getAcc();
-  getGyro();
-
-  convertAllSignals();
-  
-  accAxis[1] = rawAX[1] | rawAX[0]<<8;
-  accAxis[2] = rawAY[1] | rawAY[0]<<8;
-  accAxis[3] = rawAZ[1] | rawAZ[0]<<8;
-  gyroAxis[1] = rawGX[1] | rawGX[0]<<8;
-  gyroAxis[2] = rawGY[1] | rawGY[0]<<8;
-  gyroAxis[3] = rawGZ[1] | rawGZ[0]<<8;
-
-  // gyroAxis[1] = gyroAxis[1]/*/gyroCorrection*/;           //Set gyroAxis[1] to the correct axis that was stored in the EEPROM.
-  // gyroAxis[2] = gyroAxis[2]/*/gyroCorrection*/;          //Set gyroAxis[2] to the correct axis that was stored in the EEPROM.
-  // gyroAxis[3] = gyroAxis[3]/*/gyroCorrection*/;            //Set gyroAxis[3] to the correct axis that was stored in the EEPROM.
-  // accAxis[2] = accAxis[2]/*/accCorrection*/ ;                //Set accAxis[2] to the correct axis that was stored in the EEPROM.
-  // accAxis[1] = accAxis[1]/*/accCorrection*/ ;                //Set accAxis[1] to the correct axis that was stored in the EEPROM.
-  // accAxis[3] = accAxis[3]/*/accCorrection*/ ;                //Set accAxis[3] to the correct axis that was stored in the EEPROM.
+  Wire.beginTransmission(GYRO_ADDRESS) ;
+  Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
+  Wire.endTransmission();
+  Wire.requestFrom(GYRO_ADDRESS, 14);  // request a total of 14 registers
+  accAxis[1]  = Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
+  accAxis[2]  = Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+  accAxis[3]  = Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+  gyroTemp    = Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+  gyroAxis[1] = Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
+  gyroAxis[2] = Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
+  gyroAxis[3] = Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
 
   if(calInt >= 2000){
     gyroAxis[1] -= gyroAxisCalibration[1];                            //Only compensate after the calibration.
@@ -193,72 +186,4 @@ void readGyroscopeStatus(){
   if(eepromData[28] & 0b10000000)accAxis[1] *= -1;                   //Invert accAxis[1] if the MSB of EEPROM bit 28 is set.
   if(eepromData[29] & 0b10000000)accAxis[2] *= -1;                   //Invert accAxis[2] if the MSB of EEPROM bit 29 is set.
   if(eepromData[30] & 0b10000000)accAxis[3] *= -1;                   //Invert accAxis[3] if the MSB of EEPROM bit 30 is set.
-}
-
-void getAcc(){
-  Wire.beginTransmission(gyroAddress);
-  Wire.write(ACCEL_XOUT_H);
-  Wire.endTransmission();
-  
-  Wire.requestFrom(gyroAddress,2,1);  
-  for(int i = 0; i<2 ; i++)
-  {
-    rawAX[i] = Wire.read();
-  }
-
-  //==================================================
-  Wire.beginTransmission(gyroAddress);
-  Wire.write(ACCEL_YOUT_H);
-  Wire.endTransmission();
-  
-  Wire.requestFrom(gyroAddress,2,1);
-  for(int i = 0; i<2 ; i++)
-  {
-    rawAY[i] = Wire.read();
-  }
-
-  //==================================================
-  Wire.beginTransmission(gyroAddress);
-  Wire.write(ACCEL_ZOUT_H);
-  Wire.endTransmission();
-  
-  Wire.requestFrom(gyroAddress,2,1);
-  for(int i = 0; i<2 ; i++)
-  {
-    rawAZ[i] = Wire.read();
-  }
-}
-
-void getGyro(){
-  Wire.beginTransmission(gyroAddress);
-  Wire.write(GYRO_XOUT_H);
-  Wire.endTransmission();
-  
-  Wire.requestFrom(gyroAddress,2,1);
-  for(int i = 0; i<2 ; i++)
-  {
-    rawGX[i] = Wire.read();
-  }
-  
-  //==================================================
-  Wire.beginTransmission(gyroAddress);
-  Wire.write(GYRO_YOUT_H);
-  Wire.endTransmission();
-  
-  Wire.requestFrom(gyroAddress,2,1);
-  for(int i = 0; i<2 ; i++)
-  {
-    rawGY[i] = Wire.read();
-  }
-
-  //==================================================
-  Wire.beginTransmission(gyroAddress);
-  Wire.write(GYRO_ZOUT_H);
-  Wire.endTransmission();
-  
-  Wire.requestFrom(gyroAddress,2,1);
-  for(int i = 0; i<2 ; i++)
-  {
-    rawGZ[i] = Wire.read();
-  }
 }

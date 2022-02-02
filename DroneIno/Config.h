@@ -32,7 +32,7 @@
 // PID:
 //              (ROLL)
 #define PID_P_GAIN_ROLL             1.3                     //Gain setting for the roll P-controller (1.3)
-#define PID_I_GAIN_ROLL             0.00035                  //Gain setting for the roll I-controller (0.04)
+#define PID_I_GAIN_ROLL             0.00021                  //Gain setting for the roll I-controller (0.04)
 #define PID_D_GAIN_ROLL             15.0                    //Gain setting for the roll D-controller (18.0)
 #define PID_MAX_ROLL                400                     //Maximum output of the PID-controller (+/-)
 

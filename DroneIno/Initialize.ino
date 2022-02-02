@@ -2,7 +2,7 @@
 // @author: Sebastiano Cocchi
 
 void initialize(){
-  Serial.begin(BAUD_RATE);
+  if(DEBUG) Serial.begin(BAUD_RATE);
 
   EEPROM.begin(EEPROM_SIZE);
   vTaskDelay(50/portTICK_PERIOD_MS);
@@ -31,6 +31,9 @@ void initialize(){
   // pinmode
   setupPins();
    
+  // this led will be turned on until the setup is finished
+  ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);     
+
   //Start the I2C as master.
   setupGyroscope();                                                         
 
@@ -44,9 +47,6 @@ void initialize(){
   //Set the specific gyro registers.  
   setGyroscopeRegisters();                                                     
 
-  // turn off second led
-  ledcWrite(pwmLedFlyChannel, 0);
-
   // few seconds for calibrating the gyroscope
   calibrateGyroscope();
 
@@ -58,15 +58,7 @@ void initialize(){
 
   //Load the battery voltage to the battery_voltage variable.
   initBattery();
-
-  //The altitude sensor needs a few readings to stabilize.
-  for (start = 0; start < 100; start++) {                       //This loop runs 100 times.
-    calculateAltitudeHold();                                           //Read and calculate the barometer data.
-    vTaskDelay(4/portTICK_PERIOD_MS);                           //The main program loop also runs 250Hz (4ms per loop).
-  }
-  //Reset the pressure calculations.
-  actualPressure = 0;                                          
-
+  
   //Set start back to 0.
   start = 0;   
 
@@ -75,6 +67,7 @@ void initialize(){
 
   //When everything is done, turn off the led.
   ledcWrite(pwmLedChannel, 0);                               //Turn off the warning led.      
+  ledcWrite(pwmLedFlyChannel, 0);                            //Turn off the warning led.      
 
   //Set the timer for the next loop.
   loopTimer = micros();  

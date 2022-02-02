@@ -85,7 +85,7 @@ CIRCUITAL SCHEMATIC HERE
 
 # **Features**
 - autoleveling
-- altitude hold (developing9
+- altitude hold (developing)
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 # **Documentation**

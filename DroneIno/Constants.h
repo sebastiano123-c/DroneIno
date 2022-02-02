@@ -35,3 +35,11 @@ float fromVtoWidth = maximumWidth / BOARD_LIMIT_VOLTAGE;
 float maxBatteryLevelDropped = (float)(MAX_BATTERY_VOLTAGE-DIODE_DROP) * totalDrop;
 float correctionBattery = BOARD_LIMIT_VOLTAGE/maxBatteryLevelDropped;
 int minBatteryLevelThreshold = (float)(MIN_BATTERY_VOLTAGE-DIODE_DROP) * totalDrop / correctionBattery;
+
+// altimeter
+uint8_t osrs_t = 1;             //Temperature oversampling x 1
+uint8_t osrs_p = 1;             //Pressure oversampling x 1
+uint8_t barometerMode = 3;      //Normal barometerMode
+uint8_t t_sb = 5;               //Tstandby 1000ms
+uint8_t filter = 0;             //Filter off 
+uint8_t spi3w_en = 0;           //3-wire SPI Disable

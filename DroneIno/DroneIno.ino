@@ -32,7 +32,7 @@ void setup(){
   initialize();                                        // function at initialize.ino                                    
 }
 
-void loop(){
+void loop(){                                           // loop runs at 250Hz => each loop last 4000us
   // select mode
   if      (trimCh[5].actual < 1050) flightMode = 1;    // SWC UP: no mode on, (only auto leveling if enabled)
   else if (trimCh[5].actual < 1550 &&
@@ -52,6 +52,9 @@ void loop(){
 
   // calculate the gyroscope values for pitch, roll and yaw
   calculateAnglePRY();                                 // see Gyro.ino
+
+  //convert the signal of the rx
+  convertAllSignals();                                 // see ESC.ino
   
   // calculate the altitude hold pressure parameters
   calculateAltitudeHold();                             // see Altitude.ino
@@ -64,4 +67,21 @@ void loop(){
 
   // create ESC pulses
   setEscPulses();                                      // see ESC.ino
+
+  // finish the loop
+  if(micros() - loopTimer > 4050) //ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);
+  {
+    ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                           //Turn on the LED if the loop time exceeds 4050us.
+    if(DEBUG) {
+      Serial.print("DANGER: LOOP TIMER > 4us: ");
+      Serial.println(micros() - loopTimer );
+    }
+  }
+  else  ledcWrite(pwmLedChannel, 0);
+  
+  //All the information for controlling the motor's is available.
+  //The refresh rate is 250Hz. That means the esc's need there pulse every 4ms.
+  while(micros() - loopTimer < 4000) ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  //We wait until 4000us are passed.
+  ledcWrite(pwmLedFlyChannel, 0);
+  loopTimer = micros();                                                 //Set the timer for the next loop.
 }
