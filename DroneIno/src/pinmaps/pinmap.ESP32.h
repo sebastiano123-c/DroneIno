@@ -19,7 +19,7 @@
 
 // LEDs
 #define PIN_BATTERY_LED             19 
-#define PIN_SECOND_LED              18      //not shown in the scheme, 
+#define PIN_SECOND_LED              18      //if you don't have it, leave here an unused pin
 
 // BATTERY LEVEL
 #define PIN_BATTERY_LEVEL           2

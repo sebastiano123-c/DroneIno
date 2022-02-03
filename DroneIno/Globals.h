@@ -21,7 +21,7 @@ byte lastChannel1, lastChannel2, lastChannel3, lastChannel4, lastChannel5;
 unsigned long timer1, timer2, timer3, timer4, timer5, currentTime, loopTimer;
 int16_t esc1, esc2, esc3, esc4;
 int16_t throttle;
-double gyroAxisCalibration[4];   
+double gyroAxisCalibration[4], accAxisCalibration[2];
 
 //PID
 float pidIMemRoll, pidRollSetpoint, gyroRollInput, pidOutputRoll, pidLastRollDError;
@@ -41,7 +41,7 @@ int16_t manualThrottle;
 
 //gyro readings
 boolean gyroAnglesSet;
-int16_t gyroAddress, gyroTemp;
+int16_t gyroTemp;
 int16_t accAxis[4], gyroAxis[4];   
 float angleRollAcc, anglePitchAcc, anglePitch, angleRoll;
 float rollLevelAdjust, pitchLevelAdjust;

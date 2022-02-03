@@ -71,10 +71,10 @@
     Wire.write(0xF7);
     Wire.endTransmission();
     Wire.requestFrom(ALTITUDE_SENSOR_ADDRESS, 8);
-    calInt = 0;
+    int i = 0;
     while(Wire.available()){
-        barometerData[calInt] = Wire.read();
-        calInt++;
+        barometerData[i] = Wire.read();
+        i++;
     }
     presRaw = (barometerData[0] << 12) | (barometerData[1] << 4) | (barometerData[2] >> 4);
     tempRaw = (barometerData[3] << 12) | (barometerData[4] << 4) | (barometerData[5] >> 4);

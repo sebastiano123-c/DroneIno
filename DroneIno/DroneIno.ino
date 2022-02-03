@@ -83,13 +83,11 @@ void loop(){                                           // loop runs at 250Hz => 
 
   // finish the loop
   if(micros() - loopTimer > 4050)
-         ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);     // turn on the LED if the loop time exceeds 4050us
+         ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);     // turn on the LED if the loop time exceeds 4050us
 
   
   //  wait until 4000us are passed. This shows the dead time for each loop
-  while(micros() - loopTimer < 4000)                   // the refresh rate is 250Hz. That means the esc's need there pulse every 4ms.
-          ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE); // turn on the led until the time expires 4ms (the more it is on, the more time remains)
-
+  while(micros() - loopTimer < 4000);                   // the refresh rate is 250Hz, thus esc's pulse update is every 4ms.
 
   ledcWrite(pwmLedFlyChannel, 0);                      // turn off the fly led for the next loop
 

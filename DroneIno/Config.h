@@ -21,7 +21,6 @@
 // BATTERY
 #define MAX_BATTERY_VOLTAGE         11100                    //(mV) battery nominal maximum voltage (use ONLY 11.1V batteries)
 #define MIN_BATTERY_VOLTAGE         5000                     //(mV) battery level above which it is dangerous to use
-#define DIODE_DROP                  700                      //generally it is -0.7V
 
 // SENSORS
 #define GYROSCOPE                   MPU6050                  //unique for now

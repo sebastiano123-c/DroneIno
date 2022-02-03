@@ -1,4 +1,4 @@
-#define GYRO_ADDRESS 0x68
+#define GYRO_ADDRESS            0x68
 
 #define GYRO_CONFIG             0x1B
 #define ACCEL_CONFIG            0x1C                        // 0x1A

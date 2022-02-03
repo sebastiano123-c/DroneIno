@@ -1,13 +1,10 @@
 void setupGyroscope(){
-  // set gyro address
-  gyroAddress = GYRO_ADDRESS; 
-  
   // setup wire
   Wire.setClock(WIRE_CLOCK);
   Wire.begin(PIN_SDA, PIN_SCL);
   vTaskDelay(40/portTICK_PERIOD_MS);
 
-  Wire.beginTransmission(gyroAddress);
+  Wire.beginTransmission(GYRO_ADDRESS);
 
   //Start communication with the MPU-6050.                           
   int error = Wire.endTransmission();                              //End the transmission and register the exit status.
@@ -18,7 +15,7 @@ void setupGyroscope(){
     ledcWrite(pwmLedChannel, 0);
     vTaskDelay(80/portTICK_PERIOD_MS);                             //Simulate a 250Hz refresc rate as like the main loop.
     Serial.print("MPU6050 ERROR at address: ");
-    Serial.println(gyroAddress);
+    Serial.println(GYRO_ADDRESS);
   }
   ledcWrite(pwmLedChannel, 0);
   if(DEBUG) Serial.println("Gyroscope setup: OK");
@@ -27,33 +24,33 @@ void setupGyroscope(){
 void setGyroscopeRegisters(){
   //Setup the MPU-6050
   if(eepromData[31] == 1){
-    Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search.
+    Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search.
     Wire.write(PWR_MGMT_1);                                     //We want to write to the PWR_MGMT_1 register (6B hex)
     Wire.write(0x00);                                           //Set the register bits as 00000000 to activate the gyro
     Wire.endTransmission();                                     //End the transmission with the gyro.
 
-    Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search.
+    Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search.
     Wire.write(GYRO_CONFIG);                                    //We want to write to the GYRO_CONFIG register (1B hex)
     Wire.write(GYRO_REGISTERS_BITS);                            //Set the register bits as 00001000 (500dps full scale)
     Wire.endTransmission();                                     //End the transmission with the gyro
 
-    Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search.
+    Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search.
     Wire.write(ACCEL_CONFIG);                                   //We want to write to the ACCEL_CONFIG register (1A hex)
     Wire.write(ACC_REGISTERS_BITS);                             //Set the register bits as 00010000 (+/- 8g full scale range)
     Wire.endTransmission();                                     //End the transmission with the gyro
 
     //Let's perform a random register check to see if the values are written correct
-    Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search
+    Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search
     Wire.write(GYRO_CONFIG);                                    //Start reading @ register GYRO_CONFIG
     Wire.endTransmission();                                     //End the transmission
-    Wire.requestFrom(gyroAddress, 1);                           //Request 1 bytes from the gyro
+    Wire.requestFrom(GYRO_ADDRESS, 1);                           //Request 1 bytes from the gyro
     while(Wire.available() < 1);                                //Wait until the 6 bytes are received
     if(Wire.read() != GYRO_REGISTERS_BITS){                     //Check if the value is 0x08
       ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                      //Turn on the warning led
       while(1)vTaskDelay(10/portTICK_PERIOD_MS);                //Stay in this loop for ever
     }
 
-    Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search
+    Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search
     Wire.write(0x1A);                                           //We want to write to the CONFIG register (1A hex)
     Wire.write(DIGITAL_LOW_PASS_FILTER);                        //Set the register bits as 00000011 (Set Digital Low Pass Filter to ~43Hz)
     Wire.endTransmission();                                     //End the transmission with the gyro    
@@ -61,7 +58,7 @@ void setGyroscopeRegisters(){
 }
 
 void calibrateGyroscope(){
-for (calInt = 0; calInt < 1250 ; calInt ++){                           //Wait 5 seconds before continuing.
+  for (calInt = 0; calInt < 1250 ; calInt ++){                           //Wait 5 seconds before continuing.
     ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
     ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
     ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
@@ -75,14 +72,26 @@ for (calInt = 0; calInt < 1250 ; calInt ++){                           //Wait 5 
     vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
   }
 
+  accAxisCalibration[1] = 0;
+  accAxisCalibration[2] = 0;
+  gyroAxisCalibration[1] = 0;                                       //Ad roll value to gyro_roll_cal.
+  gyroAxisCalibration[2] = 0;                                       //Ad pitch value to gyro_pitch_cal.
+  gyroAxisCalibration[3] = 0;                                       //Ad yaw value to gyro_yaw_cal.
+  
   //Let's take multiple gyro data samples so we can determine the average gyro offset (calibration).
   for (calInt = 0; calInt < 2000 ; calInt ++){                           //Take 2000 readings for calibration.
+    
     if(calInt % 15 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //Change the led status to indicate calibration.
     else ledcWrite(pwmLedChannel, 0);
+    
     readGyroscopeStatus();                                                        //Read the gyro output.
+    
     gyroAxisCalibration[1] += gyroAxis[1];                                       //Ad roll value to gyro_roll_cal.
     gyroAxisCalibration[2] += gyroAxis[2];                                       //Ad pitch value to gyro_pitch_cal.
     gyroAxisCalibration[3] += gyroAxis[3];                                       //Ad yaw value to gyro_yaw_cal.
+
+    accAxisCalibration[1] += accAxis[1];
+    accAxisCalibration[2] += accAxis[2];
 
     //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while calibrating the gyro.
     ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
@@ -98,10 +107,15 @@ for (calInt = 0; calInt < 1250 ; calInt ++){                           //Wait 5 
     ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                         //Set digital port 4, 5, 6 and 7 low.
     vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
   }
+
   //Now that we have 2000 measures, we need to devide by 2000 to get the average gyro offset.
   gyroAxisCalibration[1] /= 2000;                                                 //Divide the roll total by 2000.
   gyroAxisCalibration[2] /= 2000;                                                 //Divide the pitch total by 2000.
   gyroAxisCalibration[3] /= 2000;                                                 //Divide the yaw total by 2000.
+
+  accAxisCalibration[1] /= 2000;
+  accAxisCalibration[2] /= 2000;
+
   if(DEBUG) Serial.println("calibrateGyroscope: OK \n calibrating...");
 }
 
@@ -178,6 +192,8 @@ void readGyroscopeStatus(){
     gyroAxis[1] -= gyroAxisCalibration[1];                            //Only compensate after the calibration.
     gyroAxis[2] -= gyroAxisCalibration[2];                            //Only compensate after the calibration.
     gyroAxis[3] -= gyroAxisCalibration[3];                            //Only compensate after the calibration.
+    accAxis[1]  -= accAxisCalibration[1];
+    accAxis[2]  -= accAxisCalibration[2];
   }
 
   if(eepromData[28] & 0b10000000)gyroAxis[1] *= -1;               //Invert gyroAxis[1] if the MSB of EEPROM bit 28 is set.
