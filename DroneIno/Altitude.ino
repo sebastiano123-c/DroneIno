@@ -124,7 +124,7 @@
   void smoothPressureReadings(){
     //To get a smoother pressure value we will use a 20 location rotating memory.
     pressureTotalAvarage -= pressureRotatingMem[pressureRotatingMemLocation];                          //Subtract the current memory position to make room for the new value.
-    pressureRotatingMem[pressureRotatingMemLocation] = pressure;                                                //Calculate the new change between the actual pressure and the previous measurement.
+    pressureRotatingMem[pressureRotatingMemLocation] = pressure;                                      //Calculate the new change between the actual pressure and the previous measurement.
     pressureTotalAvarage += pressureRotatingMem[pressureRotatingMemLocation];                          //Add the new value to the long term avarage value.
     pressureRotatingMemLocation++;                                                                         //Increase the rotating memory location.
 
@@ -198,10 +198,10 @@ void calculateAltitudeAdjustementPID(){
 
   //To get better results the P-gain is increased when the error between the setpoint and the actual pressure value increases.
   //The variable pidErrorGainAltitude will be used to adjust the P-gain of the PID-controller.
-  pidErrorGainAltitude = 0;                                                   //Set the pidErrorGainAltitude to 0.
-  if (pidErrorTemp > 10 || pidErrorTemp < -10) {                             //If the error between the setpoint and the actual pressure is larger than 10 or smaller then -10.
+  pidErrorGainAltitude = 0;                                                  //Set the pidErrorGainAltitude to 0.
+  if (pidErrorTemp > 10 || pidErrorTemp < - 10) {     //If the error between the setpoint and the actual pressure is larger than 10 or smaller then -10.
     pidErrorGainAltitude = (abs(pidErrorTemp) - 10) / 20.0;                 //The positive pidErrorGainAltitude variable is calculated based based on the error.
-    if (pidErrorGainAltitude > 3)pidErrorGainAltitude = 3;                 //To prevent extreme P-gains it must be limited to 3.
+    if (abs(pidErrorGainAltitude -3.0) > 1e-9)pidErrorGainAltitude = 3;     //To prevent extreme P-gains it must be limited to 3.
   }
 
   //In the following section the I-output is calculated. It's an accumulation of errors over time.
@@ -220,27 +220,27 @@ void calculateAltitudeAdjustementPID(){
 }
 
 void calculateAltitudeHold(){
-  //Every time this function is called the barometerCounter variable is incremented. This way a specific action
-  //is executed at the correct moment. This is needed because requesting data from the MS5611 takes around 9ms to complete.
+  // the barometric readings happen in two subsequent loops. This counter is needed for this
   barometerCounter ++;
 
   switch (barometerCounter)
-  {                                                                    //When the barometerCounter variable is 1.
+  {                                                                                  //When the barometerCounter variable is 1.
 
   case 1:
 
-    readPressureData();                                                //Get pressure data
+    readPressureData();                                                              //Get pressure data
     break;
 
-  case 2:                                                              //When the barometer counter is 3    
+  case 2:                                                                            //When the barometer counter is 2   
+
     tempCal = calibration_T(tempRaw);
     pressCal = calibration_P(presRaw);
     temperature = (double)tempCal / 100.0;
     pressure = (double)pressCal / 100.0;
 
-    smoothPressureReadings();                                          //remove the spikes from the barometer data
+    smoothPressureReadings();                                                        //remove the spikes from the barometer data
     
-    barometerCounter = 0;                                              //Set the barometer counter to 0 for the next measurements.
+    barometerCounter = 0;                                                            //Set the barometer counter to 0 for the next measurements.
     
     //If the altitude hold function is disabled some variables need to be reset to ensure a bumpless start when the altitude hold function is activated again.
     switch (flightMode)
@@ -263,11 +263,12 @@ void calculateAltitudeHold(){
       if (abs(pidAltitudeSetpoint) < 1e-8) pidAltitudeSetpoint = actualPressure;       //If not yet set, set the PID altitude setpoint.
 
       calculateAltitudeAdjustementPID();
+      
     }
 
     break;
 
-  default: // if barometerCounter is neither 1 or 2
+  default:                                                                            // if barometerCounter is neither 1 or 2
     barometerCounter = 1;
   }
 }

@@ -5,21 +5,21 @@
 // @author: Sebastiano Cocchi
 
 // ESC
-#define PIN_ESC_1 17
-#define PIN_ESC_2 16
-#define PIN_ESC_3 27
-#define PIN_ESC_4 14
+#define PIN_ESC_1                   17
+#define PIN_ESC_2                   16
+#define PIN_ESC_3                   27
+#define PIN_ESC_4                   14
 
 // RECEIVER
-#define PIN_RECEIVER_1 12
-#define PIN_RECEIVER_2 13
-#define PIN_RECEIVER_3 5
-#define PIN_RECEIVER_4 23
-#define PIN_RECEIVER_5 4
+#define PIN_RECEIVER_1              12
+#define PIN_RECEIVER_2              13
+#define PIN_RECEIVER_3              5
+#define PIN_RECEIVER_4              23
+#define PIN_RECEIVER_5              4
 
-// LED
+// LEDs
 #define PIN_BATTERY_LED             19 
-#define PIN_SECOND_LED              18 
+#define PIN_SECOND_LED              18      //not shown in the scheme, 
 
 // BATTERY LEVEL
 #define PIN_BATTERY_LEVEL           2

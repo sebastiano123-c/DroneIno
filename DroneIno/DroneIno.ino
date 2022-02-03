@@ -33,55 +33,67 @@ void setup(){
 }
 
 void loop(){                                           // loop runs at 250Hz => each loop last 4000us
-  // select mode
+
+  // select mode via SWC of the controller
   if      (trimCh[5].actual < 1050) flightMode = 1;    // SWC UP: no mode on, (only auto leveling if enabled)
+
   else if (trimCh[5].actual < 1550 &&
            trimCh[5].actual > 1450) flightMode = 2;    // SWC CENTER: altitude hold 
+
   else if (trimCh[5].actual < 2050 &&
            trimCh[5].actual > 1950) flightMode = 3;    // SWC DOWN: GPS*
+
   
-  // starting the quadcopter
+  // starting sequence of the quadcopter
   if(receiverInputChannel3 < 1050 &&                   // to start the motors: throttle low and yaw left (step 1).
      receiverInputChannel4 < 1050) start = 1;          
+
   if(start                == 1    &&                   // when yaw stick is back in the center position start the motors (step 2).
      receiverInputChannel3 < 1050 && 
      receiverInputChannel4 > 1450) droneStart();       
+
   if(start                == 2    &&                   // stopping the motors: throttle low and yaw right.
      receiverInputChannel3 < 1050 &&  
-     receiverInputChannel4 > 1950) start = 0;          
+     receiverInputChannel4 > 1950) start = 0;      
+
 
   // calculate the gyroscope values for pitch, roll and yaw
   calculateAnglePRY();                                 // see Gyro.ino
 
-  //convert the signal of the rx
+
+  // convert the signal of the rx
   convertAllSignals();                                 // see ESC.ino
+
   
   // calculate the altitude hold pressure parameters
   calculateAltitudeHold();                             // see Altitude.ino
 
+
   // calculate PID values
   calculatePID();                                      // see PID.ino
+
 
   // battery voltage can affect the efficiency 
   batteryVoltageCompensation();                        // see Battery.ino
 
+
   // create ESC pulses
   setEscPulses();                                      // see ESC.ino
 
+
   // finish the loop
-  if(micros() - loopTimer > 4050) //ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);
-  {
-    ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                           //Turn on the LED if the loop time exceeds 4050us.
-    if(DEBUG) {
-      Serial.print("DANGER: LOOP TIMER > 4us: ");
-      Serial.println(micros() - loopTimer );
-    }
-  }
-  else  ledcWrite(pwmLedChannel, 0);
+  if(micros() - loopTimer > 4050)
+         ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);     // turn on the LED if the loop time exceeds 4050us
+
   
-  //All the information for controlling the motor's is available.
-  //The refresh rate is 250Hz. That means the esc's need there pulse every 4ms.
-  while(micros() - loopTimer < 4000) ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  //We wait until 4000us are passed.
-  ledcWrite(pwmLedFlyChannel, 0);
-  loopTimer = micros();                                                 //Set the timer for the next loop.
+  //  wait until 4000us are passed. This shows the dead time for each loop
+  while(micros() - loopTimer < 4000)                   // the refresh rate is 250Hz. That means the esc's need there pulse every 4ms.
+          ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE); // turn on the led until the time expires 4ms (the more it is on, the more time remains)
+
+
+  ledcWrite(pwmLedFlyChannel, 0);                      // turn off the fly led for the next loop
+
+
+  loopTimer = micros();                                // set the timer for the next loop
+
 }

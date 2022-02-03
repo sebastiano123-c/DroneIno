@@ -45,6 +45,7 @@ Make sure to do all the passages described here below.
 - [**Usage**](#usage)
 - [**Description**](#description)
 - [**Features**](#features)
+  - [**Selecting flight mode**](#selecting-flight-mode)
 - [**Documentation**](#documentation)
   - [**Circuit scheme**](#circuit-scheme)
   - [**Pinmap**](#pinmap)
@@ -84,54 +85,60 @@ CIRCUITAL SCHEMATIC HERE
 - ESP32 D1 R32 -->
 
 # **Features**
-- autoleveling
-- altitude hold (developing)
+1) auto-leveling
+2) altitude hold (developing)
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
+
+## **Selecting flight mode**
+Set the SWC switch of the transmitter to channel 5 and connect the receiver channel to the desired pin (mine is the GPIO 4):
+* SWC up: flight mode selected is only auto-leveling;
+* SWC center: flight mode selected is altitude hold (and auto-leveling if enabled);
+* SWC down: flight mode selected is GPS (NOT YET IMPLEMENTED).
 
 # **Documentation**
 ## **Circuit scheme**
 The power is supplied by the 11.1V 2200mAh 3s 20C LiPo battery.
 The battery powers the motors and the ESP32.
-The resistances (Ohms) R2 = 1K and R3 = 1.5K and the diode D1 (1N4001 or similar) handle the current going through the board.
+The resistances (Ohms) R2 = 0.5K and R3 = 1.1K and the diode D1 (1N4001 or similar) handle the current going through the board.
 D1 ensures that the PC is safe while both battery and pc are connected to the ESP32.
 The resistance R1 = 330 is used for the LED. 
 <pre>
-LEGEND:                                             +-----+--R3--+     
-X-  = disconnected                                  |     |      |                      
--+- = sold cables                                   |     R1     |                   __________________ 
--|- = not touching cables                           |  +--|------+---D1--------++====|+VCC|11.1V, >= 20C | 
-=== = 3-5A cables                                   |  |  +----------------++==||====|-GND|2200mAh, 3s   | 
-                                                    |  |  |                ||  ||    ## LiPo BATTERY ## 
-                                                    |  |  |   _________    ||  ||                       
-           +----------------------------------------|--|--|-->|°INPUT |====||==||=============/     \
-           | +-----------------------------------+  |  |  | X-|+VIN   |====||==||=============| M1  |
-           | | +-------------------------------+ |  |  |  +-->|-GND   |====||==||=============\ CCW /
-           | | | +---------------------------+ | |  |  |  |   |      +|====||==++                    
-           | | | |   _____________________   | | |  |  |  |   |      -|====++  ||                    
-           | | | |   |°IO03         IO39°|   | | |  |  |  |   ##ESC-1##    ||  ||                    
-           | | | |   |°IO01         IO38°|   | | |  |  |  |   _________    ||  ||                    
-           | | | |   |°IO26         IO34°|   | | +--|--|--|-->|°INPUT |====||==||=============/     \
-           | | | |   |°IO25         IO04°|   | |    |  |  | X-|+VIN   |====||==||=============| M2  |
-           | | | +-->|°IO17         IO02°|<--|-|----+  |  +-->|-GND   |====||==||=============\ CW  /
-           | | +---->|°IO16              |   | |       |  |   |      +|====||==++                    
-           | +------>|°IO27          VIN+|<--|-|-------+  |   |      -|====++  ||                    
-           +-------->|°IO14          GND-|<--|-|----------+   ##ESC-2##    ||  ||                    
-     _______         |               GND-|   | |          |   _________    ||  ||                    
-     | CH1°|<------->|°IO12           5V°|<+ | +----------|-->|°INPUT |====||==||=============/     \
-     | CH2°|<------->|°IO13          3V3°| | |            | X-|+VIN   |====||==||=============| M3  |
-     | CH3°|<------->|°IO05          RST°| | |            +-->|-GND   |====||==||=============\ CCW /
-     | CH4°|<------->|°IO23           5V°| | |            |   |      +|====||==++                    
-+--->| VIN+|    +--->|°IO19           OD°| | |            |   |      -|====++  ||                    
-| +->| GND-|    R1   |°IO18              | | |            |   ##ESC-3##    ||  ||                    
-| |  ##RX ##    |    |-GND   (not in     | | |            |   _________    ||  ||                    
-| |  _______  (LED)  |°RST     scale)    | | +------------|-->|°INPUT |====||==||=============/     \
-| |  | SDA°|<---|--->|°SDA               | |              | X-|+VIN   |====||==||=============| M4  |
-| |  | SCL°|<---|--->|°SCL               | |              +-->|-GND   |====||==||=============\ CW  /
-+-|->| VCC+|    |    #### ESP32 D1 R32 ### |              |   |      +|====||==++                  
-| +->| GND-|    |                          |              |   |      -|====++                        
-| |  #gyro #    |                          |              |   ##ESC-4##                              
-| +-------------+--------------------------|--------------+                                            
-+------------------------------------------+                                                                                     
+    LEGEND:                                                 +-----+--R3--+     
+    X-  = disconnected                                      |     |      |                      
+    -+- = sold cables                                       |     R1     |                   __________________ 
+    -|- = not touching cables                               |  +--|------+---D1--------++==|+VCC|11.1V, >= 20C | 
+    === = 3-5A cables                                       |  |  +----------------++==||==|-GND|2200mAh, 3s   | 
+                                                            |  |  |                ||  ||    ## LiPo BATTERY ## 
+                 +---------------------------------+        |  |  |   _________    ||  ||              _____    
+                 | +-------------------------------|--------|--|--|-->|°INPUT |====||==||=============/     \
+                 | | +-----------------------------|-----+  |  |  | X-|+VIN   |====||==||=============| M1  |
+                 | | | +---------------------------|---+ |  |  |  +-->|-GND   |====||==||=============\ CCW /
+        ______   | | | | +-------------------------|-+ | |  |  |  |   |      +|====||==++                    
++------>|SDA°|   | | | | |   _____________________ | | | |  |  |  |   |      -|====++  ||                    
+| +---->|SCL°|   | | | | |   |°IO03         IO39°| | | | |  |  |  |   ##ESC-1##    ||  ||                    
+| |     |VCC+|<--------------------------+  IO38°| | | | |  |  |  |   _________    ||  ||              _____  
+| |   +>|GND-|   | | | | |   |°IO26      |  IO34°| | | | +--|--|--|-->|°INPUT |====||==||=============/     \
+| |   | #baro#   | | | | |   |°IO25      |  IO04°|<+ | |    |  |  | X-|+VIN   |====||==||=============| M2  |
+| |   |          | | | | +-->|°IO17      |  IO02°|<--|-|----+  |  +-->|-GND   |====||==||=============\ CW  /
+| |   |          | | | +---->|°IO16      |       |   | |       |  |   |      +|====||==++                    
+| |   |          | | +------>|°IO27      |   VIN+|<--|-|-------+  |   |      -|====++  ||                    
+| |   |  _______ | +-------->|°IO14      |   GND-|<--|-|----------+   ##ESC-2##    ||  ||                    
+| |   |  | CH5°|<+           |           |   GND-|   | |          |   _________    ||  ||              _____ 
+| |   |  | CH1°|<----------->|°IO12      |    5V°|<+ | +----------|-->|°INPUT |====||==||=============/     \
+| |   |  | CH2°|<----------->|°IO13      +-->3V3°| | |            | X-|+VIN   |====||==||=============| M3  |
+| |   |  | CH3°|<----------->|°IO05          RST°| | |            +-->|-GND   |====||==||=============\ CCW /
+| |   |  | CH4°|<----------->|°IO23           5V°| | |            |   |      +|====||==++                    
+| | +-|->| VIN+|       +---->|°IO19  (not in  OD°| | |            |   |      -|====++  ||                    
+| | | +->| GND-|       R1 +->|°IO18    scale)    | | |            |   ##ESC-3##    ||  ||                    
+| | | |  ##RX ##       |  |  |-GND               | | |            |   _________    ||  ||              _____ 
+| | | |  _______     (LED)|  |°RST               | | +------------|-->|°INPUT |====||==||=============/     \
++-|-|-|->| SDA°|<------|--|->|°SDA (GPIO 21)     | |              | X-|+VIN   |====||==||=============| M4  |
+  +-|-|->| SCL°|<------|--|->|°SCL (GPIO 22)     | |              +-->|-GND   |====||==||=============\ CW  /
+    +-|->| VCC+|       |  |  #### ESP32 D1 R32 ### |              |   |      +|====||==++                  
+    | +->| GND-|       |  R1                       |              |   |      -|====++                        
+    | |  #gyro #       | (LEDf)                   |              |   ##ESC-4##                              
+    | +----------------+--+------------------------|--------------+                                            
+    +----------------------------------------------+                                                                       
 </pre>
 After building the circuit, place it on the drone and proceed with the following passages.
 

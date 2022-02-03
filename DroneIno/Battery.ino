@@ -28,6 +28,6 @@ void batteryVoltageCompensation(){
   // }
 
   //Turn on the led if battery voltage is too low.
-  if(batteryVoltage < (float)minBatteryLevelThreshold);// ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);
+  if(batteryVoltage < (float)minBatteryLevelThreshold) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);
   else ledcWrite(pwmLedChannel, 0);
 }
