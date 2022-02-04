@@ -1,7 +1,13 @@
-// Initialize 
-// @author: Sebastiano Cocchi
+/*
+* Initialize 
+* @author @sebastiano123-c
+*/
 
 void initialize(){
+  /* 
+  * @brief entire setup funtcion: initialize all the sensors
+  */
+
   if(DEBUG) Serial.begin(BAUD_RATE);
 
   EEPROM.begin(EEPROM_SIZE);
@@ -14,14 +20,16 @@ void initialize(){
   if(DEBUG) printEEPROM();
 
   // fill the configured values for the trims    
-  for (start = 1; start <= 4; start++){
+  for (start = 1; start <= 4; start++)
+  {
     byte channel = eepromData[start + 23] & 0b00000111;                   //What channel corresponds with the specific function
+
     if(eepromData[start + 23] & 0b10000000) trimCh[start].reverse = 1;    //Reverse channel when most significant bit is set
     else trimCh[start].reverse = 0;                                       //If the most significant is not set there is no reverse
 
-    trimCh[start].low = (eepromData[channel * 2 + 15] << 8) | eepromData[channel * 2 + 14];    //Store the low value for the specific receiver input channel
-    trimCh[start].center = (eepromData[channel * 2 - 1] << 8) | eepromData[channel * 2 - 2];   //Store the center value for the specific receiver input channel
-    trimCh[start].high = (eepromData[channel * 2 + 7] << 8) | eepromData[channel * 2 + 6];     //Store the high value for the specific receiver input channel
+    trimCh[start].low = (eepromData[channel * 2 + 15] << 8) | eepromData[channel * 2 + 14];  //Store the low value for the specific receiver input channel
+    trimCh[start].center = (eepromData[channel * 2 - 1] << 8) | eepromData[channel * 2 - 2]; //Store the center value for the specific receiver input channel
+    trimCh[start].high = (eepromData[channel * 2 + 7] << 8) | eepromData[channel * 2 + 6];   //Store the high value for the specific receiver input channel
   }
   trimCh[5] = {reverse : 0b00000000, low : 1000, center: 1500, high : 2000};
 
@@ -74,47 +82,49 @@ void initialize(){
 }
 
 void waitController(){
-  //Wait until the receiver is active and the throtle is set to the lower position.
-  while(receiverInputChannel3 < 990 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400){
+  /* 
+  * @brief wait until the receiver is active and the throttle is set to the lower position
+  */
+
+  while(receiverInputChannel3 < 990 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400)
+  {
     receiverInputChannel3 = convertReceiverChannel(3);                 //Convert the actual receiver signals for throttle to the standard 1000 - 2000us
     receiverInputChannel4 = convertReceiverChannel(4);                 //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
-    start ++;                                                          //While waiting increment start whith every loop.
-    //We don't want the esc's to be beeping annoyingly. So let's give them a 1000us puls while waiting for the receiver inputs.
-    ledcWrite(pwmChannel1, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, MAX_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, MAX_DUTY_CYCLE);
-    
-    vTaskDelay(1/portTICK_PERIOD_MS);                                                //Wait 1000us.
-    ledcWrite(pwmChannel1, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel2, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel3, HALF_DUTY_CYCLE);
-    ledcWrite(pwmChannel4, HALF_DUTY_CYCLE);                                                     //Set digital port 4, 5, 6 and 7 low.
-    vTaskDelay(3/portTICK_PERIOD_MS);                                                //Wait 3000us.
 
-    if(start == 125){                                                       //Every 125 loops (500ms).
-      if(calInt % 15 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //Change the led status to indicate calibration.
+    start ++;                                                          //While waiting increment start whith every loop.
+
+    switch (start)
+    {
+    case 125:
+
+      if(calInt % 15 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);        //Change the led status to indicate calibration.
       else ledcWrite(pwmLedChannel, 0);
-      start = 0;                                                            //Start again at 0.
+      start = 0;  
+      break;
+    
+    default:
+      break;
     }
-  }                    
+  }   
 }
 
 void setupPins(){
-  // LED 
-  ledcSetup(pwmLedChannel, freq, resolution);
+  /* 
+  * @brief define all the pinModes
+  */
+  
+  // LED pinmode
+  ledcSetup(pwmLedChannel, freq, resolution);                                       // battery led
+  ledcSetup(pwmLedFlyChannel, freq, resolution);                                    // fly led
   ledcAttachPin(PIN_BATTERY_LED, pwmLedChannel);
-
-  //FLY LED
-  ledcSetup(pwmLedFlyChannel, freq, resolution);
-  ledcAttachPin(PIN_SECOND_LED, pwmLedFlyChannel);//pwmLedFlyChannel
+  ledcAttachPin(PIN_SECOND_LED, pwmLedFlyChannel);
 
   // ESCs pinmode  
   //     ledc ESC PWM setups
-  ledcSetup(pwmChannel1, freq, resolution);
-  ledcSetup(pwmChannel2, freq, resolution);
-  ledcSetup(pwmChannel3, freq, resolution);
-  ledcSetup(pwmChannel4, freq, resolution);
+  ledcSetup(pwmChannel1, freq, resolution);                                         // ESC 1 pinmode
+  ledcSetup(pwmChannel2, freq, resolution);                                         // ESC 2 pinmode 
+  ledcSetup(pwmChannel3, freq, resolution);                                         // ESC 3 pinmode 
+  ledcSetup(pwmChannel4, freq, resolution);                                         // ESC 4 pinmode 
 
   //      attach pin to channel
   ledcAttachPin(PIN_ESC_1, pwmChannel1);
@@ -137,11 +147,21 @@ void setupPins(){
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_5), myISR, CHANGE);
 
   //Use the led on the Arduino for startup indication.
-  ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                                                    //Turn on the warning led.
+  ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                                          //Turn on the warning led.
   ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE); 
+
+  // remove the motor beep
+  ledcWrite(pwmChannel1, 1000);
+  ledcWrite(pwmChannel2, 1000);
+  ledcWrite(pwmChannel3, 1000);
+  ledcWrite(pwmChannel4, 1000);
 }
 
 void intro(){
+  /* 
+  * @brief introduction with logo and author
+  */
+
   vTaskDelay(50/portTICK_PERIOD_MS);
   Serial.println();
   Serial.println();
@@ -169,6 +189,10 @@ void intro(){
 }
 
 void printEEPROM(){
+  /* 
+  * @brief print all the EEPROM data
+  */
+
   for (int i = 0; i < EEPROM_SIZE; i++){
     Serial.println(eepromData[i]);
   }

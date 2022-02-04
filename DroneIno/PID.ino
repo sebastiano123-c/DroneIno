@@ -1,5 +1,13 @@
+/* 
+* PID
+* @author @sebastiano123-c
+*/
+
 void setPID(){
-  //The PID set point in degrees per second is determined by the roll receiver input.
+  /* 
+  * @brief the PID set point in degrees per second is determined by the roll receiver input
+  */
+
   //In the case of deviding by 3 the max roll rate is aprox 164 degrees per second ( (500-8)/3 = 164d/s ).
   pidRollSetpoint = 0;
   //We need a little dead band of 16us for better results.
@@ -30,6 +38,10 @@ void setPID(){
 }
 
 void calculatePID(){
+  /* 
+  * @brief calculate PID in degrees per second
+  */
+
   //set PID parameters
   setPID();
 

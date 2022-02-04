@@ -1,6 +1,17 @@
+/* 
+* ISR
+* @author @sebastiano123-c
+*/
+
 void myISR(){
+  /* 
+  * @brief measures the receiver input signal length 
+  * @todo use pwm to read the receivers signals, avoid digitalRead
+  */
+
   currentTime = micros();
-  //Channel 1=========================================                                               
+
+  // channel 1                                               
   if(digitalRead(PIN_RECEIVER_1) == HIGH){                                  //Is RECEIVER input high?
       if(lastChannel1 == 0){                                                //Input 8 changed from 0 to 1.
           lastChannel1 = 1;                                                   //Remember current input state.
@@ -11,7 +22,9 @@ void myISR(){
       lastChannel1 = 0;                                                     //Remember current input state.
       trimCh[1].actual = currentTime - timer1;                             //Channel 1 is currentTime - timer1.
   }
-  //Channel 2=========================================                                              
+
+
+  // channel 2                                              
   if(digitalRead(PIN_RECEIVER_2) == HIGH){                                 //Is RECEIVER input high?
       if(lastChannel2 == 0){                                                //Input 9 changed from 0 to 1.
           lastChannel2 = 1;                                                   //Remember current input state.
@@ -22,7 +35,9 @@ void myISR(){
       lastChannel2 = 0;                                                     //Remember current input state.
       trimCh[2].actual = currentTime - timer2;                             //Channel 2 is currentTime - timer2.
   }
-  //Channel 3=========================================                                              
+
+
+  // channel 3                                              
   if(digitalRead(PIN_RECEIVER_3) == HIGH){                                 //Is RECEIVER input high?
       if(lastChannel3 == 0){                                                //Input 10 changed from 0 to 1.
           lastChannel3 = 1;                                                   //Remember current input state.
@@ -33,7 +48,9 @@ void myISR(){
       lastChannel3 = 0;                                                     //Remember current input state.
       trimCh[3].actual = currentTime - timer3;                             //Channel 3 is currentTime - timer3.
   }
-  //Channel 4=========================================                                              
+
+
+  // channel 4                                              
   if(digitalRead(PIN_RECEIVER_4) == HIGH){                                 //Is RECEIVER input high?
       if(lastChannel4 == 0){                                                //Input 11 changed from 0 to 1.
           lastChannel4 = 1;                                                   //Remember current input state.
@@ -44,7 +61,9 @@ void myISR(){
       lastChannel4 = 0;                                                     //Remember current input state.
       trimCh[4].actual = currentTime - timer4;                             //Channel 4 is currentTime - timer4.
   }
-  //Channel 5=========================================                                              
+
+  
+  // channel 5                                              
   if(digitalRead(PIN_RECEIVER_5) == HIGH){                          //Is RECEIVER input high?
       if(lastChannel5 == 0){                                                //Input 11 changed from 0 to 1.
           lastChannel5 = 1;                                                   //Remember current input state.

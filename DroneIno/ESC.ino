@@ -1,9 +1,18 @@
+/* 
+* ESC 
+* @author @sebastiano123-c
+*/
+
 void droneStart(){
+  /* 
+  * @brief first settings of the PID and angles
+  */
+
   start = 2;
 
   anglePitch = anglePitchAcc;                                          //Set the gyro pitch angle equal to the accelerometer pitch angle when the quadcopter is started.
   angleRoll = angleRollAcc;                                            //Set the gyro roll angle equal to the accelerometer roll angle when the quadcopter is started.
-  gyroAnglesSet = true;                                                 //Set the IMU started flag.
+  gyroAnglesSet = true;                                                //Set the IMU started flag.
 
   //Reset the PID controllers for a bumpless start.
   pidIMemRoll = 0;
@@ -15,6 +24,10 @@ void droneStart(){
 }
 
 int convertReceiverChannel(byte ch){
+  /* 
+  * @brief convert the input RX signal
+  * @param ch channel that has to be converted
+  */
   int difference;
 
   if(trimCh[ch].actual < trimCh[ch].center){            //The actual receiver value is lower than the center value
@@ -54,7 +67,11 @@ int convertReceiverChannel(byte ch){
 }
 
 void setEscPulses(){
-  throttle = receiverInputChannel3; //We need the throttle signal as a base signal.
+  /* 
+  * @brief set ESC pulses
+  */
+
+  throttle = receiverInputChannel3;                                   //We need the throttle signal as a base signal.
 
   switch(start){
     case 2:

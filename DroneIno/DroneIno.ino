@@ -1,6 +1,10 @@
-
-// DroneIno32
-// @author: Sebastiano Cocchi
+/*
+* DroneIno32
+*
+* @author @sebastiano123-c
+* @date 02/03/2022 
+* @version 0.1
+*/
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //Terms of use
@@ -28,11 +32,15 @@
 #include "Globals.h"
 
 void setup(){
-  // init function
-  initialize();                                        // function at initialize.ino                                    
+
+  // init function comprised
+  initialize();                                        // function at initialize.ino    
+
 }
 
 void loop(){                                           // loop runs at 250Hz => each loop last 4000us
+
+  Serial.println(start);
 
   // select mode via SWC of the controller
   if      (trimCh[5].actual < 1050) flightMode = 1;    // SWC UP: no mode on, (only auto leveling if enabled)
@@ -43,7 +51,11 @@ void loop(){                                           // loop runs at 250Hz => 
   else if (trimCh[5].actual < 2050 &&
            trimCh[5].actual > 1950) flightMode = 3;    // SWC DOWN: GPS*
 
-  
+
+  // convert the signal of the rx
+  convertAllSignals();                                 // see ESC.ino
+
+
   // starting sequence of the quadcopter
   if(receiverInputChannel3 < 1050 &&                   // to start the motors: throttle low and yaw left (step 1).
      receiverInputChannel4 < 1050) start = 1;          
@@ -60,13 +72,9 @@ void loop(){                                           // loop runs at 250Hz => 
   // calculate the gyroscope values for pitch, roll and yaw
   calculateAnglePRY();                                 // see Gyro.ino
 
-
-  // convert the signal of the rx
-  convertAllSignals();                                 // see ESC.ino
-
   
   // calculate the altitude hold pressure parameters
-  calculateAltitudeHold();                             // see Altitude.ino
+//   calculateAltitudeHold();                             // see Altitude.ino
 
 
   // calculate PID values
@@ -83,11 +91,11 @@ void loop(){                                           // loop runs at 250Hz => 
 
   // finish the loop
   if(micros() - loopTimer > 4050)
-         ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);     // turn on the LED if the loop time exceeds 4050us
+         ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  // turn on the LED if the loop time exceeds 4050us
 
   
-  //  wait until 4000us are passed. This shows the dead time for each loop
-  while(micros() - loopTimer < 4000);                   // the refresh rate is 250Hz, thus esc's pulse update is every 4ms.
+  // wait until 4000us are passed. This shows the dead time for each loop
+  while(micros() - loopTimer < 4000);                  // the refresh rate is 250Hz, thus esc's pulse update is every 4ms.
 
   ledcWrite(pwmLedFlyChannel, 0);                      // turn off the fly led for the next loop
 
