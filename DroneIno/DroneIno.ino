@@ -25,7 +25,10 @@
 
 #include <Arduino.h>
 #include <Wire.h>                          
-#include <EEPROM.h>     
+#include <EEPROM.h>
+#include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 #include "Config.h"
 #include "src/Models.h"
 #include "Constants.h"            
@@ -34,15 +37,13 @@
 void setup(){
 
   // init function comprised
-  initialize();                                        // function at initialize.ino    
+  initialize();                                        // see Initialize.ino     
 
 }
 
-void loop(){                                           // loop runs at 250Hz => each loop last 4000us
+void loop(){                                           // loop runs at 250Hz => each loop lasts 4000us
 
-  Serial.println(start);
-
-  // select mode via SWC of the controller
+  // select mode via SWC of the controller:
   if      (trimCh[5].actual < 1050) flightMode = 1;    // SWC UP: no mode on, (only auto leveling if enabled)
 
   else if (trimCh[5].actual < 1550 &&
@@ -52,29 +53,29 @@ void loop(){                                           // loop runs at 250Hz => 
            trimCh[5].actual > 1950) flightMode = 3;    // SWC DOWN: GPS*
 
 
+  // calculate the gyroscope values for pitch, roll and yaw
+  calculateAnglePRY();                                 // see Gyro.ino
+
+
   // convert the signal of the rx
   convertAllSignals();                                 // see ESC.ino
 
 
-  // starting sequence of the quadcopter
-  if(receiverInputChannel3 < 1050 &&                   // to start the motors: throttle low and yaw left (step 1).
-     receiverInputChannel4 < 1050) start = 1;          
+  // starting sequence of the quadcopter:
+  if(receiverInputChannel3 < 1050 &&                   // a) to start the motors: throttle low and yaw left (step 1).
+     receiverInputChannel4 < 1050)    start = 1;          
 
-  if(start                == 1    &&                   // when yaw stick is back in the center position start the motors (step 2).
+  if(start                 == 1   &&                   // b) when yaw stick is back in the center position start the motors (step 2).
      receiverInputChannel3 < 1050 && 
-     receiverInputChannel4 > 1450) droneStart();       
+     receiverInputChannel4 > 1450)    droneStart();       
 
-  if(start                == 2    &&                   // stopping the motors: throttle low and yaw right.
+  if(start                 == 2   &&                   // c) stopping the motors: throttle low and yaw right.
      receiverInputChannel3 < 1050 &&  
-     receiverInputChannel4 > 1950) start = 0;      
+     receiverInputChannel4 > 1950)    start = 0;      
 
 
-  // calculate the gyroscope values for pitch, roll and yaw
-  calculateAnglePRY();                                 // see Gyro.ino
-
-  
   // calculate the altitude hold pressure parameters
-//   calculateAltitudeHold();                             // see Altitude.ino
+  calculateAltitudeHold();                             // see Altitude.ino
 
 
   // calculate PID values
@@ -88,17 +89,15 @@ void loop(){                                           // loop runs at 250Hz => 
   // create ESC pulses
   setEscPulses();                                      // see ESC.ino
 
+  // send telemetry via wifi
+  sendTelemetry();
 
   // finish the loop
   if(micros() - loopTimer > 4050)
          ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  // turn on the LED if the loop time exceeds 4050us
 
-  
-  // wait until 4000us are passed. This shows the dead time for each loop
+  // wait until 4000us are passed
   while(micros() - loopTimer < 4000);                  // the refresh rate is 250Hz, thus esc's pulse update is every 4ms.
-
-  ledcWrite(pwmLedFlyChannel, 0);                      // turn off the fly led for the next loop
-
 
   loopTimer = micros();                                // set the timer for the next loop
 

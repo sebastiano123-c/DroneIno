@@ -18,8 +18,8 @@
 #define PIN_RECEIVER_5              4
 
 // LEDs
-#define PIN_BATTERY_LED             19 
-#define PIN_SECOND_LED              18      //if you don't have it, leave here an unused pin
+#define PIN_BATTERY_LED             18 
+#define PIN_SECOND_LED              19      //if you don't have it, leave here an unused pin
 
 // BATTERY LEVEL
 #define PIN_BATTERY_LEVEL           2

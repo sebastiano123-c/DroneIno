@@ -59,6 +59,7 @@ Make sure to do all the passages described here below.
     - [**Step 1: reset variables**](#step-1-reset-variables)
     - [**Step 2: yaw tuning**](#step-2-yaw-tuning)
     - [**Step 3: roll/pitch tuning**](#step-3-rollpitch-tuning)
+  - [**WiFi telemetry (developing)**](#wifi-telemetry-developing)
 - [**Roadmap**](#roadmap)
 
 # **Usage**
@@ -69,7 +70,7 @@ or download the .zip file.
 
 # **Description**
 Based on the [YMFC-AL](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
-* ESP32 D1 R32 board;
+* ESP32 D1 R32 board, like [this](https://github.com/sebastiano123-c/Motorize-a-1980-telescope/blob/main/Setup/D1%20R32%20Board%20Pinout.pdf);
 * gyroscope MPU6050;
 * radio controller and a receiver (_e.g._ FlySky);
 * 11.1V 3S >20C LiPo battery (2200mAh or 3800mAh);
@@ -87,6 +88,7 @@ CIRCUITAL SCHEMATIC HERE
 # **Features**
 1) auto-leveling
 2) altitude hold (developing)
+3) WiFi telemetry system (developing)
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 ## **Selecting flight mode**
@@ -136,7 +138,7 @@ The resistance R1 = 330 is used for the LED.
   +-|-|->| SCL°|<------|--|->|°SCL (GPIO 22)     | |              +-->|-GND   |====||==||=============\ CW  /
     +-|->| VCC+|       |  |  #### ESP32 D1 R32 ### |              |   |      +|====||==++                  
     | +->| GND-|       |  R1                       |              |   |      -|====++                        
-    | |  #gyro #       | (LEDf)                   |              |   ##ESC-4##                              
+    | |  #gyro #       | (LEDf)                    |              |   ##ESC-4##                              
     | +----------------+--+------------------------|--------------+                                            
     +----------------------------------------------+                                                                       
 </pre>
@@ -233,6 +235,13 @@ Increment the value until this behavior reduces.
 Do the same with the **P**, incrementing in steps of 0.2.
 
 After a while you may observe that the behaviour depends widely on the PID parameters, and you may find your own way to set properly these parameters.
+
+## **WiFi telemetry (developing)**
+I have developed a WiFi telemetry system exploiting the ESP32 native WiFi as access point (AP).
+After connecting to DroneInoTelemetry network using the password "DroneIno", dial in a browser search bar "192.168.4.1".
+After few seconds you will see the telemetry data like pitch, roll, battery and flight mode.
+You can also adjust fly the PID settings.
+To better improve the WiFi range install an external antenna.
 
 # **Roadmap**
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.

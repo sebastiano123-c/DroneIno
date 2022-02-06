@@ -13,11 +13,11 @@ void initialize(){
   EEPROM.begin(EEPROM_SIZE);
   vTaskDelay(50/portTICK_PERIOD_MS);
 
-  if(DEBUG) intro();
+ // if(DEBUG) intro();
 
   for(start = 0; start <= 35; start++) eepromData[start] = EEPROM.read(start);
  
-  if(DEBUG) printEEPROM();
+ //if(DEBUG) printEEPROM();
 
   // fill the configured values for the trims    
   for (start = 1; start <= 4; start++)
@@ -55,6 +55,10 @@ void initialize(){
   //Set the specific gyro registers.  
   setGyroscopeRegisters();                                                     
 
+
+  // setup telemetry
+  setupWiFiTelemetry();
+
   // few seconds for calibrating the gyroscope
   calibrateGyroscope();
 
@@ -62,7 +66,7 @@ void initialize(){
   checkAltitudeSensor();
 
   // wait until the rx is connected
-  if(!DEBUG) waitController();                                                           
+  //if(!DEBUG) waitController();                                                           
 
   //Load the battery voltage to the battery_voltage variable.
   initBattery();
@@ -97,12 +101,12 @@ void waitController(){
     {
     case 125:
 
-      if(calInt % 15 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);        //Change the led status to indicate calibration.
-      else ledcWrite(pwmLedChannel, 0);
+      ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                        //Change the led status to indicate calibration.
       start = 0;  
       break;
     
     default:
+      ledcWrite(pwmLedChannel, 0);
       break;
     }
   }   

@@ -29,36 +29,13 @@
 
 // SENSORS
 #define GYROSCOPE                   MPU6050                  // (MPU6050) unique for now
-#define GYROSCOPE_PITCH_CORR        -4.09                    // read your gyroscope data after the calibration, put here the angle pitch you read
-#define GYROSCOPE_ROLL_CORR         -0.22                    // read your gyroscope data after the calibration, put here the angle roll you read
+#define GYROSCOPE_PITCH_FILTER      .98                      // read your gyroscope data after the calibration, try different values and choose the best one
+#define GYROSCOPE_ROLL_FILTER       .98                      // read your gyroscope data after the calibration, try different values and choose the best one
+#define GYROSCOPE_PITCH_CORR        -1.65                    // (-1.65.) after set GYROSCOPE_PITCH_FILTER, put here the angle pitch you read eneabling DEBUG
+#define GYROSCOPE_ROLL_CORR         -.30                     // (0.) after set GYROSCOPE_ROLL_FILTER, put here the angle roll you read eneabling DEBUG
 
-#define ALTITUDE_SENSOR             OFF                      //(OFF, BMP280, BME280*)
+
+#define ALTITUDE_SENSOR             BMP280                   //(OFF, BMP280, BME280*)
 
 #define PROXIMITY_SENSOR            OFF                      //(OFF, HCSR04*)
 #define DANGER_DISTANCE             40                       //(cm) Proximity sensor distance above which is considered a danger zone
-
-
-// PID:
-//              (ROLL)
-#define PID_P_GAIN_ROLL             1.3                      //Gain setting for the roll P-controller (1.3)
-#define PID_I_GAIN_ROLL             0.0002                  //Gain setting for the roll I-controller  (0.0002)
-#define PID_D_GAIN_ROLL             10.0                     //Gain setting for the roll D-controller (10.0)
-#define PID_MAX_ROLL                400                      //Maximum output of the PID-controller   (+/-)
-
-//              (PITCH)
-#define PID_P_GAIN_PITCH            PID_P_GAIN_ROLL          //Gain setting for the pitch P-controller
-#define PID_I_GAIN_PITCH            PID_I_GAIN_ROLL          //Gain setting for the pitch I-controller
-#define PID_D_GAIN_PITCH            PID_D_GAIN_ROLL          //Gain setting for the pitch D-controller
-#define PID_MAX_PITCH               PID_MAX_ROLL             //Maximum output of the PID-controller   (+/-)
-
-//              (YAW)
-#define PID_P_GAIN_YAW              4.0                      //Gain setting for the pitch P-controller. (2.0)
-#define PID_I_GAIN_YAW              0.002                     //Gain setting for the pitch I-controller. (0.04)
-#define PID_D_GAIN_YAW              0.0                      //Gain setting for the pitch D-controller. (0.0)
-#define PID_MAX_YAW                 400                      //Maximum output of the PID-controller     (+/-)
-
-//            (ALTITUDE)
-#define PID_P_GAIN_ALTITUDE         1.4                      //Gain setting for the altitude P-controller (default = 1.4).
-#define PID_I_GAIN_ALTITUDE         0.3                      //Gain setting for the altitude I-controller (default = 0.2).
-#define PID_D_GAIN_ALTITUDE         0.75                     //Gain setting for the altitude D-controller (default = 0.75).
-#define PID_MAX_ALTITUDE            400                      //Maximum output of the PID-controller (+/-).

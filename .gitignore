@@ -5,6 +5,7 @@ AutoLeveling
 .vscode
 test
 EEPROM_data.txt
+*.log
 
 # Further implementations
 HCSR04.ino 

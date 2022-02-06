@@ -52,7 +52,7 @@ float rollLevelAdjust, pitchLevelAdjust;
 long accTotalVector;
 
 // battery
-float batteryVoltage;
+float batteryVoltage, batteryPercent;
 
 // altitude sensor
 float pressure;
