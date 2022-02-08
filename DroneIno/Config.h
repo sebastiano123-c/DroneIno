@@ -29,11 +29,10 @@
 
 // SENSORS
 #define GYROSCOPE                   MPU6050                  // (MPU6050) unique for now
-#define GYROSCOPE_PITCH_FILTER      .98                      // read your gyroscope data after the calibration, try different values and choose the best one
-#define GYROSCOPE_ROLL_FILTER       .98                      // read your gyroscope data after the calibration, try different values and choose the best one
+#define GYROSCOPE_PITCH_FILTER      .998                     // read your gyroscope data after the calibration, try different values and choose the best one
+#define GYROSCOPE_ROLL_FILTER       .998                     // read your gyroscope data after the calibration, try different values and choose the best one
 #define GYROSCOPE_PITCH_CORR        -1.65                    // (-1.65.) after set GYROSCOPE_PITCH_FILTER, put here the angle pitch you read eneabling DEBUG
 #define GYROSCOPE_ROLL_CORR         -.30                     // (0.) after set GYROSCOPE_ROLL_FILTER, put here the angle roll you read eneabling DEBUG
-
 
 #define ALTITUDE_SENSOR             BMP280                   //(OFF, BMP280, BME280*)
 

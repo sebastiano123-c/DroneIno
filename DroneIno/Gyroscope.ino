@@ -3,17 +3,6 @@
 * @author @sebastiano123-c
 */
 
-void setupGyroscope(){
-  /*
-  * @brief setup WIRE communication
-  */
-
-  // setup wire
-  Wire.setClock(WIRE_CLOCK);
-  Wire.begin(PIN_SDA, PIN_SCL);
-  vTaskDelay(40/portTICK_PERIOD_MS);
-}
-
 void setGyroscopeRegisters(){
   /*
   * @brief try a first communication with the gyroscope

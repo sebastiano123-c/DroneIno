@@ -59,7 +59,7 @@ Make sure to do all the passages described here below.
     - [**Step 1: reset variables**](#step-1-reset-variables)
     - [**Step 2: yaw tuning**](#step-2-yaw-tuning)
     - [**Step 3: roll/pitch tuning**](#step-3-rollpitch-tuning)
-  - [**WiFi telemetry (developing)**](#wifi-telemetry-developing)
+  - [**WiFi PID adjustment (developing)**](#wifi-pid-adjustment-developing)
 - [**Roadmap**](#roadmap)
 
 # **Usage**
@@ -88,7 +88,7 @@ CIRCUITAL SCHEMATIC HERE
 # **Features**
 1) auto-leveling
 2) altitude hold (developing)
-3) WiFi telemetry system (developing)
+3) modify PID using WiFi access point (developing)
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 ## **Selecting flight mode**
@@ -194,7 +194,7 @@ Finally, upload the [DroneIno](https://github.com/sebastiano123-c/DroneIno/tree/
 ## **PID tuning**
 PID may be different from case to case and plays a very important role in the flight stability.
 PID controls:
-- roll movement ;
+- roll movement;
 - pitch movement;
 - yaw movement.
 
@@ -234,20 +234,27 @@ Increment the value until this behavior reduces.
 
 Do the same with the **P**, incrementing in steps of 0.2.
 
-After a while you may observe that the behaviour depends widely on the PID parameters, and you may find your own way to set properly these parameters.
+After a while you may observe that the behavior depends widely on the PID parameters, and you may find your own way to set properly these parameters.
 
-## **WiFi telemetry (developing)**
-I have developed a WiFi telemetry system exploiting the ESP32 native WiFi as access point (AP).
+<!--## **WiFi telemetry (developing)**
+ I have developed a WiFi telemetry system exploiting the ESP32 native WiFi as access point (AP).
 After connecting to DroneInoTelemetry network using the password "DroneIno", dial in a browser search bar "192.168.4.1".
 After few seconds you will see the telemetry data like pitch, roll, battery and flight mode.
 You can also adjust fly the PID settings.
-To better improve the WiFi range install an external antenna.
+To better improve the WiFi range install an external antenna. -->
+
+## **WiFi PID adjustment (developing)**
+This feature exploits the ESP32 native WiFi as access point (AP).
+After connecting to DroneInoTelemetry network using the password "DroneIno", dial in a browser search bar "192.168.4.1".
+Using this app, you can adjust on the fly the PID settings.
+This feature promise to be very smart in terms of time savings and feedback.
 
 # **Roadmap**
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.
 
 Future improvements:
-- use other boards
+- improve the telemetry data with esp-now
 - altitude hold
 - GPS
 - Gimbal CAM
+- use other boards

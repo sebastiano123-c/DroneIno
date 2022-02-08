@@ -69,3 +69,11 @@ unsigned long int tempRaw, presRaw;
 signed long int tFine;
 signed long int tempCal;
 unsigned long int pressCal;
+
+// esp-now telemetry
+typedef struct struct_message {
+    float anglePitch;
+    float angleRoll;
+} struct_message;
+
+struct_message myData;

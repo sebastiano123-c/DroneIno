@@ -7,8 +7,8 @@
 // PID:
 //              (ROLL)
 float PID_P_GAIN_ROLL            = 1.3;                      //Gain setting for the roll P-controller (1.3)
-float PID_I_GAIN_ROLL            = 0.001;                  //Gain setting for the roll I-controller  (0.0002)
-float PID_D_GAIN_ROLL            = 8.0;                     //Gain setting for the roll D-controller (10.0)
+float PID_I_GAIN_ROLL            = 0.001;                    //Gain setting for the roll I-controller  (0.0002)
+float PID_D_GAIN_ROLL            = 8.0;                      //Gain setting for the roll D-controller (10.0)
 int PID_MAX_ROLL                 = 400;                      //Maximum output of the PID-controller   (+/-)
 
 //              (PITCH)
@@ -31,39 +31,39 @@ int PID_MAX_ALTITUDE             = 400;                      //Maximum output of
 
 
 // gyro constants
-const int gyroFrequency       = 250;                               // (Hz)
-const float gyroSensibility   = 65.5;                                 
-const int correctionPitchRoll = 15;                                // correction for the pitch and roll
-float convDegToRad            = 180.0 / PI;                                 
-float travelCoeff             = 1/((float)gyroFrequency * gyroSensibility);     
-float travelCoeffToRad        = travelCoeff / convDegToRad;
-float anglePitchOffset        = 0;                                 // NOT touch, for future 
-float angleRollOffset         = 0;                                 // NOT touch, for future 
+const int gyroFrequency          = 250;                               // (Hz)
+const float gyroSensibility      = 65.5;                                 
+const int correctionPitchRoll    = 15;                                // correction for the pitch and roll
+float convDegToRad               = 180.0 / PI;                                 
+float travelCoeff                = 1/((float)gyroFrequency * gyroSensibility);     
+float travelCoeffToRad           = travelCoeff / convDegToRad;
+float anglePitchOffset           = 0;                                 // NOT touch, for future 
+float angleRollOffset            = 0;                                 // NOT touch, for future 
   
 // PWM channels
-const int pwmLedChannel       = 0;
-const int pwmChannel1         = 1;
-const int pwmChannel2         = 2;
-const int pwmChannel3         = 3;
-const int pwmChannel4         = 4;
-const int pwmLedFlyChannel    = 5;
+const int pwmLedChannel          = 0;
+const int pwmChannel1            = 1;
+const int pwmChannel2            = 2;
+const int pwmChannel3            = 3;
+const int pwmChannel4            = 4;
+const int pwmLedFlyChannel       = 5;
 
 // PWM constants
-const int freq                = 500;                                   // (Hz) for what I know, 500 is the best 
-const int resolution          = 11;                                    // (bits) 11 is the best guess
-const int MAX_DUTY_CYCLE      = (int)(pow(2, resolution) - 1);
-const int HALF_DUTY_CYCLE     = (int)(0.5*MAX_DUTY_CYCLE);
+const int freq                   = 500;                                   // (Hz) for what I know, 500 is the best 
+const int resolution             = 11;                                    // (bits) 11 is the best guess
+const int MAX_DUTY_CYCLE         = (int)(pow(2, resolution) - 1);
+const int HALF_DUTY_CYCLE        = (int)(0.5*MAX_DUTY_CYCLE);
 
 // battery
 // total resistance calculations, the important quantity is totalDrop
-const int DIODE_DROP          = 700;                                   //generally it is -0.7V
-float res3                    = 2.5;                                   // resistance between Vin and vout
-float res2                    = 1.;                                    // load resistance
-float totalDrop               = res2 / (res2 + res3);                  // IMPORTANT: this is in my case, you have to calculate YOUR total drop
+const int DIODE_DROP             = 700;                                   //generally it is -0.7V
+float res3                       = 2.5;                                   // resistance between Vin and vout
+float res2                       = 1.;                                    // load resistance
+float totalDrop                  = res2 / (res2 + res3);                  // IMPORTANT: this is in my case, you have to calculate YOUR total drop
 
 // digital read bits accuracy
-uint8_t adcBits                 = 12;                                    // (bits) of width when measuring the voltage
-float maximumWidth              = pow(2., (float)adcBits)-1;             // maximum width that the pin can read
+uint8_t adcBits                  = 12;                                    // (bits) of width when measuring the voltage
+float maximumWidth               = pow(2., (float)adcBits)-1;             // maximum width that the pin can read
 
 // battery calculations
 double fromVtoWidth              = maximumWidth / (double)BOARD_LIMIT_VOLTAGE;
@@ -97,162 +97,10 @@ const char* P_YAW_GET   = "yawP";
 const char* I_YAW_GET   = "yawI";
 const char* D_YAW_GET   = "yawD";
 
-// server
+// PID adjustment using wifi
 AsyncWebServer server(80);
 
-// Create an Event Source on /events
-AsyncEventSource events("/events");
-
-// HTML web page to handle 3 input fields (input1, input2, input3)
-const char* index_html = R"rawliteral(
-<!DOCTYPE HTML><html>
-<head>
-    <title>DroneInoTelemetry</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-    html {
-      font-family: Arial; 
-      display: inline-block; 
-      text-align: center;
-    }
-    p { 
-      font-size: 1.2rem;
-    }
-    body {  
-      margin: 0;
-    }
-    .topnav { 
-      overflow: hidden; 
-      background-color: #50B8B4; 
-      color: white; 
-      font-size: 1rem; 
-    }
-    .content { 
-      padding: 20px; 
-    }
-    .card { 
-      background-color: white; 
-      max-width: 500px; 
-      box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); 
-    }
-    .cards { 
-      max-width: 800px; 
-      margin: 0 auto; 
-      display: grid; 
-      grid-gap: 2rem; 
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-    .reading { 
-      font-size: 1.4rem;  
-    }
-    .pid-input{
-      max-width: 50px;
-    }
-    </style>
-</head>
-<body>
-    <div class="topnav">
-      <h1>DroneInoTelemetry</h1>
-    </div>
-    <div class="content">
-      <div class="cards">
-        <div class="card">
-          <p> pitch</p>
-          <p><span class="reading"><span id="anglePitch">%PITCHANGLE%</span> &deg;</span></p>
-        </div>
-        <div class="card">
-          <p> roll</p>
-          <p><span class="reading"><span id="angleRoll">%ROLLANGLE%</span> &deg;</span></p>
-        </div>
-        <div class="card">
-            <p> battery</p>
-            <p><span class="reading"><span id="battery">%BATTERY%</span></span></p>
-        </div>
-        <div class="card">
-          <p> flight mode</p>
-          <p><span class="reading"><span id="flightMode">%FLIGHTMODE%</span></span></p>
-          </div>
-      </div>
-    </div><br>
-    <div class="topnav">
-        <h1>PID values</h1>
-    </div>
-    <div class="content">
-        <div class="cards">
-            <div class="card">
-                <p >  Roll </p>
-                <form action="get">
-                    P: <label class="pid-label" id="rollPVal"> </label><input class="pid-input" type="text" name="rollP">
-                    <input type="submit" value="set">
-                </form>
-                <form action="get">
-                    I: <label class="pid-label" id="rollIVal"> </label><input class="pid-input" type="text" name="rollI">
-                    <input type="submit" value="set">
-                </form>
-                <form action="get">
-                    D: <label class="pid-label" id="rollDVal"> </label><input class="pid-input" type="text" name="rollD">
-                    <input type="submit" value="set">
-                </form><br>
-            </div>
-            <div class="card">
-                <p >  Pitch </p>
-                <form action="get">
-                    P: <label class="pid-label" id="pitchPVal"> </label><input class="pid-input" type="text" name="pitchP">
-                    <input type="submit" value="set">
-                </form>
-                <form action="get">
-                    I: <label class="pid-label" id="pitchIVal"> </label><input class="pid-input" type="text" name="pitchI">
-                    <input type="submit" value="set">
-                </form>
-                    D: <label class="pid-label" id="pitchDVal"> </label><input class="pid-input" type="text" name="pitchD">
-                    <input type="submit" value="set">
-                </form><br>
-            </div>
-            <div class="card">
-                <p >  Yaw </p>
-                <form action="get">
-                    P: <label class="pid-label" id="yawPVal"> </label><input class="pid-input" type="text" name="yawP">
-                    <input type="submit" value="set">
-                </form>
-                <form action="get">
-                    I: <label class="pid-label" id="yawIVal"> </label><input class="pid-input" type="text" name="yawI">
-                    <input type="submit" value="set">
-                </form>
-                    D: <label class="pid-label" id="yawDVal"> </label><input class="pid-input" type="text" name="yawD">
-                    <input type="submit" value="set">
-                </form><br>
-            </div>
-        </div>
-    </div>
-       <script  type="text/javascript">
-    if (!!window.EventSource) {
-      var source = new EventSource('/events');
-      source.addEventListener('open', function(e) {
-        console.log("Events Connected");
-      }, false);
-      source.addEventListener('error', function(e) {
-        if (e.target.readyState != EventSource.OPEN) {
-          console.log("Events Disconnected");
-        }
-      }, false);
-      source.addEventListener('message', function(e) {
-        console.log("message", e.data);
-      }, false);
-      source.addEventListener('anglePitch', function(e) {
-        console.log("anglePitch", e.data);
-        document.getElementById("anglePitch").innerHTML = e.data;
-      }, false);
-      source.addEventListener('angleRoll', function(e) {
-        console.log("angleRoll", e.data);
-        document.getElementById("angleRoll").innerHTML = e.data;
-      }, false);
-      source.addEventListener('flightMode', function(e) {
-        console.log("flightMode", e.data);
-        document.getElementById("flightMode").innerHTML = e.data;
-      }, false);
-      source.addEventListener('battery', function(e) {
-        console.log("battery", e.data);
-        document.getElementById("battery").innerHTML = e.data;
-      }, false);
-    }
-</script>
-  </body></html>)rawliteral";
+// // esp-now telemetry
+// uint8_t broadcastAddress[] = {0x58, 0xBF, 0x25, 0x82, 0x4D, 0x08}; // RECEIVER MAC Address
+// // Create an Event Source on /events
+// AsyncEventSource events("/events");

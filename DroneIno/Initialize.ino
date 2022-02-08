@@ -3,23 +3,28 @@
 * @author @sebastiano123-c
 */
 
-void initialize(){
+void initEEPROM(){
   /* 
-  * @brief entire setup funtcion: initialize all the sensors
+  * @brief initilize the EEPROM
   */
-
-  if(DEBUG) Serial.begin(BAUD_RATE);
-
+ 
   EEPROM.begin(EEPROM_SIZE);
   vTaskDelay(50/portTICK_PERIOD_MS);
 
- // if(DEBUG) intro();
+  //if(DEBUG) printEEPROM();
 
   for(start = 0; start <= 35; start++) eepromData[start] = EEPROM.read(start);
  
- //if(DEBUG) printEEPROM();
+  //Check the EEPROM signature to make sure that the setup program is executed.
+  while(eepromData[33] != 'J' || eepromData[34] != 'M' || eepromData[35] != 'B') vTaskDelay(10/portTICK_PERIOD_MS);
 
-  // fill the configured values for the trims    
+}
+
+void configureReceiverTrims(){
+  /* 
+  * @brief fill the configured values for the trims 
+  */
+
   for (start = 1; start <= 4; start++)
   {
     byte channel = eepromData[start + 23] & 0b00000111;                   //What channel corresponds with the specific function
@@ -30,86 +35,22 @@ void initialize(){
     trimCh[start].low = (eepromData[channel * 2 + 15] << 8) | eepromData[channel * 2 + 14];  //Store the low value for the specific receiver input channel
     trimCh[start].center = (eepromData[channel * 2 - 1] << 8) | eepromData[channel * 2 - 2]; //Store the center value for the specific receiver input channel
     trimCh[start].high = (eepromData[channel * 2 + 7] << 8) | eepromData[channel * 2 + 6];   //Store the high value for the specific receiver input channel
+
   }
+  
   trimCh[5] = {reverse : 0b00000000, low : 1000, center: 1500, high : 2000};
 
-  //Set start back to zero.
-  start = 0;                                                                
-       
-  // pinmode
-  setupPins();
-   
-  // this led will be turned on until the setup is finished
-  ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);     
-
-  //Start the I2C as master.
-  setupGyroscope();                                                         
-
-  //Check the EEPROM signature to make sure that the setup program is executed.
-  while(eepromData[33] != 'J' || eepromData[34] != 'M' || eepromData[35] != 'B') vTaskDelay(10/portTICK_PERIOD_MS);
-
-  //The flight controller needs the MPU-6050 with gyro and accelerometer
-  //If setup is completed without MPU-6050 stop the flight controller program  
-  if(eepromData[31] == 2 || eepromData[31] == 3) vTaskDelay(10/portTICK_PERIOD_MS);
-
-  //Set the specific gyro registers.  
-  setGyroscopeRegisters();                                                     
-
-
-  // setup telemetry
-  setupWiFiTelemetry();
-
-  // few seconds for calibrating the gyroscope
-  calibrateGyroscope();
-
-  // check Pressure
-  checkAltitudeSensor();
-
-  // wait until the rx is connected
-  //if(!DEBUG) waitController();                                                           
-
-  //Load the battery voltage to the battery_voltage variable.
-  initBattery();
-  
-  //Set start back to 0.
-  start = 0;   
-
-  // start without any mode (except for autoleveling if true)
-  flightMode = 1;                                         
-
-  //When everything is done, turn off the led.
-  ledcWrite(pwmLedChannel, 0);                               //Turn off the warning led.      
-  ledcWrite(pwmLedFlyChannel, 0);                            //Turn off the warning led.      
-
-  //Set the timer for the next loop.
-  loopTimer = micros();  
 }
 
-void waitController(){
-  /* 
-  * @brief wait until the receiver is active and the throttle is set to the lower position
+void setupWireI2C(){
+  /*
+  * @brief setup WIRE communication
   */
 
-  while(receiverInputChannel3 < 990 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400)
-  {
-    receiverInputChannel3 = convertReceiverChannel(3);                 //Convert the actual receiver signals for throttle to the standard 1000 - 2000us
-    receiverInputChannel4 = convertReceiverChannel(4);                 //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
-
-    start ++;                                                          //While waiting increment start whith every loop.
-
-    switch (start)
-    {
-    case 125:
-
-      ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                        //Change the led status to indicate calibration.
-      start = 0;  
-      break;
-    
-    default:
-      ledcWrite(pwmLedChannel, 0);
-      break;
-    }
-  }   
+  // setup wire
+  Wire.setClock(WIRE_CLOCK);
+  Wire.begin(PIN_SDA, PIN_SCL);
+  vTaskDelay(40/portTICK_PERIOD_MS);
 }
 
 void setupPins(){
