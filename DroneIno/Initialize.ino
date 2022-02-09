@@ -51,6 +51,7 @@ void setupWireI2C(){
   Wire.setClock(WIRE_CLOCK);
   Wire.begin(PIN_SDA, PIN_SCL);
   vTaskDelay(40/portTICK_PERIOD_MS);
+  
 }
 
 void setupPins(){
@@ -58,11 +59,13 @@ void setupPins(){
   * @brief define all the pinModes
   */
   
+
   // LED pinmode
   ledcSetup(pwmLedChannel, freq, resolution);                                       // battery led
   ledcSetup(pwmLedFlyChannel, freq, resolution);                                    // fly led
   ledcAttachPin(PIN_BATTERY_LED, pwmLedChannel);
   ledcAttachPin(PIN_SECOND_LED, pwmLedFlyChannel);
+
 
   // ESCs pinmode  
   //     ledc ESC PWM setups
@@ -76,6 +79,7 @@ void setupPins(){
   ledcAttachPin(PIN_ESC_2, pwmChannel2);
   ledcAttachPin(PIN_ESC_3, pwmChannel3);
   ledcAttachPin(PIN_ESC_4, pwmChannel4);
+
 
   // RECEIVER pinmode
   pinMode(PIN_RECEIVER_1, INPUT_PULLUP);
@@ -91,15 +95,16 @@ void setupPins(){
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_4), myISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_5), myISR, CHANGE);
 
-  //Use the led on the Arduino for startup indication.
-  ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                                          //Turn on the warning led.
-  ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE); 
-
   // remove the motor beep
   ledcWrite(pwmChannel1, 1000);
   ledcWrite(pwmChannel2, 1000);
   ledcWrite(pwmChannel3, 1000);
   ledcWrite(pwmChannel4, 1000);
+
+
+  // BATTERY LEVEL pinmode
+  pinMode(PIN_BATTERY_LEVEL, INPUT);
+
 }
 
 void intro(){

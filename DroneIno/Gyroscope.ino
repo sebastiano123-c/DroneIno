@@ -63,7 +63,7 @@ void calibrateGyroscope(){
   * @brief uses the gyroscope measurement to calculate the accelerometer and the gyroscope calibration
   */
  
-  if(DEBUG) Serial.println("calibrateGyroscope...");
+  if(DEBUG) Serial.printf("\ncalibrateGyroscope...\n");
 
   accAxisCalibration[1] = 0;
   accAxisCalibration[2] = 0;

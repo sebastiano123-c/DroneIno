@@ -22,7 +22,7 @@
 #define PIN_SECOND_LED              19      //if you don't have it, leave here an unused pin
 
 // BATTERY LEVEL
-#define PIN_BATTERY_LEVEL           2
+#define PIN_BATTERY_LEVEL           39
 
 // PROXIMITY_SENSOR
 #define PIN_PROXIMITY_SENSOR_ECHO   26

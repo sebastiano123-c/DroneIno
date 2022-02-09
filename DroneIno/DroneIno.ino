@@ -46,30 +46,31 @@ void setup(){
  // if(DEBUG) intro();
 
 
-  initEEPROM();                                       // see Initialize.ino
+  initEEPROM();                                        // see Initialize.ino
 
 
-  configureReceiverTrims();                           // see Initialize.ino
+  configureReceiverTrims();                            // see Initialize.ino
 
 
   //Set start back to zero.
-  start = 0;                                                                
+  start = 0; 
        
 
   // pinmode
-  setupPins();                                        // see Initialize.ino
+  setupPins();                                         // see Initialize.ino
    
 
-  // this led will be turned on until the setup is finished
-  ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);     
+  // signaling the start point
+  ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                                         
+  ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE); 
 
 
   //Start the I2C as master.
-  setupWireI2C();                                     // see Initialize.ino          
+  setupWireI2C();                                      // see Initialize.ino          
 
 
   // setup telemetry
-  //setupTelemetry();                                 // esp-now not working for now
+  //setupTelemetry();                                  // esp-now NOT working for now
 
 
   // setup wifi AP
@@ -88,14 +89,14 @@ void setup(){
 
 
   // wait until the rx is connected
-  if(!DEBUG) waitController();                                                           
-
-
-  initBattery();                                       // see Battery.ino
+  // if(!DEBUG) waitController();                                                           
   
   
   start = 0;                                           // Set start back to 0.
   flightMode = 1;                                      // start without any mode (except for autoleveling if true)                                 
+
+
+  initBattery();                                       // see Battery.ino
 
 
   //When everything is done, turn off the led.
@@ -169,8 +170,8 @@ void loop(){                                           // loop runs at 250Hz => 
 
   // finish the loop
   if(micros() - loopTimer > 4050)
-         ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);  // turn on the LED if the loop time exceeds 4050us
-  else ledcWrite(pwmLedChannel, 0);
+         ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  // turn on the LED if the loop time exceeds 4050us
+  else ledcWrite(pwmLedFlyChannel, 0);
 
   // wait until 4000us are passed
   while(micros() - loopTimer < 4000);                  // the refresh rate is 250Hz, thus esc's pulse update is every 4ms.

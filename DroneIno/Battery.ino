@@ -25,13 +25,14 @@ void initBattery(){
   * @brief get the initial value of the battery voltage
   */
 
-  // set 2^10=1024 width (analogSetWidth can go from 9-12 (default 12))
-  analogSetWidth(adcBits);  
   
-  // get battery voltage
-  getBatteryVoltage();
+  analogSetWidth(adcBits);                                      // set 2^10=1024 width (analogSetWidth can go from 9-12 (default 12))
+  
+  
+  getBatteryVoltage();                                          // get battery voltage
 
   // if(DEBUG) {Serial.print("initBattery: OK; voltage: "); Serial.println(batteryVoltage);}
+  
 }
 
 int getBatteryVoltage(){
@@ -39,7 +40,7 @@ int getBatteryVoltage(){
   * @brief get battery voltage
   */
 
-  batteryVoltage = analogRead(PIN_BATTERY_LEVEL) / fromVtoWidth;
+  batteryVoltage = (float)analogRead(PIN_BATTERY_LEVEL) / fromVtoWidth;
 
 }
 
@@ -52,12 +53,12 @@ void batteryVoltageCompensation(){
   batteryVoltage = batteryVoltage * 0.92 + analogRead(PIN_BATTERY_LEVEL) / fromVtoWidth * 0.08;
   batteryPercent = batteryVoltage*correctionBattery/maxBatteryLevelDropped;
 
- if(DEBUG) {
-   Serial.print("batteryVoltage: "); Serial.print(batteryVoltage);
-   Serial.print(",analog read width: "); Serial.print(analogRead(PIN_BATTERY_LEVEL));
-   Serial.print(",analog read volt: "); Serial.print(analogRead(PIN_BATTERY_LEVEL) / fromVtoWidth/1000);
-   Serial.print(",minBatteryLevelThreshold: "); Serial.println(minBatteryLevelThreshold);
- }
+//  if(DEBUG) {
+//    Serial.print("batteryVoltage: "); Serial.print(batteryVoltage);
+//    Serial.print(", analog read width: "); Serial.print(analogRead(2));
+//    Serial.print(", analog read volt: "); Serial.print(analogRead(PIN_BATTERY_LEVEL) / fromVtoWidth/1000);
+//    Serial.print(", minBatteryLevelThreshold: "); Serial.println(minBatteryLevelThreshold);
+//  }
 
   //Turn on the led if battery voltage is too low.
   if(batteryVoltage < minBatteryLevelThreshold) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);

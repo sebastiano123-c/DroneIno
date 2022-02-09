@@ -59,7 +59,8 @@ Make sure to do all the passages described here below.
     - [**Step 1: reset variables**](#step-1-reset-variables)
     - [**Step 2: yaw tuning**](#step-2-yaw-tuning)
     - [**Step 3: roll/pitch tuning**](#step-3-rollpitch-tuning)
-  - [**WiFi PID adjustment (developing)**](#wifi-pid-adjustment-developing)
+  - [**DroneInoTelemetry web app (developing)**](#droneinotelemetry-web-app-developing)
+    - [**Connection**](#connection)
 - [**Roadmap**](#roadmap)
 
 # **Usage**
@@ -88,7 +89,7 @@ CIRCUITAL SCHEMATIC HERE
 # **Features**
 1) auto-leveling
 2) altitude hold (developing)
-3) modify PID using WiFi access point (developing)
+3) DroneInoTelemetry web app (developing)
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 ## **Selecting flight mode**
@@ -243,11 +244,18 @@ After few seconds you will see the telemetry data like pitch, roll, battery and 
 You can also adjust fly the PID settings.
 To better improve the WiFi range install an external antenna. -->
 
-## **WiFi PID adjustment (developing)**
-This feature exploits the ESP32 native WiFi as access point (AP).
-After connecting to DroneInoTelemetry network using the password "DroneIno", dial in a browser search bar "192.168.4.1".
-Using this app, you can adjust on the fly the PID settings.
-This feature promise to be very smart in terms of time savings and feedback.
+## **DroneInoTelemetry web app (developing)**
+DroneInoTelemtry is a web app that makes every thing simple and easy reach.
+Use it to fine-tune your PID or fix gyroscope set point and altitude hold PID parameters.
+
+Exploiting the ESP32 native WiFi access point (AP), DroneInoTelemetry web app promises to be very smart in terms of time savings and feedback.
+
+Using this app, you can adjust on the fly every PID parameter, and much more.
+
+### **Connection**
+After connecting to DroneInoTelemetry network using the password `DroneIno`, dial in your browser's search bar `292.168.4.1`.
+That's it.
+You don't have to download anything, it's just there.
 
 # **Roadmap**
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.

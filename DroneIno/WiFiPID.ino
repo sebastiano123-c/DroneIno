@@ -76,7 +76,7 @@ const char* index_html(){
                   </form>
                   <form action="get">
                       I: <label class="pid-label" id="rollIVal">)rawliteral";
-  String rollIInput = indexHTMLBody1 + String(PID_I_GAIN_ROLL, 4);
+  String rollIInput = indexHTMLBody1 + String(PID_I_GAIN_ROLL, 5);
   String indexHTMLBody2 = rollIInput + R"rawliteral(</label><input class="pid-input" type="text" id="rollIInput" name="rollI">
                       <input type="submit" id="rollI" onclick="showInput(this);" value="set">
                   </form>
@@ -122,17 +122,88 @@ const char* index_html(){
   String indexHTMLBody6 = yawDInput + R"rawliteral(</label><input class="pid-input" type="text" id="yawDInput" name="yawD">
                       <input type="submit" id="yawD" onclick="showInput(this);" value="set">
                   </form>
-              </div>
+              </div>)rawliteral";
+String indexHTMLBody7 = indexHTMLBody6 + R"rawliteral(<div class="card">
+              <p >  Gyroscope </p>
+              <form action="get">
+                P/R filter (%): <label class="pid-label" id="filterPitchRollVal">)rawliteral";
+String filterPitchRollHTML = indexHTMLBody7 + String(GYROSCOPE_ROLL_FILTER, 4);
+String indexHTMLBody8 = filterPitchRollHTML + R"rawliteral(</label><input class="pid-input" type="text" id="filterPitchRollInput" name="filterPitchRoll">
+                <input type="submit" id="filterPitchRoll" onclick="showInput(this);" value="set">
+              </form> 
+              <form action="get">
+                roll corr.(deg;): <label class="pid-label" id="correctionRollVal">)rawliteral";
+String corrRollHTML = indexHTMLBody8 + String(GYROSCOPE_ROLL_CORR, 4);
+String indexHTMLBody9 = corrRollHTML + R"rawliteral(</label><input class="pid-input" type="text" id="correctionRollInput" name="correctionRoll">
+                <input type="submit" id="correctionRoll" onclick="showInput(this);" value="set">
+              </form> 
+              <form action="get">
+                pitch corr.(deg;): <label class="pid-label" id="correctionPitchVal">)rawliteral";
+String corrPitchHTML = indexHTMLBody9 + String(GYROSCOPE_PITCH_CORR, 4);
+String indexHTMLBody10 = corrPitchHTML + R"rawliteral(</label><input class="pid-input" type="text" id="correctionPitchInput" name="correctionPitch">
+                <input type="submit" id="correctionPitch" onclick="showInput(this);" value="set">
+              </form> 
+            </div>)rawliteral";
+
+String indexHTMLBody11 = indexHTMLBody10 + R"rawliteral(<div class="card">
+              <p >  Altitude </p>
+              <form action="get">
+                P: <label class="pid-label" id="altitudePVal">)rawliteral";
+String altitudePHTML = indexHTMLBody11 + String(PID_P_GAIN_ALTITUDE, 4);
+String indexHTMLBody12 = altitudePHTML + R"rawliteral(</label><input class="pid-input" type="text" id="altitudePInput" name="altitudeP">
+                <input type="submit" id="altitudeP" onclick="showInput(this);" value="set">
+              </form> 
+              <form action="get">
+                I: <label class="pid-label" id="altitudeIVal">)rawliteral";
+String altitudeIHTML = indexHTMLBody12 + String(PID_I_GAIN_ALTITUDE, 4);
+String indexHTMLBody13 = altitudeIHTML + R"rawliteral(</label><input class="pid-input" type="text" id="altitudeIInput" name="altitudeI">
+                <input type="submit" id="altitudeI" onclick="showInput(this);" value="set">
+              </form> 
+              <form action="get">
+                D: <label class="pid-label" id="altitudeDVal">)rawliteral";
+String altitudeDHTML = indexHTMLBody13 + String(PID_D_GAIN_ALTITUDE, 4);
+String indexHTMLBody14 = altitudeDHTML + R"rawliteral(</label><input class="pid-input" type="text" id="altitudeDInput" name="altitudeD">
+                <input type="submit" id="altitudeD" onclick="showInput(this);" value="set">
+              </form> 
+            </div>
+
           </div>
-      </div>
-      <script  type="text/javascript">
-        function showInput(elem) {
+      </div>)rawliteral";
+String sendHTMLButton = indexHTMLBody14 + R"rawliteral(<p> Don't forget these values! Copy them in the Constant.h file from <button id="copyToConstants" onclick="copyToConstants();">here</button> </p>)rawliteral";
+String scriptHTML = sendHTMLButton + R"rawliteral(<script  type="text/javascript">
+      // onsubmit
+      function showInput(elem) {
           document.getElementById(elem.id+"Val").innerHTML = document.getElementById(elem.id+"Input").value;
       }
-    </script>
-    </body></html>)rawliteral";
+      // alert setup values
+      function copyToConstants(){
+        var stringToPrint = "";
+        stringToPrint += "float PID_P_GAIN_ROLL            = " + document.getElementById("rollPVal").innerHTML + ";\n";
+        stringToPrint += "float PID_I_GAIN_ROLL            = " + document.getElementById("rollIVal").innerHTML + ";\n";
+        stringToPrint += "float PID_D_GAIN_ROLL            = " + document.getElementById("rollDVal").innerHTML + ";\n";
+        // stringToPrint += "int PID_MAX_ROLL                 = 400;\n\n";
+        // stringToPrint += "float PID_P_GAIN_PITCH           = PID_P_GAIN_ROLL;";
+        // stringToPrint += "float PID_I_GAIN_PITCH           = PID_I_GAIN_ROLL;";
+        // stringToPrint += "float PID_D_GAIN_PITCH           = PID_D_GAIN_ROLL;";
+        // stringToPrint += "int PID_MAX_PITCH                = 400;\n\n";
+        stringToPrint += "float PID_P_GAIN_YAW             = " + document.getElementById("yawPVal").innerHTML + ";\n";
+        stringToPrint += "float PID_I_GAIN_YAW             = " + document.getElementById("yawIVal").innerHTML + ";\n";
+        stringToPrint += "float PID_D_GAIN_YAW             = " + document.getElementById("yawDVal").innerHTML + ";\n";
+        // stringToPrint += "int PID_MAX_YAW                  = 400;\n\n" ;
+        stringToPrint += "float PID_P_GAIN_ALTITUDE        = " + document.getElementById("altitudePVal").innerHTML + ";\n";
+        stringToPrint += "float PID_I_GAIN_ALTITUDE        = " + document.getElementById("altitudeIVal").innerHTML + ";\n";
+        stringToPrint += "float PID_D_GAIN_ALTITUDE        = " + document.getElementById("altitudeDVal").innerHTML + ";\n";
+        // stringToPrint += "int PID_MAX_ALTITUDE             = 400;\n\n" ;
+        stringToPrint += "float GYROSCOPE_ROLL_FILTER      = " + document.getElementById("filterPitchRollVal").innerHTML + ";\n";
+        // stringToPrint += "float GYROSCOPE_PITCH_FILTER     = GYROSCOPE_ROLL_FILTER;\n";
+        stringToPrint += "float GYROSCOPE_ROLL_CORR        = " + document.getElementById("correctionRollVal").innerHTML + ";\n";
+        stringToPrint += "float GYROSCOPE_PITCH_CORR       = " + document.getElementById("correctionPitchVal").innerHTML + ";\n";
+        alert(stringToPrint);
+      }
+    </script>)rawliteral";
+  String endHTML = scriptHTML + R"rawliteral(</body></html>)rawliteral";
   
-  return indexHTMLBody6.c_str();
+  return endHTML.c_str();
 }
 
 void notFound(AsyncWebServerRequest *request) {
@@ -216,10 +287,46 @@ void setupWiFiTelemetry(){
        inputParam = D_YAW_GET;
        PID_D_GAIN_YAW = inputMessage.toFloat();
      }
+    // gyroscope
+     else if (request->hasParam("filterPitchRoll")) {
+       inputMessage = request->getParam("filterPitchRoll")->value();
+       inputParam = "filterPitchRoll";
+       GYROSCOPE_ROLL_FILTER = inputMessage.toFloat();
+       GYROSCOPE_PITCH_FILTER = inputMessage.toFloat();
+     }
+     else if (request->hasParam("correctionRoll")) {
+       inputMessage = request->getParam("correctionRoll")->value();
+       inputParam = "correctionRoll";
+       GYROSCOPE_ROLL_CORR = inputMessage.toFloat();
+     }
+     else if (request->hasParam("correctionPitch")) {
+       inputMessage = request->getParam("correctionPitch")->value();
+       inputParam = "correctionPitch";
+       GYROSCOPE_PITCH_CORR = inputMessage.toFloat();
+     }
+    // altitude
+     else if (request->hasParam("altitudeP")) {
+       inputMessage = request->getParam("altitudeP")->value();
+       inputParam = "altitudeP";
+       PID_P_GAIN_ALTITUDE = inputMessage.toFloat();
+     }
+     else if (request->hasParam("altitudeI")) {
+       inputMessage = request->getParam("altitudeI")->value();
+       inputParam = "altitudeI";
+       PID_I_GAIN_ALTITUDE = inputMessage.toFloat();
+     }
+     else if (request->hasParam("altitudeD")) {
+       inputMessage = request->getParam("altitudeD")->value();
+       inputParam = "altitudeD";
+       PID_D_GAIN_ALTITUDE = inputMessage.toFloat();
+     }
      else {
        inputMessage = "No message sent";
        inputParam = "none";
      }
+     if(DEBUG) Serial.printf("wifi command: %s\n",inputMessage);
+     if(DEBUG) Serial.printf("wifi tag id: %s\n",inputParam);
+
      request->send_P(200, "text/html", index_html());                         
    });
 
