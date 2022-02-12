@@ -1,0 +1,37 @@
+html {
+    font-family: Arial; 
+    display: inline-block; 
+    text-align: center;
+  }
+  p { 
+    font-size: 1.2rem;
+  }
+  body {  
+    margin: 0;
+  }
+  .topnav { 
+    overflow: hidden; 
+    background-color: #50B8B4; 
+    color: white; 
+    font-size: 1rem; 
+  }
+  .content { 
+    padding: 20px; 
+  }
+  .card { 
+    background-color: white; 
+    max-width: 500px; 
+    box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5); 
+  }
+  .cards { 
+    max-width: 800px; 
+    margin: 0 auto; 
+    display: grid; 
+    grid-gap: 2rem; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .reading { 
+    font-size: 1.4rem;  
+  }
+  .pid-input{
+    max-width: 50px;
+  }

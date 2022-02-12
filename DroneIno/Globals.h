@@ -70,10 +70,20 @@ signed long int tFine;
 signed long int tempCal;
 unsigned long int pressCal;
 
-// esp-now telemetry
-typedef struct struct_message {
-    float anglePitch;
-    float angleRoll;
-} struct_message;
 
-struct_message myData;
+// telemetry tx
+const int dataTransferSize = 5;
+float dataTransfer[dataTransferSize];
+
+// telemetry rx
+const int dataControllerSize = 9;
+float dataController[dataControllerSize];
+
+// serial
+HardwareSerial SUART(1); 
+
+// server
+AsyncWebServer server(80);
+
+// Create an Event Source on /events
+AsyncEventSource events("/events");

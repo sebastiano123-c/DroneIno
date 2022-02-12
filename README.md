@@ -61,6 +61,7 @@ Make sure to do all the passages described here below.
     - [**Step 3: roll/pitch tuning**](#step-3-rollpitch-tuning)
   - [**DroneInoTelemetry web app (developing)**](#droneinotelemetry-web-app-developing)
     - [**Connection**](#connection)
+    - [**Connection using ESP32-CAM**](#connection-using-esp32-cam)
 - [**Roadmap**](#roadmap)
 
 # **Usage**
@@ -256,6 +257,13 @@ Using this app, you can adjust on the fly every PID parameter, and much more.
 After connecting to DroneInoTelemetry network using the password `DroneIno`, dial in your browser's search bar `292.168.4.1`.
 That's it.
 You don't have to download anything, it's just there.
+
+### **Connection using ESP32-CAM**
+Now on developing, the ESP32-CAM promises to be the best solution for the telemetry.
+Without it, it is only possible to set PID parameters.
+Instead, with the ESP32-CAM, the flying experience will be much more interactive.
+<ins>*The description full will available in the future*</ins>
+
 
 # **Roadmap**
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.

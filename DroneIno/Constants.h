@@ -31,7 +31,7 @@ int PID_MAX_ALTITUDE             = 400;                      //Maximum output of
 
 
 // GYROSCOPE
-float GYROSCOPE_ROLL_FILTER      = .996;                      // read your gyroscope data after the calibration, try different values and choose the best one
+float GYROSCOPE_ROLL_FILTER      = .9996;                      // read your gyroscope data after the calibration, try different values and choose the best one
 float GYROSCOPE_PITCH_FILTER     = GYROSCOPE_PITCH_FILTER;    // read your gyroscope data after the calibration, try different values and choose the best one
 float GYROSCOPE_ROLL_CORR        = -.30;                      // (0.) after set GYROSCOPE_ROLL_FILTER, put here the angle roll you read eneabling DEBUG
 float GYROSCOPE_PITCH_CORR       = -1.65;                     // (-1.65.) after set GYROSCOPE_PITCH_FILTER, put here the angle pitch you read eneabling DEBUG
@@ -98,11 +98,6 @@ const char* D_ROLL_GET  = "rollD";
 const char* P_YAW_GET   = "yawP";
 const char* I_YAW_GET   = "yawI";
 const char* D_YAW_GET   = "yawD";
-
-
-// PID adjustment using wifi
-AsyncWebServer server(80);
-
 
 // // esp-now telemetry
 // uint8_t broadcastAddress[] = {0x58, 0xBF, 0x25, 0x82, 0x4D, 0x08}; // RECEIVER MAC Address

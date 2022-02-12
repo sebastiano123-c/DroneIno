@@ -1,14 +1,17 @@
-DroneIno/src/AutoLeveling.cpp
-DroneIno/src/AutoLeveling.h
-DroneIno/src/Constants.h
 AutoLeveling
 .vscode
-test
 EEPROM_data.txt
 *.log
+
+# test folder
+test/*
+!test/wifi
+!test/uart
+!test/battery-calculations.cpp
 
 # Further implementations
 HCSR04.ino 
 
 # development
+index.html
 EspNow.ino

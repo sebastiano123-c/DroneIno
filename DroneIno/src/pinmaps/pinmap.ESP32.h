@@ -25,12 +25,20 @@
 #define PIN_BATTERY_LEVEL           39
 
 // PROXIMITY_SENSOR
-#define PIN_PROXIMITY_SENSOR_ECHO   26
-#define PIN_PROXIMITY_SENSOR_TRIG   25
+// #define PIN_PROXIMITY_SENSOR_ECHO   26
+// #define PIN_PROXIMITY_SENSOR_TRIG   25
 
 // I2C PINS
 #define PIN_SDA                     21
 #define PIN_SCL                     22
+
+// UART0 - Serial
+#define PIN_RX0                     1
+#define PIN_TX0                     3
+
+// UART1 - Serial1
+#define PIN_RX1                     25     // by default is 16, but it is occupied by PIN_ESCs
+#define PIN_TX1                     26     // by default is 17, but it is occupied by PIN_ESCs
 
 // board limit voltage of the pins, for ESP32 is 3.mV
 #define BOARD_LIMIT_VOLTAGE         3300
