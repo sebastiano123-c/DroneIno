@@ -21,7 +21,7 @@
 
 
 // AUTO LEVElING
-#define AUTO_LEVELING               true                     // (true, false)
+#define AUTO_LEVELING               true                     // (true, false) false disable every autoleveling compensation
 
 
 // BATTERY

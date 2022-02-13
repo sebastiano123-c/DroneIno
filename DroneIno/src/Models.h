@@ -34,3 +34,8 @@
 #if PROXIMITY_SENSOR == HCSR04
   #include <HCSR04.h>
 #endif
+
+// WIFI TELEMETRY
+#if WIFI_TELEMETRY == ESP_CAM
+  #include "pinmaps/pinmap.ESP32CAM.h"
+#endif

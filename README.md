@@ -150,7 +150,7 @@ After building the circuit, place it on the drone and proceed with the following
 Check that your pinmap corresponds to the one defined in the [pinmap](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/pinmaps) folder, otherwise change it.
 
 ## **Configuration**
-Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/Config.h) file where you can adjust the PID parameters and others constants.
+Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/Config.h) file where you can set the hardware components, the battery minimum voltage, the sensors you use and others.
 
 ## **Setup**
 Upload the [setup](https://github.com/sebastiano123-c/DroneIno/tree/main/Setup) sketch to your board and run it.
@@ -246,7 +246,7 @@ You can also adjust fly the PID settings.
 To better improve the WiFi range install an external antenna. -->
 
 ## **DroneInoTelemetry web app (developing)**
-DroneInoTelemtry is a web app that makes every thing simple and easy reach.
+DroneInoTelemetry is a web app that makes every thing simple and easy reach.
 Use it to fine-tune your PID or fix gyroscope set point and altitude hold PID parameters.
 
 Exploiting the ESP32 native WiFi access point (AP), DroneInoTelemetry web app promises to be very smart in terms of time savings and feedback.
@@ -260,8 +260,8 @@ You don't have to download anything, it's just there.
 
 ### **Connection using ESP32-CAM**
 Now on developing, the ESP32-CAM promises to be the best solution for the telemetry.
-Without it, it is only possible to set PID parameters.
-Instead, with the ESP32-CAM, the flying experience will be much more interactive.
+<!-- Without it, it is only possible to set PID parameters. -->
+With the ESP32-CAM, the flying experience will be much more interactive.
 <ins>*The description full will available in the future*</ins>
 
 
@@ -269,7 +269,8 @@ Instead, with the ESP32-CAM, the flying experience will be much more interactive
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.
 
 Future improvements:
-- improve the telemetry data with esp-now
+- improve the telemetry data with esp-cam
+- streaming video with esp-cam
 - altitude hold
 - GPS
 - Gimbal CAM
