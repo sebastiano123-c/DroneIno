@@ -247,10 +247,10 @@ You can also adjust fly the PID settings.
 To better improve the WiFi range install an external antenna. -->
 
 # **DroneInoTelemetry web app (developing)**
-DroneInoTelemetry is a web app that makes every thing simple and easy reach.
+DroneInoTelemetry is a web app that makes everything simple and easy reach.
 Use it to fine-tune your PID or fix gyroscope set point and altitude hold PID parameters.
 
-Using this app, you can adjust on the fly every PID parameter, and much more.
+Using this app, you can adjust on the fly these parameters and much more.
 
 ## **Connection using only ESP32**
 Exploiting the ESP32 native WiFi access point (AP), DroneInoTelemetry web app promises to be very smart in terms of time savings and feedback.
@@ -270,14 +270,14 @@ Features:
 - set PID parameters;
 - pitch, roll, altitude pressure, flight mode and battery telemetry system;
 
-Connect your ESP32-CAM to the 5V pin and GND pin of the ESP32 board.
-Then connect:
-- GPIO_3 pin of the cam to the GPIO_25 of the ESP32 board;
-- GPIO_1 pin of the cam to the GPIO_26 of the ESP32 board;
+First of all, upload the [WiFiTelemetry](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/addons/WiFiTelemetry) sketch to your ESP32-CAM.
 
-Upload the [WiFiTelemetry](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/addons/WiFiTelemetry) sketch.
+Then, power the ESP32-CAM with the 5V pin of the ESP32 board and connect the ESP32-CAM GND to the one of the ESP32.
+The two boards can talk to each other using the UART communication reached by connecting:
+- GPIO_3 pin of the ESP32-CAM to the GPIO_25 of the ESP32 board;
+- GPIO_1 pin of the ESP32-CAM to the GPIO_26 of the ESP32 board;
 
-<ins> Till now, there is no way to communicate the initial PID values from the ESP32 board to the CAM board, so you have to copy and paste them in the WiFiTelemetry sketch </ins> 
+<ins> Till now, there is no way to communicate the **initial** PID values from the ESP32 board to the CAM board, so you have to copy and paste them in the WiFiTelemetry sketch </ins> 
 
 
 # **Roadmap**

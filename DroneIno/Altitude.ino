@@ -1,3 +1,14 @@
+/**
+ * @file Altitude.ino
+ * @author @sebastiano123-c
+ * @brief pressure readings routines
+ * @version 0.1
+ * @date 2022-02-18
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #if ALTITUDE_SENSOR == BMP280
   void checkAltitudeSensor(){
     uint8_t ctrl_meas_reg = (osrs_t << 5) | (osrs_p << 2) | barometerMode;

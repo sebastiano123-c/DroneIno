@@ -1,13 +1,13 @@
-/* 
-* ISR
-* @author @sebastiano123-c
-*/
+/** 
+ * ISR
+ * @author @sebastiano123-c
+ */
 
 void myISR(){
-  /* 
-  * @brief measures the receiver input signal length 
-  * @todo use pwm to read the receivers signals, avoid digitalRead
-  */
+  /** 
+   * @brief measures the receiver input signal length 
+   * @todo use pwm to read the receivers signals, avoid digitalRead
+   */
 
   currentTime = micros();
 

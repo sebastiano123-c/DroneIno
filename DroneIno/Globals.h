@@ -1,7 +1,7 @@
-/*
-* Globals.h
-* @author @sebastiano123-c
-*/
+/**
+ * @brief Global variables
+ * 
+ */
 
 // trim position structure
 struct trimPosition{

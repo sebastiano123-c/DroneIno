@@ -1,13 +1,15 @@
-/*
-* Battery
-* @author @sebastiano123-c
-*/
+/**
+ * @brief Battery calculations routines
+ * 
+ * @param volt 
+ * @return float 
+ */
 
 float voltagePartitor(int volt){
-  /* 
-  * @brief voltage partitor 
-  * @param (int)volt battery voltage in mV
-  */
+  /** 
+    * @brief voltage partitor 
+    * @param (int)volt battery voltage in mV
+    */
 
   return (float)(volt-DIODE_DROP) * totalDrop;
 }
@@ -21,9 +23,9 @@ float fromWidthToVBattery(int width, float corr = 1.){
 }
 
 void initBattery(){
-  /* 
-  * @brief get the initial value of the battery voltage
-  */
+  /** 
+    * @brief get the initial value of the battery voltage
+    */
 
   
   analogSetWidth(adcBits);                                      // set 2^10=1024 width (analogSetWidth can go from 9-12 (default 12))
@@ -36,18 +38,18 @@ void initBattery(){
 }
 
 int getBatteryVoltage(){
-  /* 
-  * @brief get battery voltage
-  */
+  /** 
+    * @brief get battery voltage
+    */
 
   batteryVoltage = (float)analogRead(PIN_BATTERY_LEVEL) / fromVtoWidth;
 
 }
 
 void batteryVoltageCompensation(){
-  /* 
-  * @brief compensate the ESCs pulses with battery voltage
-  */
+  /** 
+    * @brief compensate the ESCs pulses with battery voltage
+    */
  
   //The battery voltage is needed for compensation.
   batteryVoltage = batteryVoltage * 0.92 + analogRead(PIN_BATTERY_LEVEL) / fromVtoWidth * 0.08;

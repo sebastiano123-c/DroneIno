@@ -1,7 +1,7 @@
-/* 
-* PID
-* @author @sebastiano123-c
-*/
+/** 
+ * @file PID.ino
+ * @author @sebastiano123-c
+ */
 
 void setPID(){
   /* 

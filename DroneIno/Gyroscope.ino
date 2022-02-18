@@ -1,10 +1,10 @@
-/* 
-* Gyroscope
-* @author @sebastiano123-c
-*/
+/** 
+ * Gyroscope
+ * @author @sebastiano123-c
+ */
 
 void setGyroscopeRegisters(){
-  /*
+  /**
   * @brief try a first communication with the gyroscope
   */
 
@@ -59,9 +59,9 @@ void setGyroscopeRegisters(){
 }
 
 void calibrateGyroscope(){
-  /*
-  * @brief uses the gyroscope measurement to calculate the accelerometer and the gyroscope calibration
-  */
+  /**
+   * @brief uses the gyroscope measurement to calculate the accelerometer and the gyroscope calibration
+   */
  
   if(DEBUG) Serial.printf("\ncalibrateGyroscope...\n");
 
@@ -106,7 +106,7 @@ void calibrateGyroscope(){
 }
 
 void calculateAnglePRY(){
-  /*
+  /**
   * @brief calculate the pitch, roll and yaw angles from the previous gyroscope readings
   */
 

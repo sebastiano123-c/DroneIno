@@ -1,11 +1,13 @@
-/*
-* DroneIno32
-*
-* @author @sebastiano123-c
-* @date 02/03/2022 
-* @version 0.1
-* 
-*/
+/**
+ * @file DroneIno.ino
+ * @author @sebastiano123-c
+ * @brief main file for piloting your ESP32 based DIY drone
+ * @version 0.2
+ * @date 2022-02-18
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //Terms of use
@@ -85,7 +87,7 @@ void setup(){
 
 
   // wait until the rx is connected
-  // if(!DEBUG) waitController();                                                           
+  if(!DEBUG) waitController();                                                           
   
   
   start = 0;                                           // Set start back to 0.
@@ -168,8 +170,10 @@ void loop(){                                           // loop runs at 250Hz => 
          ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  // turn on the LED if the loop time exceeds 4050us
   else ledcWrite(pwmLedFlyChannel, 0);
 
+
   // wait until 4000us are passed
   while(micros() - loopTimer < 4000);                  // the refresh rate is 250Hz, thus esc's pulse update is every 4ms.
+
 
   loopTimer = micros();                                // set the timer for the next loop
 

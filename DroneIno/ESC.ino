@@ -1,12 +1,13 @@
-/* 
-* ESC 
-* @author @sebastiano123-c
-*/
+/**
+ * 
+ * @brief ESC routines tells motors what to do
+ * 
+ */
 
 void droneStart(){
-  /* 
-  * @brief first settings of the PID and angles
-  */
+  /** 
+   * @brief first settings of the PID and angles
+   */
 
   start = 2;
 
@@ -24,9 +25,9 @@ void droneStart(){
 }
 
 void setEscPulses(){
-  /* 
-  * @brief set ESC pulses
-  */
+  /** 
+    * @brief set ESC pulses
+    */
 
   throttle = receiverInputChannel3;                                   //We need the throttle signal as a base signal.
 

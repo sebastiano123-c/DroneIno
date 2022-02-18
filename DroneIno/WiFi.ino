@@ -1,5 +1,5 @@
-/*
- * WiFiPID
+/**
+ * @file WiFi.ino
  * @author @sebastiano123-c
  *
  * @note Actually, it is not a telemetry if WIFI_TELEMETRY is defined NATIVE.

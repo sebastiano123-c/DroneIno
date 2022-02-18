@@ -1,7 +1,7 @@
-/* 
-* Controller
-* @author @sebastiano123-c
-*/
+/** 
+ * @file Controller.ino
+ * @author @sebastiano123-c
+ */
 
 void waitController(){
   /* 

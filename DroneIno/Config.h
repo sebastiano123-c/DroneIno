@@ -1,9 +1,9 @@
-/* 
-* Config.h
-* @author @sebastiano123-c
-* 
-* @note * = not available at the moment
-*/
+/** 
+ * @file Config.h
+ * @author @sebastiano123-c
+ * 
+ * @note * = not available at the moment
+ */
 
 
 // MICROCONTROLLER BOARD
