@@ -69,10 +69,6 @@ void setup(){
   setupWireI2C();                                      // see Initialize.ino          
 
 
-  // setup telemetry
-  //setupTelemetry();                                  // esp-now NOT working for now
-
-
   // setup wifi AP
   setupWiFiTelemetry();                                // see WiFiTelemtry.ino    
 
@@ -106,6 +102,9 @@ void setup(){
 
   //Set the timer for the next loop.
   loopTimer = micros();  
+
+  
+  if(DEBUG) Serial.println("setup finished");
 
 }
 
@@ -161,11 +160,7 @@ void loop(){                                           // loop runs at 250Hz => 
 
 
   // send telemetry via wifi
-  // sendTelemetry();
-
-
-  // send telemetry via wifi
-//   sendWiFiTelemetry();
+  sendWiFiTelemetry();
 
 
   // finish the loop
@@ -177,5 +172,6 @@ void loop(){                                           // loop runs at 250Hz => 
   while(micros() - loopTimer < 4000);                  // the refresh rate is 250Hz, thus esc's pulse update is every 4ms.
 
   loopTimer = micros();                                // set the timer for the next loop
+
 
 }

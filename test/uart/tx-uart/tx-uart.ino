@@ -21,7 +21,7 @@ float dataController[dataControllerSize];
 void setup()
 {
   Serial.begin(115200);
-  SUART.begin(115200, SERIAL_8N1, 16, 17);
+  SUART.begin(115200, SERIAL_8N1, 26, 25);
   delay(30);
 }
 
@@ -41,7 +41,7 @@ void loop()
 
 void writeDataTransfer(){
 
-  Serial.printf("I'm sending...\n");
+  //Serial.printf("I'm sending...\n");
 
   // fill data structure before send
   dataTransfer[0] = angleRoll;
@@ -58,7 +58,7 @@ void writeDataTransfer(){
   SUART.printf("%.6f\n", dataTransfer[dataTransferSize - 1]);
 
   // print
-  checkMessage();
+  //checkMessage();
 }
 
 

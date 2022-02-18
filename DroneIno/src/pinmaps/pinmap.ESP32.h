@@ -37,8 +37,8 @@
 #define PIN_TX0                     3
 
 // UART1 - Serial1
-#define PIN_RX1                     25     // by default is 16, but it is occupied by PIN_ESCs
-#define PIN_TX1                     26     // by default is 17, but it is occupied by PIN_ESCs
+#define PIN_RX1                     26     // by default is 16, but it is occupied by PIN_ESCs
+#define PIN_TX1                     25     // by default is 17, but it is occupied by PIN_ESCs
 
 // board limit voltage of the pins, for ESP32 is 3.mV
 #define BOARD_LIMIT_VOLTAGE         3300

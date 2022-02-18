@@ -59,10 +59,11 @@ Make sure to do all the passages described here below.
     - [**Step 1: reset variables**](#step-1-reset-variables)
     - [**Step 2: yaw tuning**](#step-2-yaw-tuning)
     - [**Step 3: roll/pitch tuning**](#step-3-rollpitch-tuning)
-  - [**DroneInoTelemetry web app (developing)**](#droneinotelemetry-web-app-developing)
-    - [**Connection**](#connection)
-    - [**Connection using ESP32-CAM**](#connection-using-esp32-cam)
+- [**DroneInoTelemetry web app (developing)**](#droneinotelemetry-web-app-developing)
+  - [**Connection using only ESP32**](#connection-using-only-esp32)
+  - [**Connection using ESP32-CAM**](#connection-using-esp32-cam)
 - [**Roadmap**](#roadmap)
+- [**Author**](#author)
 
 # **Usage**
 Clone this repo
@@ -89,8 +90,8 @@ CIRCUITAL SCHEMATIC HERE
 
 # **Features**
 1) auto-leveling
-2) altitude hold (developing)
-3) DroneInoTelemetry web app (developing)
+2) DroneInoTelemetry web app
+3) altitude hold (developing)
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 ## **Selecting flight mode**
@@ -245,33 +246,50 @@ After few seconds you will see the telemetry data like pitch, roll, battery and 
 You can also adjust fly the PID settings.
 To better improve the WiFi range install an external antenna. -->
 
-## **DroneInoTelemetry web app (developing)**
+# **DroneInoTelemetry web app (developing)**
 DroneInoTelemetry is a web app that makes every thing simple and easy reach.
 Use it to fine-tune your PID or fix gyroscope set point and altitude hold PID parameters.
 
-Exploiting the ESP32 native WiFi access point (AP), DroneInoTelemetry web app promises to be very smart in terms of time savings and feedback.
-
 Using this app, you can adjust on the fly every PID parameter, and much more.
 
-### **Connection**
+## **Connection using only ESP32**
+Exploiting the ESP32 native WiFi access point (AP), DroneInoTelemetry web app promises to be very smart in terms of time savings and feedback.
+
 After connecting to DroneInoTelemetry network using the password `DroneIno`, dial in your browser's search bar `292.168.4.1`.
 That's it.
 You don't have to download anything, it's just there.
 
-### **Connection using ESP32-CAM**
+## **Connection using ESP32-CAM**
 Now on developing, the ESP32-CAM promises to be the best solution for the telemetry.
 <!-- Without it, it is only possible to set PID parameters. -->
 With the ESP32-CAM, the flying experience will be much more interactive.
-<ins>*The description full will available in the future*</ins>
+
+Features:
+- on flight camera streaming;
+- set camera settings;
+- set PID parameters;
+- pitch, roll, altitude pressure, flight mode and battery telemetry system;
+
+Connect your ESP32-CAM to the 5V pin and GND pin of the ESP32 board.
+Then connect:
+- GPIO_3 pin of the cam to the GPIO_25 of the ESP32 board;
+- GPIO_1 pin of the cam to the GPIO_26 of the ESP32 board;
+
+Upload the [WiFiTelemetry](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/addons/WiFiTelemetry) sketch.
+
+<ins> Till now, there is no way to communicate the initial PID values from the ESP32 board to the CAM board, so you have to copy and paste them in the WiFiTelemetry sketch </ins> 
 
 
 # **Roadmap**
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.
 
 Future improvements:
-- improve the telemetry data with esp-cam
-- streaming video with esp-cam
+- store data flight on the SD storage on the esp-cam
 - altitude hold
 - GPS
+- flight plan and autonomous flight
 - Gimbal CAM
 - use other boards
+
+# **Author**
+Sebastiano Cocchi

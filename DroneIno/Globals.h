@@ -76,7 +76,7 @@ const int dataTransferSize = 5;
 float dataTransfer[dataTransferSize];
 
 // telemetry rx
-const int dataControllerSize = 9;
+const int dataControllerSize = 12;
 float dataController[dataControllerSize];
 
 // serial

@@ -8,7 +8,7 @@ float flightMode = 3;
 float batteryPercentage = 4;
 float altitudeMeasure = 5;
 
-int delayTime = 4; // ms
+int delayTime = 200; // ms
 int sendTelemetryLoopN = 0;
 
 // telemetry
