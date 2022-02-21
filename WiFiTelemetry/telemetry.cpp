@@ -1,9 +1,7 @@
 #include "telemetry.h"
 
-const int dataControllerSize = 12;
 float dataController[dataControllerSize];
 
-const int dataTransferSize = 5;
 float dataTransfer[dataTransferSize];
 
 // serial
@@ -29,14 +27,6 @@ void updatePID(){
   dataController[11] = PID_D_GAIN_ALTITUDE;
 }
 
-void updateTelemetry(){
-  // fill data structure after receiving
-  rollAngle = dataTransfer[0];
-  pitchAngle = dataTransfer[1];
-  flightMode = dataTransfer[2];
-  batteryPercentage = dataTransfer[3];
-  altitudeMeasure = dataTransfer[4];
-}
 
 void writeDataTransfer(){
 
@@ -53,7 +43,7 @@ void writeDataTransfer(){
 
 
 void readDataTransfer(){
-    if(SUART.available()){
+    if(SUART.available()>0){
         // declair index array
         int indices[dataTransferSize-1];
         String str = "";
@@ -81,10 +71,23 @@ void readDataTransfer(){
         }
         dataTransfer[dataTransferSize - 1] = str.substring(indices[dataTransferSize - 2] + 1 ).toFloat();
         
-        updateTelemetry();
+        // fill data structure after receiving
+        rollAngle = dataTransfer[0];
+        pitchAngle = dataTransfer[1];
+        flightMode = dataTransfer[2];
+        batteryPercentage = dataTransfer[3];
+        altitudeMeasure = dataTransfer[4];
+        
         //  // print in csv format   
         //  for(int i = 0; i < dataTransferSize; i++){
         //    Serial.printf("%.6f\n", dataTransfer[i]);
         //  }
     }
+    // else{
+    //     rollAngle = 0.;
+    //     pitchAngle = 2.;
+    //     flightMode = 0.;
+    //     batteryPercentage = 3.;
+    //     altitudeMeasure = 0.;
+    // }
 }

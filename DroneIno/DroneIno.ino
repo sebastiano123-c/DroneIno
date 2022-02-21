@@ -33,7 +33,7 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-// #include <esp_now.h>
+#include <HardwareSerial.h>
 
 #include "Config.h"
 #include "src/Models.h"
@@ -45,6 +45,10 @@ void setup(){
   if(DEBUG) Serial.begin(BAUD_RATE);
 
 
+  // setup wifi AP
+  setupWiFiTelemetry();                                // see WiFiTelemtry.ino  
+
+  
  // if(DEBUG) intro();
 
 
@@ -68,11 +72,7 @@ void setup(){
 
 
   //Start the I2C as master.
-  setupWireI2C();                                      // see Initialize.ino          
-
-
-  // setup wifi AP
-  setupWiFiTelemetry();                                // see WiFiTelemtry.ino    
+  setupWireI2C();                                      // see Initialize.ino           
 
 
   //Set the specific gyro registers.  
@@ -87,7 +87,7 @@ void setup(){
 
 
   // wait until the rx is connected
-  if(!DEBUG) waitController();                                                           
+  waitController();                                                           
   
   
   start = 0;                                           // Set start back to 0.

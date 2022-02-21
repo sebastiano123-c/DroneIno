@@ -1,9 +1,7 @@
-
 #pragma once
+#include "app_httpd.h"
+#include "HardwareSerial.h"
 
-#include "telemetry.h"
-
-void startCameraServer();
 
 //              (ROLL)
 extern float PID_P_GAIN_ROLL;                    //Gain setting for the roll P-controller (1.3)
@@ -35,3 +33,10 @@ extern float pitchAngle;
 extern float flightMode;
 extern float batteryPercentage;
 extern float altitudeMeasure;
+
+const int dataTransferSize = 5;
+const int dataControllerSize = 12;
+
+extern void writeDataTransfer();
+extern void readDataTransfer();
+extern void beginUARTCOM();

@@ -321,6 +321,7 @@
   
   void setupWiFiTelemetry(){
       SUART.begin(115200, SERIAL_8N1, PIN_RX1, PIN_TX1);
+      // Serial.println("SUART enabled");
   }
   
   void sendWiFiTelemetry(){
@@ -362,9 +363,9 @@
       SUART.printf("%.6f,", dataTransfer[i]);
     }
     SUART.printf("%.6f>\n", dataTransfer[dataTransferSize - 1]);
-  
+    
     // print
-    //if(DEBUG) checkMessage();
+    //checkMessage();
   }
     
   
@@ -375,7 +376,7 @@
     String str;
     
     // read from serial
-    Serial.printf("I'm reading...\n");
+    if(DEBUG) Serial.printf("I'm reading...\n");
     str = SUART.readStringUntil('\n');
   
     // find positions of ","
@@ -422,9 +423,9 @@
 
     
     // print in csv format   
-    for(int i = 0; i < dataControllerSize; i++){
-      Serial.printf("%.6f\n", dataController[i]);
-    }
+    //for(int i = 0; i < dataControllerSize; i++){
+    //  Serial.printf("%.6f\n", dataController[i]);
+    //}
   }
   
   

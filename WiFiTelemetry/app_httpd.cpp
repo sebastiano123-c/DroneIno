@@ -1,19 +1,7 @@
 /**
  * @brief defines the routines for the communication between client (web app) and the server (esp32 cam)
- * */
-#include "esp_http_server.h"
-#include "esp_timer.h"
-#include "esp_camera.h"
-#include "img_converters.h"
-#include "camera_index.h"
-#include "Arduino.h"
-
-#include <stdarg.h>
-#include <stdio.h>
-
-#include "fb_gfx.h"
-#include "fd_forward.h"
-#include "fr_forward.h"
+ * 
+ */
 
 #include "app_httpd.h"
 
@@ -652,17 +640,18 @@ static esp_err_t pid_handler(httpd_req_t *req){
     else if(!strcmp(variable, "altitudeIInput")) PID_I_GAIN_ALTITUDE = val;
     else if(!strcmp(variable, "altitudeDInput")) PID_D_GAIN_ALTITUDE = val;
 
-    // Serial.printf("/pid val %f", val);
-
-    // return httpd_resp_send_500(req);
+    // send back to DroneIno the pid parameters
     writeDataTransfer();
-    // Serial.println("writeDataTransfer");
+
+    // updates the config.txt on the SD card
+    updateConfigFile(SD_MMC);
 
     httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
     return httpd_resp_send(req, NULL, 0);
 }
 
 static esp_err_t telemetry_handler(httpd_req_t *req){
+
     static char telemetry_json_response[1024];
 
     char * ptr = telemetry_json_response;
@@ -675,12 +664,13 @@ static esp_err_t telemetry_handler(httpd_req_t *req){
     ptr+=sprintf(ptr, "\"battery\":%.4f,", batteryPercentage);
     ptr+=sprintf(ptr, "\"altitude\":%.4f", altitudeMeasure);
 
-    // pitchAngle += 1;
-
     *ptr++ = '}';
     *ptr++ = 0;
+
+    // send response to the client
     httpd_resp_set_type(req, "application/json");
     httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
+
     return httpd_resp_send(req, telemetry_json_response, strlen(telemetry_json_response));
 }
 

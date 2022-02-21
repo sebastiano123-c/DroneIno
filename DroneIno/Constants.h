@@ -10,27 +10,27 @@ float PID_P_GAIN_ROLL            = 1.0;                      //Gain setting for 
 float PID_I_GAIN_ROLL            = 0.000001;                    //Gain setting for the roll I-controller  (0.0002)
 float PID_D_GAIN_ROLL            = 10.0;                      //Gain setting for the roll D-controller (10.0)
 int PID_MAX_ROLL                 = 400;                      //Maximum output of the PID-controller   (+/-)
-
-//              (PITCH)
+                                                                        
+//              (PITCH)                                              
 float PID_P_GAIN_PITCH           = PID_P_GAIN_ROLL;          //Gain setting for the pitch P-controller
 float PID_I_GAIN_PITCH           = PID_I_GAIN_ROLL;          //Gain setting for the pitch I-controller
 float PID_D_GAIN_PITCH           = PID_D_GAIN_ROLL;          //Gain setting for the pitch D-controller
 int PID_MAX_PITCH                = PID_MAX_ROLL;             //Maximum output of the PID-controller   (+/-)
-
-//              (YAW)
+                                                                            
+//              (YAW)                                          
 float PID_P_GAIN_YAW             = 0.7;                      //Gain setting for the pitch P-controller. (2.0)
 float PID_I_GAIN_YAW             = 0.05;                     //Gain setting for the pitch I-controller. (0.04)
 float PID_D_GAIN_YAW             = 0.0;                      //Gain setting for the pitch D-controller. (0.0)
 int PID_MAX_YAW                  = 400;                      //Maximum output of the PID-controller     (+/-)
-
-//            (ALTITUDE)
+                                                                               
+//            (ALTITUDE)                                                     
 float PID_P_GAIN_ALTITUDE        = 1.4;                      //Gain setting for the altitude P-controller (default = 1.4).
 float PID_I_GAIN_ALTITUDE        = 0.3;                      //Gain setting for the altitude I-controller (default = 0.2).
 float PID_D_GAIN_ALTITUDE        = 0.75;                     //Gain setting for the altitude D-controller (default = 0.75).
 int PID_MAX_ALTITUDE             = 400;                      //Maximum output of the PID-controller (+/-).
-
-
-// GYROSCOPE
+                                                                 
+                                                                         
+// GYROSCOPE                                                                    
 float GYROSCOPE_ROLL_FILTER      = .9996;                      // read your gyroscope data after the calibration, try different values and choose the best one
 float GYROSCOPE_PITCH_FILTER     = GYROSCOPE_PITCH_FILTER;    // read your gyroscope data after the calibration, try different values and choose the best one
 float GYROSCOPE_ROLL_CORR        = -.30;                      // (0.) after set GYROSCOPE_ROLL_FILTER, put here the angle roll you read eneabling DEBUG

@@ -30,7 +30,7 @@
 
 
 // WIFI
-#define WIFI_TELEMETRY              'ESP_CAM'                   //("NATIVE", "ESP_CAM"*) 
+#define WIFI_TELEMETRY              'ESP_CAM'                   //(NATIVE, ESP_CAM*) 
 #define CAMERA_MODEL_AI_THINKER                              // Has PSRAM
 
 

@@ -80,7 +80,7 @@ const int dataControllerSize = 12;
 float dataController[dataControllerSize];
 
 // serial
-HardwareSerial SUART(1); 
+HardwareSerial SUART(2); 
 
 // server
 AsyncWebServer server(80);
