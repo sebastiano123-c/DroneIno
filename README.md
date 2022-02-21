@@ -62,6 +62,7 @@ Make sure to do all the passages described here below.
 - [**DroneInoTelemetry web app (developing)**](#droneinotelemetry-web-app-developing)
   - [**Connection using only ESP32**](#connection-using-only-esp32)
   - [**Connection using ESP32-CAM**](#connection-using-esp32-cam)
+    - [**SD card for data storage**](#sd-card-for-data-storage)
 - [**Roadmap**](#roadmap)
 - [**Author**](#author)
 
@@ -270,21 +271,50 @@ Features:
 - set PID parameters;
 - pitch, roll, altitude pressure, flight mode and battery telemetry system;
 
-First of all, upload the [WiFiTelemetry](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/addons/WiFiTelemetry) sketch to your ESP32-CAM.
+First of all, upload the [WiFiTelemetry](https://github.com/sebastiano123-c/DroneIno/tree/main/WiFiTelemetry) sketch to your ESP32-CAM.
 
 Then, power the ESP32-CAM with the 5V pin of the ESP32 board and connect the ESP32-CAM GND to the one of the ESP32.
 The two boards can talk to each other using the UART communication reached by connecting:
 - GPIO_3 pin of the ESP32-CAM to the GPIO_25 of the ESP32 board;
 - GPIO_1 pin of the ESP32-CAM to the GPIO_26 of the ESP32 board;
 
-<ins> Till now, there is no way to communicate the **initial** PID values from the ESP32 board to the CAM board, so you have to copy and paste them in the WiFiTelemetry sketch </ins> 
+### **SD card for data storage**
+You can also save your flight data on a SD card. All you need is:
+- a SD card formatted in FAT32 and put it into you ESP32-CAM;
+- create a folder named 'src';
+- create a file called 'config.txt' in which you need only to write (the order is important!):
+```
+PID_P_GAIN_ROLL
+PID_I_GAIN_ROLL
+PID_D_GAIN_ROLL
+PID_P_GAIN_PITCH
+PID_I_GAIN_PITCH
+PID_D_GAIN_PITCH
+PID_P_GAIN_YAW
+PID_I_GAIN_YAW
+PID_D_GAIN_YAW
+GYROSCOPE_ROLL_FILTER
+GYROSCOPE_ROLL_CORR
+GYROSCOPE_PITCH_CORR
+PID_P_GAIN_ALTITUDE
+PID_I_GAIN_ALTITUDE
+PID_D_GAIN_ALTITUDE
+```
+_Note 1:_ GYROSCOPE_ROLL_FILTER, GYROSCOPE_ROLL_CORR and GYROSCOPE_PITCH_CORR are experimental parameters, you can set as
+```
+0.9996
+0
+0
+```
 
+_note 2:_ Depending on the value of the pitch and roll you read on the screen, change the value of the roll correction and pitch correction.
+
+This feature is recommended because when you change some settings in the web app the config.txt file will be automatically updated.
 
 # **Roadmap**
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.
 
 Future improvements:
-- store data flight on the SD storage on the esp-cam
 - altitude hold
 - GPS
 - flight plan and autonomous flight

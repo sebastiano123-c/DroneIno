@@ -42,7 +42,8 @@
 
 void setup(){
   
-  if(DEBUG) Serial.begin(BAUD_RATE);
+  
+  if(DEBUG) Serial.begin(BAUD_RATE);                   // use serial only if debugging mode
 
 
   // setup wifi AP
