@@ -52,7 +52,7 @@
 #define PIN_DIGITAL_13 18 
 
 // BATTERY LEVEL
-#define PIN_BATTERY_LEVEL 2
+#define PIN_BATTERY_LEVEL 4
 
 // PROXIMITY_SENSOR
 #define PIN_PROXIMITY_SENSOR_ECHO 26
@@ -124,11 +124,16 @@ void setup(){
   pinMode(PIN_DIGITAL_13, OUTPUT);
 
   //event change detector
-  attachInterrupt(PIN_RECEIVER_1, myISR, CHANGE);
-  attachInterrupt(PIN_RECEIVER_2, myISR, CHANGE);
-  attachInterrupt(PIN_RECEIVER_3, myISR, CHANGE);
-  attachInterrupt(PIN_RECEIVER_4, myISR, CHANGE);
-
+  pinMode(PIN_RECEIVER_1, INPUT_PULLUP);
+  pinMode(PIN_RECEIVER_2, INPUT_PULLUP);
+  pinMode(PIN_RECEIVER_3, INPUT_PULLUP);
+  pinMode(PIN_RECEIVER_4, INPUT_PULLUP);
+  
+  //       event change detector
+  attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_1), myISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_2), myISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_3), myISR, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_4), myISR, CHANGE);
   set_gyro_registers();                                                                 //Set the specific gyro registers.
 
   //Check the EEPROM signature to make sure that the setup program is executed.
@@ -137,7 +142,7 @@ void setup(){
     digitalWrite(PIN_BATTERY_LED, !digitalRead(PIN_BATTERY_LED));                                                 //Change the led status to indicate error.
   }
 
-  wait_for_receiver();                                                                  //Wait until the receiver is active.
+  //wait_for_receiver();                                                                  //Wait until the receiver is active.
   
   zeroTimer = micros();                                                                //Set the zeroTimer for the first loop.
   while(Serial.available())data = Serial.read();                                        //Empty the serial buffer.

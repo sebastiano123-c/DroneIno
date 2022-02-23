@@ -248,6 +248,7 @@ void calculateAltitudeHold(){
     pressCal = calibration_P(presRaw);
     temperature = (double)tempCal / 100.0;
     pressure = (double)pressCal / 100.0;
+    altitudeMeasure = 44330 * (1 - pow( ((float)pressure/PRESSURE_SEA_LEVEL), (1/5.255)) );
 
     smoothPressureReadings();                                                        //remove the spikes from the barometer data
     

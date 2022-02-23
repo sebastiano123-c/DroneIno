@@ -59,7 +59,7 @@ Make sure to do all the passages described here below.
     - [**Step 1: reset variables**](#step-1-reset-variables)
     - [**Step 2: yaw tuning**](#step-2-yaw-tuning)
     - [**Step 3: roll/pitch tuning**](#step-3-rollpitch-tuning)
-- [**DroneInoTelemetry web app (developing)**](#droneinotelemetry-web-app-developing)
+- [**DroneInoTelemetry web app**](#droneinotelemetry-web-app)
   - [**Connection using only ESP32**](#connection-using-only-esp32)
   - [**Connection using ESP32-CAM**](#connection-using-esp32-cam)
     - [**SD card for data storage**](#sd-card-for-data-storage)
@@ -247,7 +247,7 @@ After few seconds you will see the telemetry data like pitch, roll, battery and 
 You can also adjust fly the PID settings.
 To better improve the WiFi range install an external antenna. -->
 
-# **DroneInoTelemetry web app (developing)**
+# **DroneInoTelemetry web app**
 DroneInoTelemetry is a web app that makes everything simple and easy reach.
 Use it to fine-tune your PID or fix gyroscope set point and altitude hold PID parameters.
 
@@ -264,6 +264,7 @@ You don't have to download anything, it's just there.
 Now on developing, the ESP32-CAM promises to be the best solution for the telemetry.
 <!-- Without it, it is only possible to set PID parameters. -->
 With the ESP32-CAM, the flying experience will be much more interactive.
+See the complete [esp32-cam-telemetry](https://github.com/sebastiano123-c/Esp32-cam-telemetry) repo for more information.
 
 Features:
 - on flight camera streaming;
@@ -306,8 +307,7 @@ _Note 1:_ GYROSCOPE_ROLL_FILTER, GYROSCOPE_ROLL_CORR and GYROSCOPE_PITCH_CORR ar
 0
 0
 ```
-
-_note 2:_ Depending on the value of the pitch and roll you read on the screen, change the value of the roll correction and pitch correction.
+Then, depending on the value of the pitch and roll you read on the screen, change the value of the roll correction and pitch correction.
 
 This feature is recommended because when you change some settings in the web app the config.txt file will be automatically updated.
 

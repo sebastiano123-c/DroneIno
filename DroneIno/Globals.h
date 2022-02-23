@@ -55,7 +55,7 @@ long accTotalVector;
 float batteryVoltage, batteryPercent;
 
 // altitude sensor
-float pressure;
+float pressure, altitudeMeasure;
 float temperature;
 uint8_t barometerCounter;
 float actualPressure, actualPressureSlow, actualPressureFast, actualPressureDiff;

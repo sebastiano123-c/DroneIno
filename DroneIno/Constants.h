@@ -77,6 +77,7 @@ double minBatteryLevelThreshold  = ((double)MIN_BATTERY_VOLTAGE-(double)DIODE_DR
 
 
 // altimeter
+const float PRESSURE_SEA_LEVEL = 1013.25;                           // hPa
 uint8_t osrs_t = 1;                                                 //Temperature oversampling x 1
 uint8_t osrs_p = 1;                                                 //Pressure oversampling x 1
 uint8_t barometerMode = 3;                                          //Normal barometerMode

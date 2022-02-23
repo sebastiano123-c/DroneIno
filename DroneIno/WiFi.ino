@@ -354,7 +354,7 @@
     dataTransfer[1] = anglePitch;
     dataTransfer[2] = flightMode;
     dataTransfer[3] = batteryPercent;
-    dataTransfer[4] = actualPressure;
+    dataTransfer[4] = altitudeMeasure;
     
     // print in csv format
     int i=0;
