@@ -80,7 +80,7 @@ Based on the [YMFC-AL](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improv
 * 11.1V 3S >20C LiPo battery (2200mAh or 3800mAh);
 * four 30A ESCs;
 * four brushless DC motors (around 1000KV).
-* 
+  
 Optional addons:
 * ESP32-CAM;
 * BMP280 pressure sensor.
@@ -101,7 +101,7 @@ CIRCUITAL SCHEMATIC HERE
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 ## **Selecting flight mode**
-Set the SWC switch of the transmitter to channel 5 and connect the receiver channel to the desired pin (mine is the GPIO 4):
+Set the SWC switch of the transmitter to channel 5 and connect the receiver channel to the desired pin (mine is the GPIO 4, see the circuit scheme):
 * SWC up: flight mode selected is only auto-leveling;
 * SWC center: flight mode selected is altitude hold (and auto-leveling if enabled);
 * SWC down: flight mode selected is GPS (NOT YET IMPLEMENTED).
@@ -275,20 +275,20 @@ Features:
 - on flight camera streaming;
 - set camera settings;
 - set PID parameters;
-- pitch, roll, altitude pressure, flight mode and battery telemetry system;
+- pitch, roll, altitude pressure, flight mode and battery telemetry system.
 
 First of all, upload the [WiFiTelemetry](https://github.com/sebastiano123-c/DroneIno/tree/main/WiFiTelemetry) sketch to your ESP32-CAM.
 
 Then, power the ESP32-CAM with the 5V pin of the ESP32 board and connect the ESP32-CAM GND to the one of the ESP32.
 The two boards can talk to each other using the UART communication reached by connecting:
 - GPIO_3 pin of the ESP32-CAM to the GPIO_25 of the ESP32 board;
-- GPIO_1 pin of the ESP32-CAM to the GPIO_26 of the ESP32 board;
+- GPIO_1 pin of the ESP32-CAM to the GPIO_26 of the ESP32 board.
 
 ### **SD card for data storage**
 You can also save your flight data on a SD card. All you need is:
 - a SD card formatted in FAT32 and put it into you ESP32-CAM;
-- create a folder named 'src';
-- create a file called 'config.txt' in which you need only to write (the order is important!):
+- create a folder named `src`;
+- create a file called `config.txt` in which you need only to write (the order is important!):
 ```
 PID_P_GAIN_ROLL
 PID_I_GAIN_ROLL
@@ -314,7 +314,7 @@ _Note 1:_ GYROSCOPE_ROLL_FILTER, GYROSCOPE_ROLL_CORR and GYROSCOPE_PITCH_CORR ar
 ```
 Then, depending on the value of the pitch and roll you read on the screen, change the value of the roll correction and pitch correction.
 
-This feature is recommended because when you change some settings in the web app the config.txt file will be automatically updated.
+This feature is recommended because when you change some settings in the web app the `config.txt` file will be automatically updated.
 
 # **Roadmap**
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.
