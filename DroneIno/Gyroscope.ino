@@ -1,12 +1,18 @@
-/** 
- * Gyroscope
+/**
+ * @file Gyroscope.ino
  * @author @sebastiano123-c
+ * @brief Gyroscopes routines 
+ * @version 0.1
+ * @date 2022-02-28
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
 
+/**
+ * @brief Try a first communication with the gyroscope
+ */
 void setGyroscopeRegisters(){
-  /**
-  * @brief try a first communication with the gyroscope
-  */
 
   //Start communication with the gyroscope.                           
   Wire.beginTransmission(GYRO_ADDRESS);
@@ -58,10 +64,10 @@ void setGyroscopeRegisters(){
   } 
 }
 
+/**
+ * @brief Uses the gyroscope measurement to calculate the accelerometer and the gyroscope calibration
+ */
 void calibrateGyroscope(){
-  /**
-   * @brief uses the gyroscope measurement to calculate the accelerometer and the gyroscope calibration
-   */
  
   if(DEBUG) Serial.printf("\ncalibrateGyroscope...\n");
 
@@ -72,19 +78,19 @@ void calibrateGyroscope(){
   gyroAxisCalibration[2] = 0;                                       //Ad pitch value to gyro_pitch_cal.
   gyroAxisCalibration[3] = 0;                                       //Ad yaw value to gyro_yaw_cal.
   
-  vTaskDelay(5000/portTICK_PERIOD_MS);                                 //Wait 2 seconds before continuing.
+  vTaskDelay(5000/portTICK_PERIOD_MS);                              //Wait 2 seconds before continuing.
   
   //Let's take multiple gyro data samples so we can determine the average gyro offset (calibration).
-  for (calInt = 0; calInt < 2000; calInt ++){                           //Take 2000 readings for calibration.
+  for (calInt = 0; calInt < 2000; calInt ++){                       //Take 2000 readings for calibration.
     
-    if(calInt % 25 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                //Change the led status to indicate calibration.
+    if(calInt % 25 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);  //Change the led status to indicate calibration.
     else ledcWrite(pwmLedChannel, 0);
     
-    readGyroscopeStatus();                                                        //Read the gyro output.
+    readGyroscopeStatus();                                           //Read the gyro output.
     
-    gyroAxisCalibration[1] += gyroAxis[1];                                       //Ad roll value to gyro_roll_cal.
-    gyroAxisCalibration[2] += gyroAxis[2];                                       //Ad pitch value to gyro_pitch_cal.
-    gyroAxisCalibration[3] += gyroAxis[3];                                       //Ad yaw value to gyro_yaw_cal.
+    gyroAxisCalibration[1] += gyroAxis[1];                           //Ad roll value to gyro_roll_cal.
+    gyroAxisCalibration[2] += gyroAxis[2];                           //Ad pitch value to gyro_pitch_cal.
+    gyroAxisCalibration[3] += gyroAxis[3];                           //Ad yaw value to gyro_yaw_cal.
 
     accAxisCalibration[1] += accAxis[1];
     accAxisCalibration[2] += accAxis[2];
@@ -95,9 +101,9 @@ void calibrateGyroscope(){
   }
 
   // divide by 2000 to get the average gyro offset.
-  gyroAxisCalibration[1] /= 2000;                                                 //Divide the roll total by 2000.
-  gyroAxisCalibration[2] /= 2000;                                                 //Divide the pitch total by 2000.
-  gyroAxisCalibration[3] /= 2000;                                                 //Divide the yaw total by 2000.
+  gyroAxisCalibration[1] /= 2000;                                     //Divide the roll total by 2000.
+  gyroAxisCalibration[2] /= 2000;                                     //Divide the pitch total by 2000.
+  gyroAxisCalibration[3] /= 2000;                                     //Divide the yaw total by 2000.
 
   accAxisCalibration[1] /= 2000;
   accAxisCalibration[2] /= 2000;
@@ -105,18 +111,21 @@ void calibrateGyroscope(){
 
 }
 
+/**
+ * @brief Calculate the pitch, roll and yaw angles from the previous gyroscope readings
+ */
 void calculateAnglePRY(){
-  /**
-  * @brief calculate the pitch, roll and yaw angles from the previous gyroscope readings
-  */
-
-  // first of all, read the gyro!
+ 
+  // first of all, read the gyro
   readGyroscopeStatus();
   
-  //65.5 = 1 deg/sec (check the datasheet of the MPU-6050 for more information).
-  gyroRollInput = (gyroRollInput * 0.7) + ((gyroAxis[1] / 65.5) * 0.3);     //Gyro pid input is deg/sec.
-  gyroPitchInput = (gyroPitchInput * 0.7) + ((gyroAxis[2] / 65.5) * 0.3);   //Gyro pid input is deg/sec.
-  gyroYawInput = (gyroYawInput * 0.7) + ((gyroAxis[3] / 65.5) * 0.3);       //Gyro pid input is deg/sec.
+  // gyroSensibility = 1 deg/sec (check the datasheet of the MPU-6050 for more information).
+  gyroRollInput = (gyroRollInput * 0.7) +
+                   ((gyroAxis[1] / gyroSensibility) * 0.3);                 //Gyro pid input is deg/sec.
+  gyroPitchInput = (gyroPitchInput * 0.7) + 
+                   ((gyroAxis[2] / gyroSensibility) * 0.3);                 //Gyro pid input is deg/sec.
+  gyroYawInput = (gyroYawInput * 0.7) +
+                   ((gyroAxis[3] / gyroSensibility) * 0.3);                 //Gyro pid input is deg/sec.
  
   //Gyro angle calculations
   anglePitch += gyroAxis[2] * travelCoeff;                                  //Calculate the traveled pitch angle and add it to the anglePitch variable.
@@ -143,8 +152,10 @@ void calculateAnglePRY(){
   anglePitchAcc -= GYROSCOPE_PITCH_CORR;                                    //Accelerometer calibration value for pitch.
   angleRollAcc -= GYROSCOPE_ROLL_CORR;                                      //Accelerometer calibration value for roll. 
 
-  anglePitch = anglePitchAcc + GYROSCOPE_PITCH_FILTER * (anglePitch - anglePitchAcc);      //Correct the drift of the gyro pitch angle with the accelerometer pitch angle.
-  angleRoll = angleRollAcc + GYROSCOPE_ROLL_FILTER * (angleRoll - angleRollAcc);           //Correct the drift of the gyro roll angle with the accelerometer roll angle.
+  anglePitch = anglePitchAcc + 
+                GYROSCOPE_PITCH_FILTER * (anglePitch - anglePitchAcc);      //Correct the drift of the gyro pitch angle with the accelerometer pitch angle.
+  angleRoll = angleRollAcc + 
+                GYROSCOPE_ROLL_FILTER * (angleRoll - angleRollAcc);         //Correct the drift of the gyro roll angle with the accelerometer roll angle.
 
 
   pitchLevelAdjust = anglePitch * correctionPitchRoll;                       //Calculate the pitch angle correction
@@ -156,12 +167,13 @@ void calculateAnglePRY(){
   }
 
   // if(DEBUG) printGyroscopeStatus();                                          //print gyro status
+  
 }
 
+/** 
+ * @brief Prints gyroscope readings
+ */
 void printGyroscopeStatus(){
-  /* 
-  * @brief prints gyroscope readings
-  */
 
   Serial.print("Pitch: ");
   Serial.print(anglePitch, 2);
@@ -169,17 +181,19 @@ void printGyroscopeStatus(){
   Serial.print(angleRoll, 2);
   Serial.print(" Yaw: ");
   Serial.println(gyroAxis[3] / 65.5 ,0);
+
 }
 
+/** 
+ * @brief Read the gyroscope data
+ */
 void readGyroscopeStatus(){
-  /* 
-  * @brief read the gyroscope data
-  */
   
-  Wire.beginTransmission(GYRO_ADDRESS) ;
+  Wire.beginTransmission(GYRO_ADDRESS);
   Wire.write(0x3B);                                             // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission();
   Wire.requestFrom(GYRO_ADDRESS, 14);                           // request a total of 14 registers
+
   accAxis[1]  = Wire.read()<<8|Wire.read();                     // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
   accAxis[2]  = Wire.read()<<8|Wire.read();                     // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
   accAxis[3]  = Wire.read()<<8|Wire.read();                     // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
@@ -203,4 +217,5 @@ void readGyroscopeStatus(){
   if(eepromData[28] & 0b10000000)accAxis[1] *= -1;                //Invert accAxis[1] if the MSB of EEPROM bit 28 is set.
   if(eepromData[29] & 0b10000000)accAxis[2] *= -1;                //Invert accAxis[2] if the MSB of EEPROM bit 29 is set.
   if(eepromData[30] & 0b10000000)accAxis[3] *= -1;                //Invert accAxis[3] if the MSB of EEPROM bit 30 is set.
+
 }

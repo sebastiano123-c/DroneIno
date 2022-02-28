@@ -1,12 +1,19 @@
-/** 
+/**
  * @file PID.ino
  * @author @sebastiano123-c
+ * @brief PID routines.
+ * @version 0.1
+ * @date 2022-02-28
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
 
+/**
+ * @brief Set the PID adjustments for output.
+ * @note PID set point in degrees per second is determined by the roll receiver input.
+ */
 void setPID(){
-  /* 
-  * @brief the PID set point in degrees per second is determined by the roll receiver input
-  */
 
   //In the case of deviding by 3 the max roll rate is aprox 164 degrees per second ( (500-8)/3 = 164d/s ).
   pidRollSetpoint = 0;
@@ -37,10 +44,11 @@ void setPID(){
   }
 }
 
+/** 
+ * @brief Calculates PID adjustments for outputs.
+ * @note Calculates PID in degrees per seconds.
+ */
 void calculatePID(){
-  /* 
-  * @brief calculate PID in degrees per second
-  */
 
   //set PID parameters
   setPID();

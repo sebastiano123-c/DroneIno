@@ -1,7 +1,7 @@
 /**
  * @file Altitude.ino
  * @author @sebastiano123-c
- * @brief pressure readings routines
+ * @brief Pressure readings routines.
  * @version 0.1
  * @date 2022-02-18
  * 
@@ -10,25 +10,36 @@
  */
 
 #if ALTITUDE_SENSOR == BMP280
+
+  /**
+   * @brief Check if the altitude sensor is connected with I2C.
+   * 
+   */
   void checkAltitudeSensor(){
     uint8_t ctrl_meas_reg = (osrs_t << 5) | (osrs_p << 2) | barometerMode;
     uint8_t config_reg    = (t_sb << 5) | (filter << 2) | spi3w_en;
 
-    writeReg(0xF4, 0x27);
-    writeReg(0xF5, 0xA0);
+    writeRegister(0xF4, 0x27);
+    writeRegister(0xF5, 0xA0);
     readTrim();                                     
 
     if(DEBUG) Serial.println("checkAltitudeSensor: OK");
   }
   
-  void readTrim()
-  {
-    uint8_t data[32],i=0;                      
-    Wire.beginTransmission(ALTITUDE_SENSOR_ADDRESS);
+  /**
+   * @brief Read barometer data from I2C communication.
+   * 
+   */
+  void readTrim(){
+
+    uint8_t data[32], i = 0;                                    // prepare the array
+
+    Wire.beginTransmission(ALTITUDE_SENSOR_ADDRESS);            // start the acquisition from I2C
     Wire.write(0x88);
     Wire.endTransmission();
-    Wire.requestFrom(ALTITUDE_SENSOR_ADDRESS,24);       
-    while(Wire.available()){
+    Wire.requestFrom(ALTITUDE_SENSOR_ADDRESS, 24);              // read the communication from the altitude sensor
+
+    while(Wire.available()){                                    // fill the data array
       data[i] = Wire.read();
       i++;
     }
@@ -36,18 +47,21 @@
     Wire.beginTransmission(ALTITUDE_SENSOR_ADDRESS);    
     Wire.write(0xA1);                          
     Wire.endTransmission();                    
-    Wire.requestFrom(ALTITUDE_SENSOR_ADDRESS,1);        
+    Wire.requestFrom(ALTITUDE_SENSOR_ADDRESS,1);      
+
     data[i] = Wire.read();                     
     i++;                                       
 
     Wire.beginTransmission(ALTITUDE_SENSOR_ADDRESS);
     Wire.write(0xE1);
     Wire.endTransmission();
-    Wire.requestFrom(ALTITUDE_SENSOR_ADDRESS,7);        
+    Wire.requestFrom(ALTITUDE_SENSOR_ADDRESS,7);      
+
     while(Wire.available()){
         data[i] = Wire.read();
         i++;    
     }
+
     dig_T1 = (data[1] << 8) | data[0];
     dig_T2 = (data[3] << 8) | data[2];
     dig_T3 = (data[5] << 8) | data[4];
@@ -65,34 +79,56 @@
     dig_H3 = data[27];
     dig_H4 = (data[28]<< 4) | (0x0F & data[29]);
     dig_H5 = (data[30] << 4) | ((data[29] >> 4) & 0x0F); 
-    dig_H6 = data[31];                                   
+    dig_H6 = data[31];             
+
   }
   
-  void writeReg(uint8_t reg_address, uint8_t msg)
-  {
+  /**
+   * @brief Writes a message to the I2C designed address.
+   * 
+   * @param reg_address 
+   * @param msg 
+   */
+  void writeRegister(uint8_t reg_address, uint8_t msg){
+
     Wire.beginTransmission(ALTITUDE_SENSOR_ADDRESS);
     Wire.write(reg_address);
     Wire.write(msg);
     Wire.endTransmission();    
+
   }
 
+  /**
+   * @brief Reads pressure data
+   * 
+   */
   void readPressureData(){
+
     uint32_t barometerData[8];
+
     Wire.beginTransmission(ALTITUDE_SENSOR_ADDRESS);
     Wire.write(0xF7);
     Wire.endTransmission();
     Wire.requestFrom(ALTITUDE_SENSOR_ADDRESS, 8);
+
     int i = 0;
+
     while(Wire.available()){
         barometerData[i] = Wire.read();
         i++;
     }
+
     presRaw = (barometerData[0] << 12) | (barometerData[1] << 4) | (barometerData[2] >> 4);
     tempRaw = (barometerData[3] << 12) | (barometerData[4] << 4) | (barometerData[5] >> 4);
   }
 
-  signed long int calibration_T(signed long int adc_T)
-  {
+  /**
+   * @brief Calibrates temperature readings.
+   * 
+   * @param adc_T 
+   * @return signed long int
+   */
+  signed long int calibration_T(signed long int adc_T){
 
     signed long int var1, var2, T;
     var1 = ((((adc_T >> 3) - ((signed long int)dig_T1<<1))) * ((signed long int)dig_T2)) >> 11;
@@ -103,6 +139,12 @@
     return T; 
   }
 
+  /**
+   * @brief Calibrates pressure readings.
+   * 
+   * @param adc_P 
+   * @return unsigned long int 
+   */
   unsigned long int calibration_P(signed long int adc_P)
   {
     signed long int var1, var2;
@@ -132,6 +174,10 @@
     return P;
   }
 
+  /**
+   * @brief Filter barometer readings for a smoother flight.
+   * 
+   */
   void smoothPressureReadings(){
     //To get a smoother pressure value we will use a 20 location rotating memory.
     pressureTotalAvarage -= pressureRotatingMem[pressureRotatingMemLocation];                          //Subtract the current memory position to make room for the new value.
@@ -169,10 +215,10 @@
   void checkAltitudeSensor(){
     return;
   }
-  void calculreadTrimatePressure(){
+  void readTrim(){
     return;
   }
-  void writeReg(){
+  void writeRegister(){
     return;
   }
   void calibration_T(){
@@ -184,35 +230,43 @@
   void smoothPressureReadings(){
     return;
   }
+  void void readPressureData() return;
+
 #endif
 
+/**
+ * @brief Transforms the barometer readings into the PID output pulses.
+ * 
+ * @note When the throttle stick position is increased or decreased the altitude hold function is partially disabled.
+ * @note The manualAltitudeChange variable will indicate if the altitude of the quadcopter is changed by the pilot.
+ * 
+ */
 void calculateAltitudeAdjustementPID(){
-  //When the throttle stick position is increased or decreased the altitude hold function is partially disabled.
-  //The manualAltitudeChange variable will indicate if the altitude of the quadcopter is changed by the pilot.
+  
   manualAltitudeChange = 0;                                                    //Preset the manualAltitudeChange variable to 0.
-  manualThrottle = 0;                                                           //Set the manualThrottle variable to 0.
+  manualThrottle = 0;                                                          //Set the manualThrottle variable to 0.
 
-  if (throttle > 1600) {                                                         //If the throttle is increased above 1600us (60%).
+  if (throttle > 1600) {                                                       //If the throttle is increased above 1600us (60%).
     manualAltitudeChange = 1;                                                  //Set the manualAltitudeChange variable to 1 to indicate that the altitude is adjusted.
-    pidAltitudeSetpoint = actualPressure;                                     //Adjust the setpoint to the actual pressure value so the output of the P- and I-controller are 0.
-    manualThrottle = (throttle - 1600) / 3;                                     //To prevent very fast changes in hight limit the function of the throttle.
+    pidAltitudeSetpoint = actualPressure;                                      //Adjust the setpoint to the actual pressure value so the output of the P- and I-controller are 0.
+    manualThrottle = (throttle - 1600) / 3;                                    //To prevent very fast changes in hight limit the function of the throttle.
   }
-  if (throttle < 1400) {                                                         //If the throttle is lowered below 1400us (40%).
+  if (throttle < 1400) {                                                       //If the throttle is lowered below 1400us (40%).
     manualAltitudeChange = 1;                                                  //Set the manualAltitudeChange variable to 1 to indicate that the altitude is adjusted.
-    pidAltitudeSetpoint = actualPressure;                                     //Adjust the setpoint to the actual pressure value so the output of the P- and I-controller are 0.
-    manualThrottle = (throttle - 1400) / 5;                                     //To prevent very fast changes in hight limit the function of the throttle.
+    pidAltitudeSetpoint = actualPressure;                                      //Adjust the setpoint to the actual pressure value so the output of the P- and I-controller are 0.
+    manualThrottle = (throttle - 1400) / 5;                                    //To prevent very fast changes in hight limit the function of the throttle.
   }
 
   //Calculate the PID output of the altitude hold.
-  pidAltitudeInput = actualPressure;                                          //Set the setpoint (pidAltitudeInput) of the PID-controller.
-  pidErrorTemp = pidAltitudeInput - pidAltitudeSetpoint;                   //Calculate the error between the setpoint and the actual pressure value.
+  pidAltitudeInput = actualPressure;                                           //Set the setpoint (pidAltitudeInput) of the PID-controller.
+  pidErrorTemp = pidAltitudeInput - pidAltitudeSetpoint;                       //Calculate the error between the setpoint and the actual pressure value.
 
   //To get better results the P-gain is increased when the error between the setpoint and the actual pressure value increases.
   //The variable pidErrorGainAltitude will be used to adjust the P-gain of the PID-controller.
-  pidErrorGainAltitude = 0;                                                  //Set the pidErrorGainAltitude to 0.
-  if (pidErrorTemp > 10 || pidErrorTemp < - 10) {     //If the error between the setpoint and the actual pressure is larger than 10 or smaller then -10.
-    pidErrorGainAltitude = (abs(pidErrorTemp) - 10) / 20.0;                 //The positive pidErrorGainAltitude variable is calculated based based on the error.
-    if (abs(pidErrorGainAltitude -3.0) > 1e-9)pidErrorGainAltitude = 3;     //To prevent extreme P-gains it must be limited to 3.
+  pidErrorGainAltitude = 0;                                                    //Set the pidErrorGainAltitude to 0.
+  if (pidErrorTemp > 10 || pidErrorTemp < - 10) {                              //If the error between the setpoint and the actual pressure is larger than 10 or smaller then -10.
+    pidErrorGainAltitude = (abs(pidErrorTemp) - 10) / 20.0;                    //The positive pidErrorGainAltitude variable is calculated based based on the error.
+    if (abs(pidErrorGainAltitude -3.0) > 1e-9)pidErrorGainAltitude = 3;        //To prevent extreme P-gains it must be limited to 3.
   }
 
   //In the following section the I-output is calculated. It's an accumulation of errors over time.
@@ -226,10 +280,14 @@ void calculateAltitudeAdjustementPID(){
   //D = PID_D_GAIN_ALTITUDE * parachuteThrottle.
   pidOutputAltitude = (PID_P_GAIN_ALTITUDE + pidErrorGainAltitude) * pidErrorTemp + pidIMemAltitude + PID_D_GAIN_ALTITUDE * parachuteThrottle;
   //To prevent extreme PID-output the output must be limited.
-  if (pidOutputAltitude > PID_MAX_ALTITUDE)pidOutputAltitude = PID_MAX_ALTITUDE;
-  else if (pidOutputAltitude < PID_MAX_ALTITUDE * -1)pidOutputAltitude = PID_MAX_ALTITUDE * -1;
+  if (pidOutputAltitude > PID_MAX_ALTITUDE) pidOutputAltitude = PID_MAX_ALTITUDE;
+  else if (pidOutputAltitude < PID_MAX_ALTITUDE * -1) pidOutputAltitude = PID_MAX_ALTITUDE * -1;
 }
 
+/**
+ * @brief Main routine governing the barometer acquisitions.
+ * 
+ */
 void calculateAltitudeHold(){
   // the barometric readings happen in two subsequent loops. This counter is needed for this
   barometerCounter ++;

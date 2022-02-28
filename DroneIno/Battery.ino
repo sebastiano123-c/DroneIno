@@ -1,32 +1,51 @@
 /**
- * @brief Battery calculations routines
+ * @file Battery.ino
+ * @author @sebastiano123-c
+ * @brief Battery calculations routines.
+ * @version 0.1
+ * @date 2022-02-28
  * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
+
+/**
+ * @brief Calculates the voltage partitor given the total drop defined in the @ref Constants.ino "Constants.ino".
+ *
  * @param volt 
  * @return float 
  */
-
 float voltagePartitor(int volt){
-  /** 
-    * @brief voltage partitor 
-    * @param (int)volt battery voltage in mV
-    */
-
   return (float)(volt-DIODE_DROP) * totalDrop;
 }
 
+/**
+ * @brief Calculates the the coversion between the pin readings and the voltage.
+ * 
+ * @param width 
+ * @param corr 
+ * @return float 
+ */
 float fromWidthToVPin(int width, float corr = 1.){
   return (float)width / (fromVtoWidth * corr);
 }
 
+/**
+ * @brief Calculates the conversion between the analog pin readings and the battery initial voltage.
+ * 
+ * @param width 
+ * @param corr 
+ * @return float 
+ */
 float fromWidthToVBattery(int width, float corr = 1.){
   return (float)width / (totalDrop * fromVtoWidth * corr) + DIODE_DROP;
 }
 
+/** 
+ * @brief Get the initial value of the battery voltage.
+ */
 void initBattery(){
-  /** 
-    * @brief get the initial value of the battery voltage
-    */
-
   
   analogSetWidth(adcBits);                                      // set 2^10=1024 width (analogSetWidth can go from 9-12 (default 12))
   
@@ -37,21 +56,21 @@ void initBattery(){
   
 }
 
+/** 
+ * @brief Get battery voltage.
+ */
 int getBatteryVoltage(){
-  /** 
-    * @brief get battery voltage
-    */
 
   batteryVoltage = (float)analogRead(PIN_BATTERY_LEVEL) / fromVtoWidth;
 
 }
 
+/** 
+ * @brief Compensate the ESCs pulses with battery voltage.
+ */
 void batteryVoltageCompensation(){
-  /** 
-    * @brief compensate the ESCs pulses with battery voltage
-    */
  
-  //The battery voltage is needed for compensation.
+  // The battery voltage is needed for compensation.
   batteryVoltage = batteryVoltage * 0.92 + analogRead(PIN_BATTERY_LEVEL) / fromVtoWidth * 0.08;
  // batteryPercent = batteryVoltage / correctionBattery / maxBatteryLevelDropped;
   batteryPercent = fromWidthToVBattery(batteryVoltage)/1e3;///correctionBattery/maxBatteryLevelDropped;

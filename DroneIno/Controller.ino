@@ -1,12 +1,19 @@
-/** 
+/**
  * @file Controller.ino
  * @author @sebastiano123-c
+ * @brief Radiocommander control routines.
+ * @version 0.1
+ * @date 2022-02-28
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
 
+/** 
+ * @brief Wait until the receiver is active and the throttle is set to the lower position.
+ */
 void waitController(){
-  /* 
-  * @brief wait until the receiver is active and the throttle is set to the lower position
-  */
+
 
   while(receiverInputChannel3 < 990 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400)
   {
@@ -30,11 +37,14 @@ void waitController(){
   }   
 }
 
+/**
+ * @brief Converts the receiver input signal.
+ * 
+ * @param ch 
+ * @return int
+ */
 int convertReceiverChannel(byte ch){
-  /* 
-  * @brief convert the input RX signal
-  * @param ch channel that has to be converted
-  */
+
   int difference;
 
   if(trimCh[ch].actual < trimCh[ch].center){            //The actual receiver value is lower than the center value

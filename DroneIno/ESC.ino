@@ -1,13 +1,19 @@
 /**
+ * @file ESC.ino
+ * @author @sebastiano123-c
+ * @brief ESC routines to govern the motors.
+ * @version 0.1
+ * @date 2022-02-28
  * 
- * @brief ESC routines tells motors what to do
+ * @copyright Copyright (c) 2022
  * 
  */
 
+/**
+ * @brief First settings of the PID and angles.
+ * 
+ */
 void droneStart(){
-  /** 
-   * @brief first settings of the PID and angles
-   */
 
   start = 2;
 
@@ -24,10 +30,10 @@ void droneStart(){
   pidLastYawDError = 0;
 }
 
+/** 
+* @brief Set ESC pulses.
+*/
 void setEscPulses(){
-  /** 
-    * @brief set ESC pulses
-    */
 
   throttle = receiverInputChannel3;                                   //We need the throttle signal as a base signal.
 
@@ -71,6 +77,10 @@ void setEscPulses(){
   ledcWrite(pwmChannel4, esc4); ///2000*MAX_DUTY_CYCLE
 }
 
+/**
+ * @brief Converts PWM signals input into to the standard 1000 - 2000us.
+ * 
+ */
 void convertAllSignals(){
   receiverInputChannel1 = convertReceiverChannel(1);           //Convert the actual receiver signals for pitch to the standard 1000 - 2000us.
   receiverInputChannel2 = convertReceiverChannel(2);           //Convert the actual receiver signals for roll to the standard 1000 - 2000us.

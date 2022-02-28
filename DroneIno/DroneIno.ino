@@ -1,7 +1,7 @@
 /**
  * @file DroneIno.ino
  * @author @sebastiano123-c
- * @brief main file for piloting your ESP32 based DIY drone
+ * @brief Main file for piloting your ESP32 based DIY drone.
  * @version 0.2
  * @date 2022-02-18
  * 
@@ -27,17 +27,12 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 #include <Arduino.h>
-#include <Wire.h>                          
+#include <Wire.h>
 #include <EEPROM.h>
 
-#include <WiFi.h>
-#include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-#include <HardwareSerial.h>
-
-#include "Config.h"
+#include "Constants.h"
+#include <Config.h>
 #include "src/Models.h"
-#include "Constants.h"            
 #include "Globals.h"
 
 void setup(){
@@ -177,6 +172,5 @@ void loop(){                                           // loop runs at 250Hz => 
 
 
   loopTimer = micros();                                // set the timer for the next loop
-
 
 }

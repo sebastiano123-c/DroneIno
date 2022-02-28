@@ -1,5 +1,7 @@
 // PINMAP
 // @author: Sebastiano Cocchi
+#include "../Constants.h"
+#include "../Config.h"
 
 // PINMAP
 #if PINMAP == OFF                                       // AVR_ATmega324U predefined
@@ -23,10 +25,8 @@
 
 // ALTITUDE SENSOR
 #if ALTITUDE_SENSOR == BMP280
-  #include <Adafruit_BMP280.h>
   #include "sensors\altitude_sensor.BMP280.h"
-#elif
-  #include <Adafruit_BME280.h>
+#elif ALTITUDE_SENSOR == BME280
   #include "sensors\altitude_sensor.BME280.h"
 #endif
 
@@ -37,5 +37,7 @@
 
 // WIFI TELEMETRY
 #if WIFI_TELEMETRY == ESP_CAM
-  #include "pinmaps/pinmap.ESP32CAM.h"
+  #include "sensors/wifi_telemetry.esp_cam.h""
+#elif WIFI_TELEMETRY == NATIVE
+  #include "sensors/wifi_telemetry.native.h"
 #endif

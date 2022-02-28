@@ -1,3 +1,14 @@
+/**
+ * @file Calibration.ino
+ * @author @sebastiano123-c
+ * @brief Calibration sketch for the motors, sensors and receiver inputs.
+ * @version 0.1
+ * @date 2022-02-28
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //Terms of use
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -15,9 +26,6 @@
 //are 100% certain of what you are doing.
 ///////////////////////////////////////////////////////////////////////////////////////
 
-// Calibration
-// @author: Sebastiano Cocchi
-//
 // Dial these on the serial
 //  r = print receiver signals.
 //  a = print quadcopter angles.

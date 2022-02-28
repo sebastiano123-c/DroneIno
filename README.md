@@ -210,7 +210,7 @@ PID controls:
 <ins>_In the next steps hold the quadcopter with your hand._</ins>
   
 ### **Step 1: reset variables**
-Go in the Config.h file and set
+Go in the [Globals.h](https://github.com/sebastiano123-c/DroneIno/blob/main/DroneIno/Globals.h) file and set
 <pre>
 PID_P_GAIN_ROLL             0.0                     
 PID_I_GAIN_ROLL             0.0                    

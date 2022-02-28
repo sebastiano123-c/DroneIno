@@ -3,6 +3,10 @@ AutoLeveling
 EEPROM_data.txt
 *.log
 
+# sensors folder
+DroneIno/src/sensors/proximity_sensor.OFF.h
+DroneIno/src/sensors/proximity_sensor.HCSR04.h
+
 # test folder
 test/*
 !test/wifi
