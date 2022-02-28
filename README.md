@@ -288,7 +288,7 @@ The two boards can talk to each other using the UART communication reached by co
 You can also save your flight data on a SD card. All you need is:
 - a SD card formatted in FAT32 and put it into you ESP32-CAM;
 - create a folder named `src`;
-- create a file called `config.txt` in which you need only to write (the order is important!):
+- in `src` create a file called `config.txt` in which you need to write (the order is important!) only the values of:
 ```
 PID_P_GAIN_ROLL
 PID_I_GAIN_ROLL
@@ -306,15 +306,32 @@ PID_P_GAIN_ALTITUDE
 PID_I_GAIN_ALTITUDE
 PID_D_GAIN_ALTITUDE
 ```
-_Note 1:_ GYROSCOPE_ROLL_FILTER, GYROSCOPE_ROLL_CORR and GYROSCOPE_PITCH_CORR are experimental parameters, you can set as
+_Note 1:_ GYROSCOPE_ROLL_FILTER, GYROSCOPE_ROLL_CORR and GYROSCOPE_PITCH_CORR can be initially set to
 ```
 0.9996
 0
 0
 ```
-Then, depending on the value of the pitch and roll you read on the screen, change the value of the roll correction and pitch correction.
+Then, depending on the value of the pitch and roll you read on the telemetry web app, change the value of the roll correction and pitch correction.
+These adjustments seem to be crucial to prevent drifts when the drone is hovering.
 
-This feature is recommended because when you change some settings in the web app the `config.txt` file will be automatically updated.
+SD card feature is recommended because when you change some settings in the web app, the `src\config.txt` file will be automatically updated.
+With SD card your flight data, such as roll angle, pitch angles, battery and altitude will be save in a file in the folder `data\flight_i.txt`, which is automatically created.
+In the future, in the `data` folder, there will the possibility to save also videos and photos.
+
+The directory structure is
+<pre>
+\src
+    config.txt
+\data
+    \videos
+    \images
+    \flightData
+        flight_1.txt
+        flight_2.txt
+             :
+        flight_n.txt
+</pre>
 
 # **Roadmap**
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.
