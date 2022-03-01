@@ -3,6 +3,13 @@ AutoLeveling
 EEPROM_data.txt
 *.log
 
+# doxygen
+doxyfile
+html/*
+!html/index.html
+latex/*
+!latex/refman.pdf
+
 # sensors folder
 DroneIno/src/sensors/proximity_sensor.OFF.h
 DroneIno/src/sensors/proximity_sensor.HCSR04.h
@@ -17,7 +24,7 @@ test/*
 HCSR04.ino 
 
 # development
-index.html
+DroneIno/src/index.html
 EspNow.ino
 
 # data
