@@ -1,3 +1,14 @@
+/**
+ * @file checkGyro.ino
+ * @author @sebastiano123-c
+ * @brief Gyroscope routines.
+ * @version 0.1
+ * @date 2022-03-01
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #define GYRO_CONFIG             0x1B
 #define ACCEL_CONFIG            0x1C
 
@@ -16,6 +27,12 @@
 byte rawAX[2], rawAY[2], rawAZ[2];
 byte rawGX[2], rawGY[2], rawGZ[2];
 
+/**
+ * @brief Calculate the pitch and roll angle.
+ * 
+ * @param PRY 
+ * @param XYZ 
+ */
 void ymfcFunction(bool PRY = true, bool XYZ = false){
   //Gyro angle calculations
   anglePitch += gyroAxis[2] * travelCoeff;                                            //Calculate the traveled pitch angle and add this to the anglePitch variable.
@@ -67,6 +84,10 @@ void ymfcFunction(bool PRY = true, bool XYZ = false){
   if(loopCounter == 60)loopCounter = 0;  
 }
 
+/**
+ * @brief Main routine.
+ * 
+ */
 void checkGyro(){
   if(calInt != 2000){
       calibrateGyro();
@@ -252,7 +273,7 @@ void setupMPU(){
   }
 }
 
-void set_gyro_registers(){
+void setGyroRegisters(){
   //Setup the MPU-6050
   if(eepromData[31] == 1){
     Wire.beginTransmission(gyroAddress);                        //Start communication with the address found during search.

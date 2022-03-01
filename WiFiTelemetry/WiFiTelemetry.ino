@@ -1,14 +1,26 @@
 /** 
  * @file main.cpp
  * @author @sebastiano123-c
- * 
- * @brief wifi based telemtry system using your esp3-cam. Connect to DroneInoTelemetry network, psw: 'DroneIno'.
- *        Open browser and write '192.168.4.1'. 
- * 
- * @note board: AI thinker
- * 
+ * @brief WiFi based telemetry system using ESP3-CAM.
  * @version 0.1
  * @date 2022-02-18
+ * 
+ * Connect to DroneInoTelemetry network, psw: 'DroneIno'.
+ * Open browser and write '192.168.4.1'. 
+ * Board: AI thinker.
+ * Camera: OV2640.
+ * 
+ * 
+ * TERMS OF USE
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * 
  * 
  * @copyright Copyright (c) 2022
  */

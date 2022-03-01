@@ -1,5 +1,11 @@
 /**
- * @brief defines the routines for the communication between client (web app) and the server (esp32 cam)
+ * @file app_httpd.cpp
+ * @author @sebastiano123-c
+ * @brief Defines the routines for the communication between client (web app) and the server (esp32 cam).
+ * @version 0.1
+ * @date 2022-03-01
+ * 
+ * @copyright Copyright (c) 2022
  * 
  */
 
@@ -586,6 +592,14 @@ static esp_err_t index_handler(httpd_req_t *req){
     return httpd_resp_send(req, (const char *)index_ov2640_html_gz, index_ov2640_html_gz_len);
 }
 
+/**
+ * @brief PID update handler.
+ * 
+ * Telemetry is found on the client on '192.168\telemetry'.
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 static esp_err_t pid_handler(httpd_req_t *req){
     /*
      * @brief gets the pid parameters
@@ -650,6 +664,14 @@ static esp_err_t pid_handler(httpd_req_t *req){
     return httpd_resp_send(req, NULL, 0);
 }
 
+/**
+ * @brief Telemetry update handler.
+ * 
+ * Telemetry is found on the client on '192.168\telemetry'.
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 static esp_err_t telemetry_handler(httpd_req_t *req){
 
     static char telemetry_json_response[1024];
@@ -674,6 +696,10 @@ static esp_err_t telemetry_handler(httpd_req_t *req){
     return httpd_resp_send(req, telemetry_json_response, strlen(telemetry_json_response));
 }
 
+/**
+ * @brief Main routine governing the camera server.
+ * 
+ */
 void startCameraServer(){
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 

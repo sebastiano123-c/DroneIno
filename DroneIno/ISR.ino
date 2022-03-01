@@ -1,13 +1,19 @@
-/** 
- * ISR
+/**
+ * @file ISR.ino
  * @author @sebastiano123-c
+ * @brief ISR routine when the receiver signal is triggered.
+ * @version 0.1
+ * @date 2022-03-01
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
 
+/** 
+ * @brief Measures the receiver input signal length. 
+ * @todo Use pwm to read the receivers signals, avoid digitalRead.
+ */
 void myISR(){
-  /** 
-   * @brief measures the receiver input signal length 
-   * @todo use pwm to read the receivers signals, avoid digitalRead
-   */
 
   currentTime = micros();
 

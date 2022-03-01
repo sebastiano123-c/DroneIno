@@ -1,9 +1,16 @@
 /**
- * @file SD.cpp
- * @brief SD routines 
- * @link https://gist.github.com/youjunjer/b70b6e54ae7201a46387b8e73894ba51 @endlink
+ * @file camSD.cpp
+ * @author @sebastiano123-c
+ * @brief SD card routines.
+ * 
+ * See @link https://gist.github.com/youjunjer/b70b6e54ae7201a46387b8e73894ba51 @endlink for further details.
+ * 
+ * @version 0.1
+ * @date 2022-03-01
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
-
 #include "camSD.h"
 
 const char* configFilePath = "/src/config.txt";
@@ -14,7 +21,13 @@ const char* logFileName;
 int numberOfDataFiles = 0;
 uint8_t isConnectedSD = 0;
 
-//List dir in SD card
+/**
+ * @brief List dir in SD card.
+ * 
+ * @param fs 
+ * @param dirname 
+ * @param levels 
+ */
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     // Serial.printf("Listing directory: %s\n", dirname);
 
@@ -47,7 +60,12 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     }
 }
 
-//Create a dir in SD card
+/**
+ * @brief Create a Dir object.
+ * 
+ * @param fs 
+ * @param path 
+ */
 void createDir(fs::FS &fs, const char * path){
     // Serial.printf("Creating Dir: %s\n", path);
     if(fs.mkdir(path)){
@@ -57,7 +75,13 @@ void createDir(fs::FS &fs, const char * path){
     }
 }
 
-//Write a file in SD card
+/**
+ * @brief Write a file in SD card
+ * 
+ * @param fs 
+ * @param path 
+ * @param message 
+ */
 void writeFile(fs::FS &fs, const char * path, const char * message){
     // Serial.printf("Writing file: %s\n", path);
 
@@ -76,12 +100,13 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
     }
 }
 
-//Read the config flight file
+/**
+ * @brief Read the config flight file
+ * 
+ */
 void readConfigFile(fs::FS &fs){
-    /**
-     * @brief initialize the PID
-     * 
-     */
+
+    //initialize the PID
     float arr[dataControllerSize];
 
     File file = fs.open(configFilePath);
@@ -117,16 +142,17 @@ void readConfigFile(fs::FS &fs){
         PID_D_GAIN_ALTITUDE = arr[11];                      //Gain setting for the pitch D-controller. (0.0)
 
         // update DroneIno PID parameters
-        /**
-         * @bug calling this function here the telemetry gives infinity
-         * 
-         */
         writeDataTransfer();
         
         // for(int ii = 0; ii < dataControllerSize; ii++) Serial.printf("%i: %.6f\n", ii, arr[ii]);
     }
 }
 
+/**
+ * @brief Updates the 'src\config.txt' file in the SD card.
+ * 
+ * @param fs 
+ */
 void updateConfigFile(fs::FS &fs){
     File file = fs.open("/src/config.txt", FILE_WRITE);
     if(file){
@@ -157,11 +183,12 @@ void updateConfigFile(fs::FS &fs){
     }
 }
 
+/**
+ * @brief Writes on the SD card the flight data.
+ * 
+ * @param fs 
+ */
 void writeDataLogFlight(fs::FS &fs){
-    /**
-     * @brief stores the flight data
-     * 
-     */
 
     File file = SD_MMC.open(logFileName, FILE_APPEND);
     if(file){
@@ -187,6 +214,14 @@ void writeDataLogFlight(fs::FS &fs){
 
 }
 
+/**
+ * @brief Routine called in the setup().
+ * 
+ * This setup routine checks if the SD is attached.
+ * Then creates, if not yet done, the data folder and instantiates the flight data file header.
+ * Finally, sends to DroneIno the initial PID parameters found on the config.txt file.
+ * 
+ */
 void setupSD() {
     //Serial.begin(115200);
     // Serial.println("SDcard Testing....");
@@ -195,7 +230,7 @@ void setupSD() {
     // ledcSetup(0, 500, 8);
     // ledcAttachPin(GPIO_NUM_4, 0);
     
-    if(!SD_MMC.begin("/sdcard", true)){     // "/sdcard", true disables the flashs
+    if(!SD_MMC.begin("/sdcard", true)){     // "/sdcard", true disables the flashes
         // Serial.println("Card Mount Failed");
         //ledcWrite(0, 255);
         isConnectedSD = 0;

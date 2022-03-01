@@ -1,12 +1,18 @@
-/*
-* Initialize 
-* @author @sebastiano123-c
-*/
+/**
+ * @file Initialize.ino   
+ * @author @sebastiano123-c
+ * @brief Some routines used in the setup().
+ * @version 0.1
+ * @date 2022-03-01
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 
+/** 
+ * @brief Initilizes the EEPROM.
+ */
 void initEEPROM(){
-  /* 
-  * @brief initilize the EEPROM
-  */
  
   EEPROM.begin(EEPROM_SIZE);
   vTaskDelay(50/portTICK_PERIOD_MS);
@@ -20,10 +26,10 @@ void initEEPROM(){
 
 }
 
+/** 
+ * @brief Fills the trims values using the EEPROM saved values. 
+ */
 void configureReceiverTrims(){
-  /* 
-  * @brief fill the configured values for the trims 
-  */
 
   for (start = 1; start <= 4; start++)
   {
@@ -42,10 +48,11 @@ void configureReceiverTrims(){
 
 }
 
+/**
+ * @brief Setup the WIRE communication.
+ */
 void setupWireI2C(){
-  /*
-  * @brief setup WIRE communication
-  */
+
 
   // setup wire
   Wire.setClock(WIRE_CLOCK);
@@ -53,13 +60,12 @@ void setupWireI2C(){
   vTaskDelay(40/portTICK_PERIOD_MS);
   
 }
-
+ 
+/** 
+ * @brief Definition of all the pinModes.
+ */
 void setupPins(){
-  /* 
-  * @brief define all the pinModes
-  */
-  
-
+ 
   // LED pinmode
   ledcSetup(pwmLedChannel, freq, resolution);                                       // battery led
   ledcSetup(pwmLedFlyChannel, freq, resolution);                                    // fly led
@@ -107,10 +113,10 @@ void setupPins(){
 
 }
 
+/** 
+ * @brief Fancy introduction with logo and author.
+ */
 void intro(){
-  /* 
-  * @brief introduction with logo and author
-  */
 
   vTaskDelay(50/portTICK_PERIOD_MS);
   Serial.println();
@@ -138,10 +144,10 @@ void intro(){
 
 }
 
+/** 
+ * @brief Print all the EEPROM data. 
+ */
 void printEEPROM(){
-  /* 
-  * @brief print all the EEPROM data
-  */
 
   for (int i = 0; i < EEPROM_SIZE; i++){
     Serial.println(eepromData[i]);

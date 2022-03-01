@@ -37,7 +37,7 @@
 
 // WIFI TELEMETRY
 #if WIFI_TELEMETRY == ESP_CAM
-  #include "sensors/wifi_telemetry.esp_cam.h""
+  #include "sensors/wifi_telemetry.esp_cam.h"
 #elif WIFI_TELEMETRY == NATIVE
   #include "sensors/wifi_telemetry.native.h"
 #endif

@@ -5,35 +5,32 @@
  * @version 0.1
  * @date 2022-02-28
  * 
+ * 
+ * TERMS OF USE
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * 
+ * @note Always remove the propellers and stay away from the motors unless you are 100% certain of what you are doing.
+ * 
+ * Dial these on the serial:
+ *  @li r: print receiver signals.
+ *  @li a: print quadcopter angles.
+ *  @li 1: check rotation / vibrations for motor 1 (right front CCW).
+ *  @li 2: check rotation / vibrations for motor 2 (right rear CW).
+ *  @li 3: check rotation / vibrations for motor 3 (left rear CCW).
+ *  @li 4: check rotation / vibrations for motor 4 (left front CW).
+ *  @li 5: check vibrations for all motors together.
+ * 
  * @copyright Copyright (c) 2022
  * 
  */
 
-///////////////////////////////////////////////////////////////////////////////////////
-//Terms of use
-///////////////////////////////////////////////////////////////////////////////////////
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-//THE SOFTWARE.
-///////////////////////////////////////////////////////////////////////////////////////
-//Safety note
-///////////////////////////////////////////////////////////////////////////////////////
-//Always remove the propellers and stay away from the motors unless you 
-//are 100% certain of what you are doing.
-///////////////////////////////////////////////////////////////////////////////////////
-
-// Dial these on the serial
-//  r = print receiver signals.
-//  a = print quadcopter angles.
-//  1 = check rotation / vibrations for motor 1 (right front CCW).
-//  2 = check rotation / vibrations for motor 2 (right rear CW).
-//  3 = check rotation / vibrations for motor 3 (left rear CCW).
-//  4 = check rotation / vibrations for motor 4 (left front CW).
-//  5 = check vibrations for all motors together.
 
 #include <Arduino.h>
 #include <Wire.h>                                    //Include the Wire.h library so we can communicate with the gyro.
@@ -142,7 +139,7 @@ void setup(){
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_2), myISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_3), myISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_4), myISR, CHANGE);
-  set_gyro_registers();                                                                 //Set the specific gyro registers.
+  setGyroRegisters();                                                                 //Set the specific gyro registers.
 
   //Check the EEPROM signature to make sure that the setup program is executed.
   while(eepromData[33] != 'J' || eepromData[34] != 'M' || eepromData[35] != 'B'){
@@ -190,12 +187,12 @@ void loop(){
       esc_2 = 1000;                                                                     //Set the pulse for ESC 2 to 1000us.
       esc_3 = 1000;                                                                     //Set the pulse for ESC 3 to 1000us.
       esc_4 = 1000;                                                                     //Set the pulse for ESC 4 to 1000us.
-      esc_pulse_output();                                                               //Send the ESC control pulses.
+      escPulseOutput();                                                               //Send the ESC control pulses.
     }
     vibrationCounter = 0;                                                              //Reset the vibrationCounter variable.
   }
 
-  receiverInputChannel3 = convert_receiverChannel(3);                               //Convert the actual receiver signals for throttle to the standard 1000 - 2000us.
+  receiverInputChannel3 = convertReceiverChannel(3);                               //Convert the actual receiver signals for throttle to the standard 1000 - 2000us.
   if(receiverInputChannel3 < 1025)new_function_request = false;                      //If the throttle is in the lowest position set the request flag to false.
 
 
@@ -203,12 +200,12 @@ void loop(){
   //Run the ESC calibration program to start with.
   ////////////////////////////////////////////////////////////////////////////////////////////
   if(data == 0 && new_function_request == false){                                       //Only start the calibration mode at first start. 
-    receiverInputChannel3 = convert_receiverChannel(3);                             //Convert the actual receiver signals for throttle to the standard 1000 - 2000us.
+    receiverInputChannel3 = convertReceiverChannel(3);                             //Convert the actual receiver signals for throttle to the standard 1000 - 2000us.
     esc_1 = receiverInputChannel3;                                                   //Set the pulse for motor 1 equal to the throttle channel.
     esc_2 = receiverInputChannel3;                                                   //Set the pulse for motor 2 equal to the throttle channel.
     esc_3 = receiverInputChannel3;                                                   //Set the pulse for motor 3 equal to the throttle channel.
     esc_4 = receiverInputChannel3;                                                   //Set the pulse for motor 4 equal to the throttle channel.
-    esc_pulse_output();                                                                 //Send the ESC control pulses.
+    escPulseOutput();                                                                 //Send the ESC control pulses.
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////

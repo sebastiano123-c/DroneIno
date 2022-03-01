@@ -1,7 +1,17 @@
 /**
  * @file Globals.h
  * @author @sebastiano123-cs
- * @brief Global variables definition.
+ * @brief Global variables used in all the project.
+ * 
+ * Global variables are divided here into:
+ *  - PID: roll, yaw, pitch and altitude;
+ *  - GYROSCOPE: low/high filter percentage, pitch and roll correction;
+ *  - PWM channels: for the use of the ledWrite;
+ *  - BATTERY: battery constants and calculation of the battery level;
+ *  - ALTIMETER: constants;
+ *  - TELEMETRY: data transfer and data controller size and array;
+ *  - UNDEFINED: variables not yet defined;
+ * 
  * @version 0.1
  * @date 2022-02-28
  * 
@@ -152,7 +162,7 @@ const int dataTransferSize       = 5;
 float dataTransfer[dataTransferSize];
 
 //            (RX)
-const int dataControllerSize    = 12;
+const int dataControllerSize     = 12;
 float dataController[dataControllerSize];
 
 
@@ -179,7 +189,7 @@ struct trimPosition{
 // flight mode
 byte flightMode;                                           // 1 = only auto leveling (or nothing if AUTO_LEVELING = false), 2 = altitude hold
 
-// globals
+// very global
 byte eepromData[36], errWire;
 int16_t calInt, start;
 int error;
@@ -191,12 +201,13 @@ unsigned long timer1, timer2, timer3, timer4, timer5, currentTime, loopTimer;
 int16_t esc1, esc2, esc3, esc4;
 int16_t throttle;
 
-//PID
+// PID
 float pidIMemRoll, pidRollSetpoint, gyroRollInput, pidOutputRoll, pidLastRollDError;
 float pidIMemPitch, pidPitchSetpoint, gyroPitchInput, pidOutputPitch, pidLastPitchDError;
 float pidIMemYaw, pidYawSetpoint, gyroYawInput, pidOutputYaw, pidLastYawDError;
 float pidErrorTemp;
-//Altitude PID variables
+
+// Altitude PID variables
 float pidErrorGainAltitude;
 float pidIMemAltitude, pidAltitudeSetpoint, pidAltitudeInput, pidOutputAltitude;
 uint8_t parachuteRotatingMemLocation;

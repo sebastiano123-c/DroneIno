@@ -2,6 +2,11 @@
  * @file Controller.ino
  * @author @sebastiano123-c
  * @brief Radiocommander control routines.
+ * 
+ * The radio controller, for example the FlySky, works as PWM signals with variable time widths in the range 1000-2000us.
+ * The convertReceiverChannel() routine converts the input signal into the range 1000-2000us.
+ * waitController() routine is called in the setup() function and waits until DroneIno recognizes a readable radio controller input.
+ * 
  * @version 0.1
  * @date 2022-02-28
  * 
@@ -51,7 +56,7 @@ int convertReceiverChannel(byte ch){
     //Limit the lowest value to the value that was detected during setup
     if(trimCh[ch].actual < trimCh[ch].low)trimCh[ch].actual = trimCh[ch].low;
 
-    //Calculate and scale theactual value to a 1000 - 2000us value
+    //Calculate the scale of the actual value to a 1000 - 2000us value
     difference = ((long)(trimCh[ch].center - trimCh[ch].actual) * (long)500) / (trimCh[ch].center - trimCh[ch].low);
     
     switch (trimCh[ch].reverse){

@@ -1,7 +1,7 @@
 /**
  * @file Gyroscope.ino
  * @author @sebastiano123-c
- * @brief Gyroscopes routines 
+ * @brief Gyroscopes routines.
  * @version 0.1
  * @date 2022-02-28
  * 

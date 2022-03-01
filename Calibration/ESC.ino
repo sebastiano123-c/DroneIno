@@ -1,3 +1,18 @@
+/**
+ * @file ESC.ino
+ * @author @sebastiano123-c
+ * @brief ESC pulses output routines.
+ * @version 0.1
+ * @date 2022-03-01
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
+/**
+ * @brief Calculate the ESC pulse for the outputs.
+ * 
+ */
 void escFunction(){
     loopCounter ++;                                                                    //Add 1 to the loopCounter variable.
     if(new_function_request == true && loopCounter == 250){                            //Wait for the throttle to be set to 0.
@@ -16,7 +31,7 @@ void escFunction(){
       if(data == '4' || data == '5')esc_4 = receiverInputChannel3;                   //If motor 4 is requested set the pulse for motor 1 equal to the throttle channel.
       else esc_4 = 1000;                                                                //If motor 4 is not requested set the pulse for the ESC to 1000us (off).
 
-      esc_pulse_output();                                                               //Send the ESC control pulses.
+      escPulseOutput();                                                               //Send the ESC control pulses.
 
       //For balancing the propellors it's possible to use the accelerometer to measure the vibrations.
       if(eepromData[31] == 1){                                                         //The MPU-6050 is installed
@@ -53,7 +68,11 @@ void escFunction(){
     }
    }
 
-void esc_pulse_output(){
+/**
+ * @brief ESC outputs.
+ * 
+ */
+void escPulseOutput(){
   zeroTimer = micros();
   //Set digital port 4, 5, 6 and 7 high.
   digitalWrite(PIN_ESC_1, HIGH);

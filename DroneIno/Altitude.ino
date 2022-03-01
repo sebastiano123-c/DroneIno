@@ -2,6 +2,15 @@
  * @file Altitude.ino
  * @author @sebastiano123-c
  * @brief Pressure readings routines.
+ * 
+ * Depending on the ALTITUDE_SENSOR macro value:
+ * 
+ *  @li BMP280: uses the I2C communication WITHOUT using the ADAFRUIT library to better performances;
+ *  @li BME280: not yet implemented;
+ *  @li OFF: no altitude sensor, so there is no pressure data acquisition.
+ * 
+ * @note For now, the only sensor available is the BMP280, otherwise these routines return void.
+ * 
  * @version 0.1
  * @date 2022-02-18
  * 
@@ -237,8 +246,8 @@
 /**
  * @brief Transforms the barometer readings into the PID output pulses.
  * 
- * @note When the throttle stick position is increased or decreased the altitude hold function is partially disabled.
- * @note The manualAltitudeChange variable will indicate if the altitude of the quadcopter is changed by the pilot.
+ * When the throttle stick position is increased or decreased the altitude hold function is partially disabled.
+ * The manualAltitudeChange variable will indicate if the altitude of the quadcopter is changed by the pilot.
  * 
  */
 void calculateAltitudeAdjustementPID(){

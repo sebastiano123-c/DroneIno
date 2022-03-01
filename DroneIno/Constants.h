@@ -1,7 +1,7 @@
 /**
  * @file Constants.h
  * @author @sebastiano123-c
- * @brief DroneIno constants.
+ * @brief DroneIno constants for macros.
  * @version 0.1
  * @date 2022-02-28
  * 

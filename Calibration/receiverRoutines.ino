@@ -1,5 +1,19 @@
-//Check if the receiver values are valid within 10 seconds
-void wait_for_receiver(){
+/**
+ * @file receiverRoutines.ino
+ * @author @sebastiano123-c
+ * @brief Receiver routines.
+ * @version 0.1
+ * @date 2022-03-01
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
+/**
+ * @brief Check if the receiver values are valid within 10 seconds.
+ * 
+ */
+void waitForReceiver(){
   byte zero = 0;                                                                //Set all bits in the variable zero to 0
   while(zero < 15){                                                             //Stay in this loop until the 4 lowest bits are set
     if(receiverInput[1] < 2100 && receiverInput[1] > 900) zero |= 0b00000001;  //Set bit 0 if the receiver pulse 1 is within the 900 - 2100 range
@@ -25,9 +39,16 @@ void wait_for_receiver(){
   }
 }
 
-//This part converts the actual receiver signals to a standardized 1000 – 1500 – 2000 microsecond value.
-//The stored data in the EEPROM is used.
-int convert_receiverChannel(byte function){
+/**
+ * @brief Convert the receiver signal.
+ * 
+ * This part converts the actual receiver signals to a standardized 1000 – 2000us value.
+ * The stored data in the EEPROM is used.
+ * 
+ * @param function 
+ * @return int 
+ */
+int convertReceiverChannel(byte function){
   byte channel, reverse;                                                       //First we declare some local variables
   int low, center, high, actual;
   int difference;
@@ -56,7 +77,11 @@ int convert_receiverChannel(byte function){
   else return 1500;
 }
 
-void print_signals(){
+/**
+ * @brief Prints the signals.
+ * 
+ */
+void printSignals(){
   Serial.print("Start:");
   Serial.print(start);
 
@@ -85,15 +110,19 @@ void print_signals(){
   Serial.print(receiverInputChannel2);
 }
 
+/**
+ * @brief Main routine used in the sketch.
+ * 
+ */
 void rFunction(){
       loopCounter ++;                                                                    //Increase the loopCounter variable.
-    receiverInputChannel1 = convert_receiverChannel(1);                           //Convert the actual receiver signals for pitch to the standard 1000 - 2000us.
-    receiverInputChannel2 = convert_receiverChannel(2);                           //Convert the actual receiver signals for roll to the standard 1000 - 2000us.
-    receiverInputChannel3 = convert_receiverChannel(3);                           //Convert the actual receiver signals for throttle to the standard 1000 - 2000us.
-    receiverInputChannel4 = convert_receiverChannel(4);                           //Convert the actual receiver signals for yaw to the standard 1000 - 2000us.
+    receiverInputChannel1 = convertReceiverChannel(1);                           //Convert the actual receiver signals for pitch to the standard 1000 - 2000us.
+    receiverInputChannel2 = convertReceiverChannel(2);                           //Convert the actual receiver signals for roll to the standard 1000 - 2000us.
+    receiverInputChannel3 = convertReceiverChannel(3);                           //Convert the actual receiver signals for throttle to the standard 1000 - 2000us.
+    receiverInputChannel4 = convertReceiverChannel(4);                           //Convert the actual receiver signals for yaw to the standard 1000 - 2000us.
 
     if(loopCounter == 125){                                                            //Print the receiver values when the loopCounter variable equals 250.
-      print_signals();                                                                  //Print the receiver values on the serial monitor.
+      printSignals();                                                                  //Print the receiver values on the serial monitor.
       loopCounter = 0;                                                                 //Reset the loopCounter variable.
     }
 

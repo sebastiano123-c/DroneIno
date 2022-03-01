@@ -1,16 +1,35 @@
 /**
  * @file WiFi.ino
- * @author @sebastiano123-c
- *
- * @note Actually, it is not a telemetry if WIFI_TELEMETRY is defined NATIVE.
- * I thought it could be, but the ping time was an eternity with respect to the 4us rate.
- * Here there are the functions that permits you to set the PID very easily.
- * It uses the ESP32 access point 192.168.4.1
+ * @author your name (you@domain.com)
+ * @brief WiFi network routines for telemetry and PID settingusing web apps.
+ * 
+ * Define in the Config.h file the macro WIFI_TELEMETRY as:
+ * 
+ *   @li NATIVE: if you don't have a ESP32-CAM. This will use the ESP32 native wifi to easily set PID parameters;
+ *   @li ESP_CAM: allow you to use an ESP32-CAM mounting a OV2640 camera as a telemetry system.
+ * 
+ * NATIVE it is not actually a proper telemetry system since it allows only to change PID very easily and on the fly, but not to see telemetry data.
+ * It is so because the ping time between the message sent and the received positive response is an eternity (like 10ms) with respect to the 4ms rate.
+ * 
+ * ESP_CAM, connected to DroneIno accordingly to the documentation on GitHub,
+ * provides a full telemetry system, a video streaming and the possibility to set PID parameters back to DroneIno.
+ * 
+ * Both uses,
+ *  network name "DroneInoTelemetry"
+ *  passwork "DroneIno"
+ *  server IP "192.168.4.1"
+ * 
+ * After connecting to DroneInoTelemetry network, dial "192.168.4.1" on your browser.
+ * 
+ * @version 0.1
+ * @date 2022-03-01
+ * 
+ * @copyright Copyright (c) 2022
  * 
  */
 
 
-#if (WIFI_TELEMETRY == NATIVE)
+#if WIFI_TELEMETRY == NATIVE
 
   /**
    * @brief Not found response.
@@ -328,7 +347,7 @@
   
 
 
-#elif (WIFI_TELEMETRY == ESP_CAM)
+#elif WIFI_TELEMETRY == ESP_CAM
   
   HardwareSerial SUART(2); 
 

@@ -46,7 +46,8 @@ void setPID(){
 
 /** 
  * @brief Calculates PID adjustments for outputs.
- * @note Calculates PID in degrees per seconds.
+ * Calculates PID in degrees per seconds.
+ * 
  */
 void calculatePID(){
 

@@ -1,3 +1,14 @@
+/**
+ * @file telemetry.cpp
+ * @author @sebastiano123-c
+ * @brief Telemtry and PID routines.
+ * @version 0.1
+ * @date 2022-03-01
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "telemetry.h"
 
 float dataController[dataControllerSize];
