@@ -5,8 +5,7 @@ EEPROM_data.txt
 
 # doxygen
 doxyfile
-html/*
-!html/index.html
+/html
 latex/*
 !latex/refman.pdf
 
