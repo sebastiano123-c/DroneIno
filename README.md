@@ -327,10 +327,10 @@ The directory structure is
     \videos
     \images
     \flightData
-        flight_1.txt
-        flight_2.txt
+        flight_1.csv
+        flight_2.csv
              :
-        flight_n.txt
+        flight_n.csv
 </pre>
 
 # **Roadmap**
