@@ -284,9 +284,19 @@ The two boards can talk to each other using the UART communication reached by co
 - GPIO_3 pin of the ESP32-CAM to the GPIO_25 of the ESP32 board;
 - GPIO_1 pin of the ESP32-CAM to the GPIO_26 of the ESP32 board.
 
+Place ESP32-CAM on the drone and start the drone.
+After connecting to DroneInoTelemetry network using the password `DroneIno`, dial in your browser's search bar `292.168.4.1`.
+You will find the main menu with:
+- PID parameters;
+- camera settings;
+- handle camera buttons.
+Tap the **turn on** button to start the streaming.
+
+If you want to save *automatically* the PID parameters, you'll need to insert a SD card to store them, see the following paragraph.
+
 ### **SD card for data storage**
 You can also save your flight data on a SD card. All you need is:
-- a SD card formatted in FAT32 and put it into you ESP32-CAM;
+- a SD card formatted in FAT32 to put into your ESP32-CAM;
 - create a folder named `src`;
 - in `src` create a file called `config.txt` in which you need to write (the order is important!) only the values of:
 ```
