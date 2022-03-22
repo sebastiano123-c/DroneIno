@@ -251,23 +251,25 @@
  * 
  */
 void calculateAltitudeAdjustementPID(){
+
+  pressureForPID = pressure;                                                   // pressure value used for the PID calculations
   
   manualAltitudeChange = 0;                                                    //Preset the manualAltitudeChange variable to 0.
   manualThrottle = 0;                                                          //Set the manualThrottle variable to 0.
 
   if (throttle > 1600) {                                                       //If the throttle is increased above 1600us (60%).
     manualAltitudeChange = 1;                                                  //Set the manualAltitudeChange variable to 1 to indicate that the altitude is adjusted.
-    pidAltitudeSetpoint = actualPressure;                                      //Adjust the setpoint to the actual pressure value so the output of the P- and I-controller are 0.
+    pidAltitudeSetpoint = pressureForPID;                                      //Adjust the setpoint to the actual pressure value so the output of the P- and I-controller are 0.
     manualThrottle = (throttle - 1600) / 3;                                    //To prevent very fast changes in hight limit the function of the throttle.
   }
   if (throttle < 1400) {                                                       //If the throttle is lowered below 1400us (40%).
     manualAltitudeChange = 1;                                                  //Set the manualAltitudeChange variable to 1 to indicate that the altitude is adjusted.
-    pidAltitudeSetpoint = actualPressure;                                      //Adjust the setpoint to the actual pressure value so the output of the P- and I-controller are 0.
+    pidAltitudeSetpoint = pressureForPID;                                      //Adjust the setpoint to the actual pressure value so the output of the P- and I-controller are 0.
     manualThrottle = (throttle - 1400) / 5;                                    //To prevent very fast changes in hight limit the function of the throttle.
   }
 
   //Calculate the PID output of the altitude hold.
-  pidAltitudeInput = actualPressure;                                           //Set the setpoint (pidAltitudeInput) of the PID-controller.
+  pidAltitudeInput = pressureForPID;                                           //Set the setpoint (pidAltitudeInput) of the PID-controller.
   pidErrorTemp = pidAltitudeInput - pidAltitudeSetpoint;                       //Calculate the error between the setpoint and the actual pressure value.
 
   //To get better results the P-gain is increased when the error between the setpoint and the actual pressure value increases.
@@ -327,12 +329,12 @@ void calculateAltitudeHold(){
 
     case 1:
 
-      if(abs(pidAltitudeSetpoint) > 1e-8){                                          // if pidAltitudeSetpoint != 0
-        pidAltitudeSetpoint = 0;                                                     //Reset the PID altitude setpoint.
-        pidOutputAltitude = 0;                                                       //Reset the output of the PID controller.
-        pidIMemAltitude = 0;                                                        //Reset the I-controller.
+      if(abs(pidAltitudeSetpoint) > 1e-8){                                            // if pidAltitudeSetpoint != 0
+        pidAltitudeSetpoint = 0;                                                      //Reset the PID altitude setpoint.
+        pidOutputAltitude = 0;                                                        //Reset the output of the PID controller.
+        pidIMemAltitude = 0;                                                          //Reset the I-controller.
         manualThrottle = 0;                                                           //Set the manualThrottle variable to 0 .
-        manualAltitudeChange = 1;                                                    //Set the manualAltitudeChange to 1.
+        manualAltitudeChange = 1;                                                     //Set the manualAltitudeChange to 1.
       }
 
       break;

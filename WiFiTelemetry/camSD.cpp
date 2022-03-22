@@ -1,16 +1,9 @@
 /**
- * @file camSD.cpp
- * @author @sebastiano123-c
- * @brief SD card routines.
- * 
- * See @link https://gist.github.com/youjunjer/b70b6e54ae7201a46387b8e73894ba51 @endlink for further details.
- * 
- * @version 0.1
- * @date 2022-03-01
- * 
- * @copyright Copyright (c) 2022
- * 
+ * @file SD.cpp
+ * @brief SD routines 
+ * @link https://gist.github.com/youjunjer/b70b6e54ae7201a46387b8e73894ba51 @endlink
  */
+
 #include "camSD.h"
 
 const char* configFilePath = "/src/config.txt";
@@ -21,13 +14,7 @@ const char* logFileName;
 int numberOfDataFiles = 0;
 uint8_t isConnectedSD = 0;
 
-/**
- * @brief List dir in SD card.
- * 
- * @param fs 
- * @param dirname 
- * @param levels 
- */
+//List dir in SD card
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     // Serial.printf("Listing directory: %s\n", dirname);
 
@@ -60,12 +47,7 @@ void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     }
 }
 
-/**
- * @brief Create a Dir object.
- * 
- * @param fs 
- * @param path 
- */
+//Create a dir in SD card
 void createDir(fs::FS &fs, const char * path){
     // Serial.printf("Creating Dir: %s\n", path);
     if(fs.mkdir(path)){
@@ -75,17 +57,12 @@ void createDir(fs::FS &fs, const char * path){
     }
 }
 
-/**
- * @brief Write a file in SD card
- * 
- * @param fs 
- * @param path 
- * @param message 
- */
+//Write a file in SD card
 void writeFile(fs::FS &fs, const char * path, const char * message){
     // Serial.printf("Writing file: %s\n", path);
 
     File file = fs.open(path, FILE_WRITE);
+
     if(!file){
         // Serial.println("Failed to open file for writing");
         return;
@@ -100,13 +77,33 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
     }
 }
 
-/**
- * @brief Read the config flight file
- * 
- */
-void readConfigFile(fs::FS &fs){
+//Write a file in SD card
+void appendFile(fs::FS &fs, const char * path, const char * message){
+    // Serial.printf("Writing file: %s\n", path);
 
-    //initialize the PID
+    File file = fs.open(path, FILE_APPEND);
+
+    if(!file){
+        // Serial.println("Failed to open file for writing");
+        return;
+    }
+   
+ 
+   //fwrite(fb->buf, 1, fb->len, file);
+    if(file.print(message)){
+        // Serial.println("File written");
+    } else {
+        // Serial.println("Write failed");
+    }
+}
+
+
+//Read the config flight file
+void readConfigFile(fs::FS &fs){
+    /**
+     * @brief initialize the PID
+     * 
+     */
     float arr[dataControllerSize];
 
     File file = fs.open(configFilePath);
@@ -120,39 +117,38 @@ void readConfigFile(fs::FS &fs){
         PID_P_GAIN_ROLL = arr[0];                    //Gain setting for the roll P-controller (1.3)
         PID_I_GAIN_ROLL = arr[1];                  //Gain setting for the roll I-controller  (0.0002)
         PID_D_GAIN_ROLL = arr[2];                   //Gain setting for the roll D-controller (10.0)
-                                                    
+                                                              
         //              (PITCH)                                             
         PID_P_GAIN_PITCH = arr[0];          //Gain setting for the pitch P-controller
         PID_I_GAIN_PITCH = arr[1];          //Gain setting for the pitch I-controller
         PID_D_GAIN_PITCH = arr[2];           //Gain setting for the pitch D-controller
-                                                    
+                                                                    
         //              (YAW)                                             
         PID_P_GAIN_YAW = arr[3];                      //Gain setting for the pitch P-controller. (2.0)
         PID_I_GAIN_YAW = arr[4];                     //Gain setting for the pitch I-controller. (0.04)
         PID_D_GAIN_YAW = arr[5];                      //Gain setting for the pitch D-controller. (0.0)
-
+                          
         // GYROSCOPE
         GYROSCOPE_ROLL_FILTER = arr[6];                      // read your gyroscope data after the calibration, try different values and choose the best one
         GYROSCOPE_ROLL_CORR = arr[7];                      // (0.) after set GYROSCOPE_ROLL_FILTER, put here the angle roll you read eneabling DEBUG
         GYROSCOPE_PITCH_CORR = arr[8];                     // (-1.65.) after set GYROSCOPE_PITCH_FILTER, put here the angle pitch you read eneabling DEBUG
-
+                       
         //              (ALTITUDE)                                                                                          
         PID_P_GAIN_ALTITUDE = arr[9];                     //Gain setting for the pitch P-controller. (2.0)
         PID_I_GAIN_ALTITUDE = arr[10];                     //Gain setting for the pitch I-controller. (0.04)
         PID_D_GAIN_ALTITUDE = arr[11];                      //Gain setting for the pitch D-controller. (0.0)
 
         // update DroneIno PID parameters
+        /**
+         * @bug calling this function here the telemetry gives infinity
+         * 
+         */
         writeDataTransfer();
         
         // for(int ii = 0; ii < dataControllerSize; ii++) Serial.printf("%i: %.6f\n", ii, arr[ii]);
     }
 }
 
-/**
- * @brief Updates the 'src\config.txt' file in the SD card.
- * 
- * @param fs 
- */
 void updateConfigFile(fs::FS &fs){
     File file = fs.open("/src/config.txt", FILE_WRITE);
     if(file){
@@ -183,45 +179,45 @@ void updateConfigFile(fs::FS &fs){
     }
 }
 
-/**
- * @brief Writes on the SD card the flight data.
- * 
- * @param fs 
- */
 void writeDataLogFlight(fs::FS &fs){
+    /**
+     * @brief stores the flight data
+     * 
+     */
 
     File file = SD_MMC.open(logFileName, FILE_APPEND);
     if(file){
 
-        static char stringToPrint[1024];
+        if(rollTrim - 1 > 1e-10 && pitchTrim - 1 > 1e-10 && yawTrim - 1 > 1e-10 && throttleTrim - 1 > 1e-10){
+            static char stringToPrint[1024];
 
-        char * ptr = stringToPrint;
-        *ptr++ = ' ';
+            char * ptr = stringToPrint;
+            *ptr++ = ' ';
 
-        // telemetry
-        ptr+=sprintf(ptr, "%.6f,", rollAngle);
-        ptr+=sprintf(ptr, "%.6f,", pitchAngle);
-        ptr+=sprintf(ptr, "%.6f,", flightMode);
-        ptr+=sprintf(ptr, "%.6f,", batteryPercentage);
-        ptr+=sprintf(ptr, "%.6f", altitudeMeasure);
+            // telemetry
+            ptr+=sprintf(ptr, "%.6f,", rollAngle);
+            ptr+=sprintf(ptr, "%.6f,", pitchAngle);
+            ptr+=sprintf(ptr, "%i,", (int)flightMode);
+            ptr+=sprintf(ptr, "%.6f,", batteryPercentage);
+            ptr+=sprintf(ptr, "%.6f,", altitudeMeasure);
 
-        *ptr++ = '\n';
-        *ptr++ = 0;
+            ptr+=sprintf(ptr, "%i,", (int) rollTrim);
+            ptr+=sprintf(ptr, "%i,", (int) pitchTrim);
+            ptr+=sprintf(ptr, "%i,", (int) yawTrim);
+            ptr+=sprintf(ptr, "%i", (int) throttleTrim);
 
-        file.print(stringToPrint);
+            *ptr++ = '\n';
+            *ptr++ = 0;
+
+            file.print(stringToPrint);
+        }
+
         file.close();
+
     }
 
 }
 
-/**
- * @brief Routine called in the setup().
- * 
- * This setup routine checks if the SD is attached.
- * Then creates, if not yet done, the data folder and instantiates the flight data file header.
- * Finally, sends to DroneIno the initial PID parameters found on the config.txt file.
- * 
- */
 void setupSD() {
     //Serial.begin(115200);
     // Serial.println("SDcard Testing....");
@@ -230,7 +226,7 @@ void setupSD() {
     // ledcSetup(0, 500, 8);
     // ledcAttachPin(GPIO_NUM_4, 0);
     
-    if(!SD_MMC.begin("/sdcard", true)){     // "/sdcard", true disables the flashes
+    if(!SD_MMC.begin("/sdcard", true)){     // "/sdcard", true disables the flashs
         // Serial.println("Card Mount Failed");
         //ledcWrite(0, 255);
         isConnectedSD = 0;
@@ -251,7 +247,7 @@ void setupSD() {
 
         // write file name
         char * sptr = todayLogChar;
-        *sptr++ = '/';
+        // *sptr++ = '';
         sptr+=sprintf(sptr, "%s", flightDataPath);
         sptr+=sprintf(sptr, "/flight_%i.csv", numberOfDataFiles+1);
         *sptr++ = 0;
@@ -259,10 +255,8 @@ void setupSD() {
         numberOfDataFiles = 0;
 
         // create log file for this session
-        writeFile(SD_MMC, logFileName, "roll, pitch, flightMode, battery, altitude\n");
+        writeFile(SD_MMC, logFileName, flightDataHeaderCSV);
 
-        // initialize PID
-        readConfigFile(SD_MMC);
     }
 
 }

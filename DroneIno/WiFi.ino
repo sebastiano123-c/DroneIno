@@ -391,24 +391,31 @@
   void writeDataTransfer(){
   
     //if(DEBUG) Serial.printf("I'm sending...\n");
-  
+   
+    // declarations
+    const char* stringToPrint = "";
+    static char staticCharToPrint[500];
+    char * sptr = staticCharToPrint;
+
     // fill data structure before send
-    dataTransfer[0] = angleRoll;
-    dataTransfer[1] = anglePitch;
-    dataTransfer[2] = flightMode;
-    dataTransfer[3] = batteryPercent;
-    dataTransfer[4] = altitudeMeasure;
-    
+    sptr += sprintf(sptr, "<%.6f,", angleRoll);
+    sptr += sprintf(sptr, "%.6f,", anglePitch);
+    sptr += sprintf(sptr, "%x,", flightMode);
+    sptr += sprintf(sptr, "%.6f,", batteryPercent);
+    sptr += sprintf(sptr, "%.6f,", altitudeMeasure);
+    sptr += sprintf(sptr, "%i,", receiverInputChannel1);
+    sptr += sprintf(sptr, "%i,", receiverInputChannel2);
+    sptr += sprintf(sptr, "%i,", receiverInputChannel4);
+    sptr += sprintf(sptr, "%i>", receiverInputChannel3);
+
+    // close the string
+    *sptr++ = 0;
+
     // print in csv format
-    int i=0;
-    SUART.printf("<%.6f,", dataTransfer[i]);
-    for(i = 1; i < dataTransferSize - 1; i++){
-      SUART.printf("%.6f,", dataTransfer[i]);
-    }
-    SUART.printf("%.6f>\n", dataTransfer[dataTransferSize - 1]);
-    
-    // print
-    //checkMessage();
+    stringToPrint = (const char*)staticCharToPrint;
+
+    SUART.println(stringToPrint);
+
   }
     
   

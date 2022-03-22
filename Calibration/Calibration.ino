@@ -98,48 +98,34 @@ float travelCoeff = 1/((float)gyroFrequency * gyroSensibility);
 float convDegToRad = 180.0 / PI;
 float travelCoeffToRad = travelCoeff / convDegToRad;
 
-//Setup routine
+
 void setup(){
-  //begin
+
+  
+  // begin
   Serial.begin(BAUD_RATE);                                                                  //Start the serial port.
   EEPROM.begin(EEPROM_SIZE);
-  vTaskDelay(500/portTICK_PERIOD_MS);
+  
+
+  // introduction
+  intro();
+  
 
   //fill EEPROM data array
   for(data = 0; data < EEPROM_SIZE; data++) eepromData[data] = EEPROM.read(data);               //Read EEPROM for faster data access
 
+  
   gyroAddress = 0x68;//eepromData[32];                                                       //Store the gyro address in the variable.
+
 
   setupMPU();                                                                                 //setup MPU 6050
 
-  //print eeprom data on serial
-  Serial.println("==================================");
-  Serial.println("EEPROM data:");
-  Serial.println("");
-  for (int i = 0; i < EEPROM_SIZE; i++){
-    Serial.println(eepromData[i]);
-  }
 
-  //Arduino Uno pins default to inputs, so they don't need to be explicitly declared as inputs.
-  pinMode(PIN_ESC_1, OUTPUT);
-  pinMode(PIN_ESC_2, OUTPUT);
-  pinMode(PIN_ESC_3, OUTPUT);
-  pinMode(PIN_ESC_4, OUTPUT);
-  pinMode(PIN_BATTERY_LED, OUTPUT);
-  pinMode(PIN_DIGITAL_13, OUTPUT);
+  setPins();
 
-  //event change detector
-  pinMode(PIN_RECEIVER_1, INPUT_PULLUP);
-  pinMode(PIN_RECEIVER_2, INPUT_PULLUP);
-  pinMode(PIN_RECEIVER_3, INPUT_PULLUP);
-  pinMode(PIN_RECEIVER_4, INPUT_PULLUP);
   
-  //       event change detector
-  attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_1), myISR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_2), myISR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_3), myISR, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_4), myISR, CHANGE);
   setGyroRegisters();                                                                 //Set the specific gyro registers.
+
 
   //Check the EEPROM signature to make sure that the setup program is executed.
   while(eepromData[33] != 'J' || eepromData[34] != 'M' || eepromData[35] != 'B'){
@@ -147,16 +133,19 @@ void setup(){
     digitalWrite(PIN_BATTERY_LED, !digitalRead(PIN_BATTERY_LED));                                                 //Change the led status to indicate error.
   }
 
-  //wait_for_receiver();                                                                  //Wait until the receiver is active.
-  
+
+  waitForReceiver();                                                                  //Wait until the receiver is active.
+
+
   zeroTimer = micros();                                                                //Set the zeroTimer for the first loop.
   while(Serial.available())data = Serial.read();                                        //Empty the serial buffer.
   data = 0;                                                                             //Set the data variable back to zero.
-  Serial.println("END SETUP");
 }
 
 //Main program loop
 void loop(){
+
+  
   while(zeroTimer + 4000 > micros());                                                  //Start the pulse after 4000 micro seconds.
   zeroTimer = micros();                                                                //Reset the zero timer.
 
@@ -221,59 +210,10 @@ void loop(){
   if(data == '1' || data == '2' || data == '3' || data == '4' || data == '5'){          //If motor 1, 2, 3 or 4 is selected by the user.
     escFunction();
   }
-  ///////////////////////////////////////////////////////////////////////////////////////////
-  //When user sends a 'a' display the quadcopter angles.
-  ////////////////////////////////////////////////////////////////////////////////////////////
   if(data == 'a'){
     checkGyro();
   }
-}
-
-
-void myISR(){
-      currentTime = micros();
-      //Channel 1=========================================
-      if(digitalRead(PIN_RECEIVER_1) == HIGH){                                                     //Is input 8 high?
-          if(lastChannel1 == 0){                                                //Input 8 changed from 0 to 1.
-              lastChannel1 = 1;                                                   //Remember current input state.
-              timer1 = currentTime;                                               //Set timer1 to currentTime.
-          }
-      }
-      else if(lastChannel1 == 1){                                             //Input 8 is not high and changed from 1 to 0.
-          lastChannel1 = 0;                                                     //Remember current input state.
-          receiverInput[1] = currentTime - timer1;                             //Channel 1 is currentTime - timer1.
-      }
-      //Channel 2=========================================
-      if(digitalRead(PIN_RECEIVER_2) == HIGH){                                                    //Is input 9 high?
-          if(lastChannel2 == 0){                                                //Input 9 changed from 0 to 1.
-              lastChannel2 = 1;                                                   //Remember current input state.
-              timer2 = currentTime;                                               //Set timer2 to currentTime.
-          }
-      }
-      else if(lastChannel2 == 1){                                             //Input 9 is not high and changed from 1 to 0.
-          lastChannel2 = 0;                                                     //Remember current input state.
-          receiverInput[2] = currentTime - timer2;                             //Channel 2 is currentTime - timer2.
-      }
-      //Channel 3=========================================
-      if(digitalRead(PIN_RECEIVER_3) == HIGH){                                                    //Is input 10 high?
-          if(lastChannel3 == 0){                                                //Input 10 changed from 0 to 1.
-              lastChannel3 = 1;                                                   //Remember current input state.
-              timer3 = currentTime;                                               //Set timer3 to currentTime.
-          }
-      }
-      else if(lastChannel3 == 1){                                             //Input 10 is not high and changed from 1 to 0.
-          lastChannel3 = 0;                                                     //Remember current input state.
-          receiverInput[3] = currentTime - timer3;                             //Channel 3 is currentTime - timer3.
-      }
-      //Channel 4=========================================
-      if(digitalRead(PIN_RECEIVER_4) == HIGH){                                                    //Is input 11 high?
-          if(lastChannel4 == 0){                                                //Input 11 changed from 0 to 1.
-              lastChannel4 = 1;                                                   //Remember current input state.
-              timer4 = currentTime;                                               //Set timer4 to currentTime.
-          }
-      }
-      else if(lastChannel4 == 1){                                             //Input 11 is not high and changed from 1 to 0.
-          lastChannel4 = 0;                                                     //Remember current input state.
-          receiverInput[4] = currentTime - timer4;                             //Channel 4 is currentTime - timer4.
-      }
+  if(data == 'e'){
+    printEEPROM();
   }
+}

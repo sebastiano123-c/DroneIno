@@ -71,10 +71,10 @@ void setEscPulses(){
   }
 
   // write to ESCs
-  ledcWrite(pwmChannel1, esc1); ///2000*MAX_DUTY_CYCLE
-  ledcWrite(pwmChannel2, esc2); ///2000*MAX_DUTY_CYCLE
-  ledcWrite(pwmChannel3, esc3); ///2000*MAX_DUTY_CYCLE
-  ledcWrite(pwmChannel4, esc4); ///2000*MAX_DUTY_CYCLE
+  ledcWrite(pwmChannel1, (float)esc1/2000.*(float)MAX_DUTY_CYCLE);
+  ledcWrite(pwmChannel2, (float)esc2/2000.*(float)MAX_DUTY_CYCLE);
+  ledcWrite(pwmChannel3, (float)esc3/2000.*(float)MAX_DUTY_CYCLE);
+  ledcWrite(pwmChannel4, (float)esc4/2000.*(float)MAX_DUTY_CYCLE);
 }
 
 /**

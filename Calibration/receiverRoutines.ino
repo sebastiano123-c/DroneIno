@@ -14,29 +14,14 @@
  * 
  */
 void waitForReceiver(){
-  byte zero = 0;                                                                //Set all bits in the variable zero to 0
-  while(zero < 15){                                                             //Stay in this loop until the 4 lowest bits are set
-    if(receiverInput[1] < 2100 && receiverInput[1] > 900) zero |= 0b00000001;  //Set bit 0 if the receiver pulse 1 is within the 900 - 2100 range
-    if(receiverInput[2] < 2100 && receiverInput[2] > 900) zero |= 0b00000010;  //Set bit 1 if the receiver pulse 2 is within the 900 - 2100 range
-    if(receiverInput[3] < 2100 && receiverInput[3] > 900) zero |= 0b00000100;  //Set bit 2 if the receiver pulse 3 is within the 900 - 2100 range
-    if(receiverInput[4] < 2100 && receiverInput[4] > 900) zero |= 0b00001000;  //Set bit 3 if the receiver pulse 4 is within the 900 - 2100 range
+ while(receiverInputChannel3 < 990 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400)
+  {
+    receiverInputChannel3 = convertReceiverChannel(3);                 //Convert the actual receiver signals for throttle to the standard 1000 - 2000us
+    receiverInputChannel4 = convertReceiverChannel(4);                 //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
 
-    // --- debug
-//    Serial.print("zero:");
-//    Serial.print(zero);
-//    Serial.print(", 1:");
-//    Serial.print(receiverInput[1]);
-//    Serial.print(", 2:");
-//    Serial.print(receiverInput[2]);
-//    Serial.print(", 3:");
-//    Serial.print(receiverInput[3]);
-//    Serial.print(", 4:");
-//    Serial.print(receiverInput[4]);
-//    Serial.println();
+  }   
 
-    //Wait 500 milliseconds
-    vTaskDelay(500/portTICK_PERIOD_MS);                                         
-  }
+  Serial.println("Receiver OK!");
 }
 
 /**
@@ -137,5 +122,5 @@ void rFunction(){
     esc_2 = 1000;                                                                       //Set the pulse for ESC 1 to 1000us.
     esc_3 = 1000;                                                                       //Set the pulse for ESC 1 to 1000us.
     esc_4 = 1000;                                                                       //Set the pulse for ESC 1 to 1000us.
-    esc_pulse_output();                                                                 //Send the ESC control pulses.
+    escPulseOutput();                                                                 //Send the ESC control pulses.
 }

@@ -259,7 +259,6 @@ void getGyro(){
   gyroAxis[3] = rawGZ[1] | rawGZ[0]<<8;
 }
 
-
 void setupMPU(){
   Wire.setClock(WIRE_CLOCK);
   Wire.begin();

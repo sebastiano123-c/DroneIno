@@ -21,7 +21,7 @@ void escFunction(){
       loopCounter = 0;                                                                 //Reset the loopCounter variable.
     }
     if(new_function_request == false){                                                  //When the throttle was in the lowest position do this.
-      receiverInputChannel3 = convert_receiverChannel(3);                           //Convert the actual receiver signals for throttle to the standard 1000 - 2000us.
+      receiverInputChannel3 = convertReceiverChannel(3);                           //Convert the actual receiver signals for throttle to the standard 1000 - 2000us.
       if(data == '1' || data == '5')esc_1 = receiverInputChannel3;                   //If motor 1 is requested set the pulse for motor 1 equal to the throttle channel.
       else esc_1 = 1000;                                                                //If motor 1 is not requested set the pulse for the ESC to 1000us (off).
       if(data == '2' || data == '5')esc_2 = receiverInputChannel3;                   //If motor 2 is requested set the pulse for motor 1 equal to the throttle channel.

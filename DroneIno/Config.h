@@ -31,7 +31,7 @@
 
 // BATTERY
 #define MAX_BATTERY_VOLTAGE         11100                    // (mV) battery nominal maximum voltage (use ONLY 11.1V batteries)
-#define MIN_BATTERY_VOLTAGE         3000                     // (mV) battery level above which it is dangerous to use
+#define MIN_BATTERY_VOLTAGE         4000                     // (mV) battery level above which it is dangerous to use
 
 
 // WIFI

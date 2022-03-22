@@ -132,8 +132,8 @@ void calculateAnglePRY(){
   angleRoll += gyroAxis[1] * travelCoeff;                                   //Calculate the traveled roll angle and add it to the angleRoll variable. 
   
   //The Arduino sin function is in radians
-  anglePitch -= anglePitch * sin(gyroAxis[3] * travelCoeffToRad);           //If the IMU has yawed transfer the roll angle to the pitch angel.
-  angleRoll += angleRoll * sin(gyroAxis[3] * travelCoeffToRad);             //If the IMU has yawed transfer the pitch angle to the roll angel.
+  anglePitch -= angleRoll * sin(gyroAxis[3] * travelCoeffToRad);           //If the IMU has yawed transfer the roll angle to the pitch angel.
+  angleRoll += anglePitch * sin(gyroAxis[3] * travelCoeffToRad);             //If the IMU has yawed transfer the pitch angle to the roll angel.
 
   //Accelerometer angle calculations
   accTotalVector = sqrt((accAxis[2]*accAxis[2])+

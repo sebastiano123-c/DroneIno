@@ -31,3 +31,6 @@ data
 
 # PCB
 DroneInoPCB
+
+DroneIno_PlatformIO.lnk
+Esp32-cam-telemetry.lnk

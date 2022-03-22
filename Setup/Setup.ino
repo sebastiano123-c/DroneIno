@@ -46,6 +46,7 @@
 #define PIN_RECEIVER_2 13
 #define PIN_RECEIVER_3 5
 #define PIN_RECEIVER_4 23
+#define PIN_RECEIVER_5 4
 
 // LED
 #define PIN_BATTERY_LED 19 
@@ -77,6 +78,76 @@ unsigned long timer, timer1, timer2, timer3, timer4, currentTime;
 int16_t gyroPitch, gyroRoll, gyroYaw;
 int16_t gyroRollCal, gyroPitchCal, gyroYawCal;
 
+
+void myISR(){
+
+  currentTime = micros();
+
+  // channel 1                                               
+  if(digitalRead(PIN_RECEIVER_1) == HIGH){                                  //Is RECEIVER input high?
+      if(lastChannel1 == 0){                                                //Input 8 changed from 0 to 1.
+          lastChannel1 = 1;                                                   //Remember current input state.
+          timer1 = currentTime;                                               //Set timer1 to currentTime.
+      }
+  }
+  else if(lastChannel1 == 1){                                             //Input 8 is not high and changed from 1 to 0.
+      lastChannel1 = 0;                                                     //Remember current input state.
+      receiverInputChannel1 = currentTime - timer1;                             //Channel 1 is currentTime - timer1.
+  }
+
+
+  // channel 2                                              
+  if(digitalRead(PIN_RECEIVER_2) == HIGH){                                 //Is RECEIVER input high?
+      if(lastChannel2 == 0){                                                //Input 9 changed from 0 to 1.
+          lastChannel2 = 1;                                                   //Remember current input state.
+          timer2 = currentTime;                                               //Set timer2 to currentTime.
+      }
+  }
+  else if(lastChannel2 == 1){                                             //Input 9 is not high and changed from 1 to 0.
+      lastChannel2 = 0;                                                     //Remember current input state.
+      receiverInputChannel2 = currentTime - timer2;                             //Channel 2 is currentTime - timer2.
+  }
+
+
+  // channel 3                                              
+  if(digitalRead(PIN_RECEIVER_3) == HIGH){                                 //Is RECEIVER input high?
+      if(lastChannel3 == 0){                                                //Input 10 changed from 0 to 1.
+          lastChannel3 = 1;                                                   //Remember current input state.
+          timer3 = currentTime;                                               //Set timer3 to currentTime.
+      }
+  }
+  else if(lastChannel3 == 1){                                             //Input 10 is not high and changed from 1 to 0.
+      lastChannel3 = 0;                                                     //Remember current input state.
+      receiverInputChannel3 = currentTime - timer3;                             //Channel 3 is currentTime - timer3.
+  }
+
+
+  // channel 4                                              
+  if(digitalRead(PIN_RECEIVER_4) == HIGH){                                 //Is RECEIVER input high?
+      if(lastChannel4 == 0){                                                //Input 11 changed from 0 to 1.
+          lastChannel4 = 1;                                                   //Remember current input state.
+          timer4 = currentTime;                                               //Set timer4 to currentTime.
+      }
+  }
+  else if(lastChannel4 == 1){                                             //Input 11 is not high and changed from 1 to 0.
+      lastChannel4 = 0;                                                     //Remember current input state.
+      receiverInputChannel4 = currentTime - timer4;                             //Channel 4 is currentTime - timer4.
+  }
+
+  
+//  // channel 5                                              
+//  if(digitalRead(PIN_RECEIVER_5) == HIGH){                          //Is RECEIVER input high?
+//      if(lastChannel5 == 0){                                                //Input 11 changed from 0 to 1.
+//          lastChannel5 = 1;                                                   //Remember current input state.
+//          timer5 = currentTime;                                               //Set timer4 to currentTime.
+//      }
+//  }
+//  else if(lastChannel5 == 1){                                             //Input 11 is not high and changed from 1 to 0.
+//      lastChannel5 = 0;                                                     //Remember current input state.
+//      trimCh[5].actual = currentTime - timer5;                             //Channel 4 is currentTime - timer4.
+//  }
+}
+
 //Setup routine
 void setup(){
     Serial.begin(BAUD_RATE);      //Start the serial connetion @ 57600bps
@@ -96,10 +167,21 @@ void setup(){
     
     pinMode(PIN_BATTERY_LED, OUTPUT);
 
-    attachInterrupt(PIN_RECEIVER_1, myISR, CHANGE);
-    attachInterrupt(PIN_RECEIVER_2, myISR, CHANGE);
-    attachInterrupt(PIN_RECEIVER_3, myISR, CHANGE);
-    attachInterrupt(PIN_RECEIVER_4, myISR, CHANGE);
+    // RECEIVER pinmode
+    pinMode(PIN_RECEIVER_1, INPUT);
+    pinMode(PIN_RECEIVER_2, INPUT);
+    pinMode(PIN_RECEIVER_3, INPUT);
+    pinMode(PIN_RECEIVER_4, INPUT);
+    
+    //       event change detector
+    attachInterrupt((PIN_RECEIVER_1), myISR, CHANGE);
+    attachInterrupt((PIN_RECEIVER_2), myISR, CHANGE);
+    attachInterrupt((PIN_RECEIVER_3), myISR, CHANGE);
+    attachInterrupt((PIN_RECEIVER_4), myISR, CHANGE);
+
+    Serial.print(F("Checking for valid receiver signals."));
+    //Wait 10 seconds until all receiver inputs are valid
+    wait_for_receiver();
 
     vTaskDelay(250 / portTICK_PERIOD_MS);               //Give the gyro time to start 
 }
@@ -115,23 +197,12 @@ void loop(){
   Serial.println(F("Checking I2C clock speed."));
   vTaskDelay(300 / portTICK_PERIOD_MS);
   
-  Wire.setClock(400000L);                      //Set the I2C clock speed to 400kHz.
+  Wire.setClock(WIRE_CLOCK);                      //Set the I2C clock speed to 400kHz.
   
   #if F_CPU == 16000000L          //If the clock speed is 16MHz include the next code line when compiling
     clockspeedOk = 1;            //Set clockspeedOk to 1
   #endif                          //End of if statement
   
-  if(error == 0){
-    Serial.println(F(""));
-    Serial.println(F("==================================================="));
-    Serial.println(F("Transmitter setup"));
-    Serial.println(F("==================================================="));
-    vTaskDelay(300 / portTICK_PERIOD_MS);
-    Serial.print(F("Checking for valid receiver signals."));
-    //Wait 10 seconds until all receiver inputs are valid
-    wait_for_receiver();
-    Serial.println(F(""));
-  }
   //Quit the program in case of an error
   if(error == 0){
     vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -160,7 +231,7 @@ void loop(){
     Serial.println(F(""));
     Serial.println(F(""));
   }
-  if(error == 0){  
+  if(error == 0){
     Serial.println(F("Move the throttle stick to full throttle and back to center"));
     //Check for throttle movement
     check_receiver_inputs(1);
@@ -421,7 +492,7 @@ void loop(){
     EEPROM.write(9, highChannel1 >> 8);
     EEPROM.write(10, highChannel2 & 0b11111111);
     EEPROM.write(11, highChannel2 >> 8);
-    EEPROM.write(PIN_BATTERY_LED, highChannel3 & 0b11111111);
+    EEPROM.write(12, highChannel3 & 0b11111111);
     EEPROM.write(13, highChannel3 >> 8);
     EEPROM.write(14, highChannel4 & 0b11111111);
     EEPROM.write(15, highChannel4 >> 8);
@@ -446,52 +517,54 @@ void loop(){
     EEPROM.write(33, 'J'); 
     EEPROM.write(34, 'M');
     EEPROM.write(35, 'B');
+    
     //Commit changes
     EEPROM.commit();
     
     //To make sure evrything is ok, verify the EEPROM data.
     Serial.println(F("Verify EEPROM data"));
     vTaskDelay(1000 / portTICK_PERIOD_MS);
-    if(centerChannel1 != ((EEPROM.read(1) << 8) | EEPROM.read(0)))error = 1;
-    if(centerChannel2 != ((EEPROM.read(3) << 8) | EEPROM.read(2)))error = 1;
-    if(centerChannel3 != ((EEPROM.read(5) << 8) | EEPROM.read(4)))error = 1;
-    if(centerChannel4 != ((EEPROM.read(7) << 8) | EEPROM.read(6)))error = 1;
+    if(centerChannel1 != ((EEPROM.read(1) << 8) | EEPROM.read(0))){error = 1;Serial.println("centerChannel1");}
+    if(centerChannel2 != ((EEPROM.read(3) << 8) | EEPROM.read(2))){error = 1;Serial.println("centerChannel2");}
+    if(centerChannel3 != ((EEPROM.read(5) << 8) | EEPROM.read(4))){error = 1;Serial.println("centerChannel3");}
+    if(centerChannel4 != ((EEPROM.read(7) << 8) | EEPROM.read(6))){error = 1;Serial.println("centerChannel4");}
     
-    if(highChannel1 != ((EEPROM.read(9) << 8) | EEPROM.read(8)))error = 1;
-    if(highChannel2 != ((EEPROM.read(11) << 8) | EEPROM.read(10)))error = 1;
-    if(highChannel3 != ((EEPROM.read(13) << 8) | EEPROM.read(12)))error = 1;
-    if(highChannel4 != ((EEPROM.read(15) << 8) | EEPROM.read(14)))error = 1;
+    if(highChannel1 != ((EEPROM.read(9) << 8) | EEPROM.read(8))){error = 1;Serial.println("highChannel1");}
+    if(highChannel2 != ((EEPROM.read(11) << 8) | EEPROM.read(10))){error = 1;Serial.println("highChannel2");}
+    if(highChannel3 != ((EEPROM.read(13) << 8) | EEPROM.read(12))){error = 1;Serial.println("highChannel3");}
+    if(highChannel4 != ((EEPROM.read(15) << 8) | EEPROM.read(14))){error = 1;Serial.println("highChannel4");}
     
-    if(lowChannel1 != ((EEPROM.read(17) << 8) | EEPROM.read(16)))error = 1;
-    if(lowChannel2 != ((EEPROM.read(19) << 8) | EEPROM.read(18)))error = 1;
-    if(lowChannel3 != ((EEPROM.read(21) << 8) | EEPROM.read(20)))error = 1;
-    if(lowChannel4 != ((EEPROM.read(23) << 8) | EEPROM.read(22)))error = 1;
+    if(lowChannel1 != ((EEPROM.read(17) << 8) | EEPROM.read(16))){error = 1;Serial.println("lowChannel1");}
+    if(lowChannel2 != ((EEPROM.read(19) << 8) | EEPROM.read(18))){error = 1;Serial.println("lowChannel2");}
+    if(lowChannel3 != ((EEPROM.read(21) << 8) | EEPROM.read(20))){error = 1;Serial.println("lowChannel3");}
+    if(lowChannel4 != ((EEPROM.read(23) << 8) | EEPROM.read(22))){error = 1;Serial.println("lowChannel4");}
     
-    if(channel1Assign != EEPROM.read(24))error = 1;
-    if(channel2Assign != EEPROM.read(25))error = 1;
-    if(channel3Assign != EEPROM.read(26))error = 1;
-    if(channel4Assign != EEPROM.read(27))error = 1;
+    if(channel1Assign != EEPROM.read(24)){error = 1;Serial.println("channel1Assign");}
+    if(channel2Assign != EEPROM.read(25)){error = 1;Serial.println("channel2Assign");}
+    if(channel3Assign != EEPROM.read(26)){error = 1;Serial.println("channel3Assign");}
+    if(channel4Assign != EEPROM.read(27)){error = 1;Serial.println("channel4Assign");}
     
-    if(rollAxis != EEPROM.read(28))error = 1;
-    if(pitchAxis != EEPROM.read(29))error = 1;
-    if(yawAxis != EEPROM.read(30))error = 1;
-    if(type != EEPROM.read(31))error = 1;
-    if(gyroAddress != EEPROM.read(32))error = 1;
+    if(rollAxis != EEPROM.read(28)){error = 1;Serial.println("rollAxis");}
+    if(pitchAxis != EEPROM.read(29)){error = 1;Serial.println("pitchAxis");}
+    if(yawAxis != EEPROM.read(30)){error = 1;Serial.println("yawAxis");}
+    if(type != EEPROM.read(31)){error = 1;Serial.println("type");}
+    if(gyroAddress != EEPROM.read(32)){error = 1;Serial.println("gyroAddress");}
     
-    if('J' != EEPROM.read(33))error = 1;
-    if('M' != EEPROM.read(34))error = 1;
-    if('B' != EEPROM.read(35))error = 1;
+    if('J' != EEPROM.read(33)){error = 1;Serial.println("j");}
+    if('M' != EEPROM.read(34)){error = 1;Serial.println("m");}
+    if('B' != EEPROM.read(35)){error = 1;Serial.println("b");}
   
     if(error == 1)Serial.println(F("EEPROM verification failed!!! (ERROR 5)"));
-    else Serial.println(F("Verification done"));
+    else{
+      Serial.println(F("Verification done"));
 
-    
-    Serial.println("");
-    Serial.println("========================================");    
-    Serial.println("EEPROM DATA");   
-    Serial.println(); 
-    for(int i = 0; i < EEPROM_SIZE; i++){
-      Serial.println(EEPROM.read(i));
+      Serial.println("");
+      Serial.println("========================================");    
+      Serial.println("EEPROM DATA");   
+      Serial.println(); 
+      for(int i = 0; i < EEPROM_SIZE; i++){
+        Serial.println(EEPROM.read(i));
+      }
     }
     
   }
@@ -502,9 +575,7 @@ void loop(){
     Serial.println(F("You can now calibrate the esc's and upload the YMFC-AL code."));
   }
   else{
-   Serial.println(F("The setup is aborted due to an error."));
-   Serial.println(F("Check the Q and A page of the YMFC-AL project on:"));
-   Serial.println(F("www.brokking.net for more information about this error."));
+   Serial.println(F("The setup is aborted."));
   }
   while(1);
 }
@@ -702,14 +773,16 @@ void wait_sticks_zero(){
 
 //Check if the receiver values are valid within 10 seconds
 void wait_for_receiver(){
-  byte zero = 0;
+ Serial.printf("Wait for receiver\n");
+
+   byte zero = 0;
   timer = millis() + 10000;
   while(timer > millis() && zero < 15){
     if(receiverInputChannel1 < 2100 && receiverInputChannel1 > 900)zero |= 0b00000001;
     if(receiverInputChannel2 < 2100 && receiverInputChannel2 > 900)zero |= 0b00000010;
     if(receiverInputChannel3 < 2100 && receiverInputChannel3 > 900)zero |= 0b00000100;
     if(receiverInputChannel4 < 2100 && receiverInputChannel4 > 900)zero |= 0b00001000;
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    delay(500);
     Serial.print(F("."));
   }
   if(zero == 0){
@@ -718,6 +791,7 @@ void wait_for_receiver(){
     Serial.println(F("No valid receiver signals found!!! (ERROR 1)"));
   }
   else Serial.println(F(" OK"));
+ 
 }
 
 //Register the min and max receiver values and exit when the sticks are back in the neutral position
@@ -811,54 +885,6 @@ void check_gyro_axes(byte movement){
   if(movement == 2) pitchAxis = triggerAxis;
   if(movement == 3) yawAxis = triggerAxis;
 }
-
-void myISR(){
-      currentTime = micros();
-      //Channel 1=========================================
-      if(digitalRead(PIN_RECEIVER_1) == HIGH){                                                     //Is input 8 high?
-          if(lastChannel1 == 0){                                                //Input 8 changed from 0 to 1.
-              lastChannel1 = 1;                                                   //Remember current input state.
-              timer1 = currentTime;                                               //Set timer1 to currentTime.
-          }
-      }
-      else if(lastChannel1 == 1){                                             //Input 8 is not high and changed from 1 to 0.
-          lastChannel1 = 0;                                                     //Remember current input state.
-          receiverInputChannel1 = currentTime - timer1;                             //Channel 1 is currentTime - timer1.
-      }
-      //Channel 2=========================================
-      if(digitalRead(PIN_RECEIVER_2) == HIGH){                                                    //Is input 9 high?
-          if(lastChannel2 == 0){                                                //Input 9 changed from 0 to 1.
-              lastChannel2 = 1;                                                   //Remember current input state.
-              timer2 = currentTime;                                               //Set timer2 to currentTime.
-          }
-      }
-      else if(lastChannel2 == 1){                                             //Input 9 is not high and changed from 1 to 0.
-          lastChannel2 = 0;                                                     //Remember current input state.
-          receiverInputChannel2 = currentTime - timer2;                             //Channel 2 is currentTime - timer2.
-      }
-      //Channel 3=========================================
-      if(digitalRead(PIN_RECEIVER_3) == HIGH){                                                    //Is input 10 high?
-          if(lastChannel3 == 0){                                                //Input 10 changed from 0 to 1.
-              lastChannel3 = 1;                                                   //Remember current input state.
-              timer3 = currentTime;                                               //Set timer3 to currentTime.
-          }
-      }
-      else if(lastChannel3 == 1){                                             //Input 10 is not high and changed from 1 to 0.
-          lastChannel3 = 0;                                                     //Remember current input state.
-          receiverInputChannel3 = currentTime - timer3;                             //Channel 3 is currentTime - timer3.
-      }
-      //Channel 4=========================================
-      if(digitalRead(PIN_RECEIVER_4) == HIGH){                                                    //Is input 11 high?
-          if(lastChannel4 == 0){                                                //Input 11 changed from 0 to 1.
-              lastChannel4 = 1;                                                   //Remember current input state.
-              timer4 = currentTime;                                               //Set timer4 to currentTime.
-          }
-      }
-      else if(lastChannel4 == 1){                                             //Input 11 is not high and changed from 1 to 0.
-          lastChannel4 = 0;                                                     //Remember current input state.
-          receiverInputChannel4 = currentTime - timer4;                             //Channel 4 is currentTime - timer4.
-      }
-  }
 
 //Intro subroutine
 void intro(){

@@ -158,7 +158,7 @@ const char* I_ALTITUDE_GET       = "altitudeI";
 const char* D_ALTITUDE_GET       = "altitudeD";
 
 //           (TX)
-const int dataTransferSize       = 5;
+const int dataTransferSize       = 9;
 float dataTransfer[dataTransferSize];
 
 //            (RX)
@@ -190,7 +190,7 @@ struct trimPosition{
 byte flightMode;                                           // 1 = only auto leveling (or nothing if AUTO_LEVELING = false), 2 = altitude hold
 
 // very global
-byte eepromData[36], errWire;
+byte eepromData[EEPROM_SIZE], errWire;
 int16_t calInt, start;
 int error;
 
@@ -233,7 +233,7 @@ float batteryVoltage, batteryPercent;
 float pressure, altitudeMeasure;
 float temperature;
 uint8_t barometerCounter;
-float actualPressure, actualPressureSlow, actualPressureFast, actualPressureDiff;
+float actualPressure, actualPressureSlow, actualPressureFast, actualPressureDiff, pressureForPID;
 
 // BMP280 Wire.read() values
 uint16_t dig_P1, dig_T1;

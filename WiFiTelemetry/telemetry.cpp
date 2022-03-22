@@ -1,9 +1,9 @@
 /**
  * @file telemetry.cpp
  * @author @sebastiano123-c
- * @brief Telemtry and PID routines.
+ * @brief telemetry routines
  * @version 0.1
- * @date 2022-03-01
+ * @date 2022-02-23
  * 
  * @copyright Copyright (c) 2022
  * 
@@ -42,21 +42,43 @@ void updatePID(){
 void writeDataTransfer(){
 
   //Serial.printf("I'm sending...\n"); 
-  updatePID();
+  // updatePID();
 
   // print in csv format
-  int i=0;
-  for(i = 0; i < dataControllerSize - 1; i++){
-    SUART.printf("%.6f,", dataController[i]);
-  }
-  SUART.printf("%.6f\n", dataController[dataControllerSize - 1]);
+  const char * stringToPrint = "";
+  static char charToPrint[500];
+  char * ptr = charToPrint;
+
+  ptr += sprintf(ptr, "%.6f,", PID_P_GAIN_ROLL);
+  ptr += sprintf(ptr, "%.6f,", PID_I_GAIN_ROLL);
+  ptr += sprintf(ptr, "%.6f,", PID_D_GAIN_ROLL);
+  ptr += sprintf(ptr, "%.6f,", PID_P_GAIN_YAW);
+  ptr += sprintf(ptr, "%.6f,", PID_I_GAIN_YAW);
+  ptr += sprintf(ptr, "%.6f,", PID_D_GAIN_YAW);
+  ptr += sprintf(ptr, "%.6f,", GYROSCOPE_ROLL_FILTER);
+  ptr += sprintf(ptr, "%.6f,", GYROSCOPE_ROLL_CORR);
+  ptr += sprintf(ptr, "%.6f,", GYROSCOPE_PITCH_CORR);
+  ptr += sprintf(ptr, "%.6f,", PID_P_GAIN_ALTITUDE);
+  ptr += sprintf(ptr, "%.6f,", PID_I_GAIN_ALTITUDE);
+  ptr += sprintf(ptr, "%.6f", PID_D_GAIN_ALTITUDE);
+
+  ptr += 0;
+
+  stringToPrint = (const char*)charToPrint;
+  SUART.println(stringToPrint);
+
+  // int i=0;
+  // for(i = 0; i < dataControllerSize - 1; i++){
+  //   SUART.printf("%.6f,", dataController[i]);
+  // }
+  // SUART.printf("%.6f\n", dataController[dataControllerSize - 1]);
 }
 
 
 void readDataTransfer(){
-    if(SUART.available()>0){
+    if(SUART.available() > 0){
         // declair index array
-        int indices[dataTransferSize-1];
+        int indices[dataTransferSize - 1];
         String str = "";
         
         // read from serial
@@ -64,7 +86,9 @@ void readDataTransfer(){
         str = SUART.readStringUntil('\n');
         //Serial.println(str);
 
-        // find posistion of the last > and the last <
+        // appendFile(SD_MMC, "/debug/log.txt", (str+"\n").c_str());
+
+        // find position of the last <
         int posStart = str.lastIndexOf('<') + 1;
         
         // find positions of ","
@@ -83,11 +107,16 @@ void readDataTransfer(){
         dataTransfer[dataTransferSize - 1] = str.substring(indices[dataTransferSize - 2] + 1 ).toFloat();
         
         // fill data structure after receiving
-        rollAngle = dataTransfer[0];
-        pitchAngle = dataTransfer[1];
-        flightMode = dataTransfer[2];
+        rollAngle         = dataTransfer[0];
+        pitchAngle        = dataTransfer[1];
+        flightMode        = dataTransfer[2];
         batteryPercentage = dataTransfer[3];
-        altitudeMeasure = dataTransfer[4];
+        altitudeMeasure   = dataTransfer[4];
+
+        rollTrim          = dataTransfer[5];
+        pitchTrim         = dataTransfer[6];
+        yawTrim           = dataTransfer[7];
+        throttleTrim      = dataTransfer[8];
         
         //  // print in csv format   
         //  for(int i = 0; i < dataTransferSize; i++){
