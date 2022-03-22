@@ -33,11 +33,10 @@
 <h2>
 <b><ins><i>Disclaimer</i></ins></b>
 </h2>
-The code is not well tested yet, use it if you are an expert at your own risk.
+The device you are programming can be dangerous, use this code if you are an expert at your own risk.
+Thus, *test it first without propellers*.
 
-Test it first without propellers.
-
-Read carefully this brief documentation before starting to fly.
+Read carefully this documentation before starting to fly.
 Make sure to do all the passages described here below.
 
 # **Table of contents**
@@ -64,6 +63,7 @@ Make sure to do all the passages described here below.
   - [**Connection using ESP32-CAM**](#connection-using-esp32-cam)
     - [**SD card for data storage**](#sd-card-for-data-storage)
 - [**Roadmap**](#roadmap)
+- [**Previous version**](#previous-version)
 - [**Author**](#author)
 
 # **Usage**
@@ -73,7 +73,8 @@ Clone this repo
 or download the .zip file.
 
 # **Description**
-Based on the [YMFC-AL](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
+The code is intended to be used with PlatformIO.
+Based on the [YMFC](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
 * ESP32 D1 R32 board, like [this](https://github.com/sebastiano123-c/Motorize-a-1980-telescope/blob/main/Setup/D1%20R32%20Board%20Pinout.pdf);
 * gyroscope MPU6050;
 * radio controller and a receiver (_e.g._ FlySky);
@@ -154,16 +155,18 @@ The resistance R1 = 330 is used for the LED.
 After building the circuit, place it on the drone and proceed with the following passages.
 
 ## **Pinmap**
-Check that your pinmap corresponds to the one defined in the [pinmap](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/pinmaps) folder, otherwise change it.
+Check that your pinmap corresponds to the one defined in the [pinmap](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/include/pinmaps) folder, otherwise change it.
 
 ## **Configuration**
-Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/Config.h) file where you can set the hardware components, the battery minimum voltage, the sensors you use and others.
+Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/Config.h) file where you can set the hardware components, the battery minimum voltage, the sensors you use and others.
 
 ## **Setup**
-Upload the [setup](https://github.com/sebastiano123-c/DroneIno/tree/main/Setup) sketch to your board and run it.
+Write "UPLOADED_SKETCH  SETUP" in the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/Config.h) and upload the sketch to your board.
 
 ## **Calibration**
-If the setup sketch exits with succeed, upload the [calibration](https://github.com/sebastiano123-c/DroneIno/tree/main/Calibration) sketch. Send the following characters to the serial monitor:
+If the setup sketch exits with succeed, write "UPLOADED_SKETCH  CALIBRATION" in the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/Config.h) and upload the sketch.
+
+Send the following characters to the serial monitor:
 * **r** to check if the transmitter signal is decoded correctly; move the trim and check that:
   * throttle: low 1000us| full    2000us;
   * roll:     left 1000us| right 2000us;
@@ -196,7 +199,7 @@ Send the number of the motor to the serial and read the accelerometer measuremen
 Try to lower these numbers by adding some scotch.
 
 ## **Flight controller**
-Finally, upload the [DroneIno](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno) flight-controller.
+Finally, write "UPLOADED_SKETCH  FLIGHT_CONTROLLER" in the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/Config.h) and upload the sketch.
 
 <ins>_Try first without the propellers!_</ins>
 
@@ -352,6 +355,10 @@ Future improvements:
 - flight plan and autonomous flight
 - Gimbal CAM
 - use other boards
+
+# **Previous version**
+The first version of DroneIno is [here](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/test/DroneIno.zip).
+It is intended to work with Arduino IDE.
 
 # **Author**
 Sebastiano Cocchi
