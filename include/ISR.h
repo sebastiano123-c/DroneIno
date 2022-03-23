@@ -69,7 +69,7 @@ void myISR(){
   }
 
   
-  // channel 5                                              
+  // channel 0 is the FLIGHT MODE                                              
   if(digitalRead(PIN_RECEIVER_5) == HIGH){                          //Is RECEIVER input high?
       if(lastChannel5 == 0){                                                //Input 11 changed from 0 to 1.
           lastChannel5 = 1;                                                   //Remember current input state.
@@ -78,6 +78,6 @@ void myISR(){
   }
   else if(lastChannel5 == 1){                                             //Input 11 is not high and changed from 1 to 0.
       lastChannel5 = 0;                                                     //Remember current input state.
-      trimCh[5].actual = currentTime - timer5;                             //Channel 4 is currentTime - timer4.
+      trimCh[0].actual = currentTime - timer5;                             //Channel 4 is currentTime - timer4.
   }
 }

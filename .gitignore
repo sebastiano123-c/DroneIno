@@ -4,3 +4,6 @@
 .vscode/launch.json
 .vscode/ipch
 .vscode
+
+test/*
+!test/DroneIno.zip

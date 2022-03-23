@@ -51,8 +51,10 @@ void setPID(){
  */
 void calculatePID(){
 
+
   //set PID parameters
   setPID();
+
 
   //Roll calculations
   pidErrorTemp = gyroRollInput - pidRollSetpoint;
@@ -89,4 +91,5 @@ void calculatePID(){
   else if(pidOutputYaw < PID_MAX_YAW * -1)pidOutputYaw = PID_MAX_YAW * -1;
 
   pidLastYawDError = pidErrorTemp;
+
 }

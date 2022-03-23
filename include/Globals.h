@@ -4,13 +4,13 @@
  * @brief Global variables used in all the project.
  * 
  * Global variables are divided here into:
- *  - PID: roll, yaw, pitch and altitude;
- *  - GYROSCOPE: low/high filter percentage, pitch and roll correction;
- *  - PWM channels: for the use of the ledWrite;
- *  - BATTERY: battery constants and calculation of the battery level;
- *  - ALTIMETER: constants;
- *  - TELEMETRY: data transfer and data controller size and array;
- *  - UNDEFINED: variables not yet defined;
+ *  @li PID: roll, yaw, pitch and altitude;
+ *  @li GYROSCOPE: low/high filter percentage, pitch and roll correction;
+ *  @li PWM channels: for the use of the ledWrite;
+ *  @li BATTERY: battery constants and calculation of the battery level;
+ *  @li ALTIMETER: constants;
+ *  @li TELEMETRY: data transfer and data controller size and array;
+ *  @li UNDEFINED: variables not yet defined;
  * 
  * @version 0.1
  * @date 2022-02-28
@@ -26,10 +26,11 @@
  * 
  */
 
+
 //    (ROLL)
-float PID_P_GAIN_ROLL            = 1.0;                      //Gain setting for the roll P-controller (1.3)
-float PID_I_GAIN_ROLL            = 0.000001;                 //Gain setting for the roll I-controller  (0.0002)
-float PID_D_GAIN_ROLL            = 10.0;                     //Gain setting for the roll D-controller (10.0)
+float PID_P_GAIN_ROLL            = 1.1;                      //Gain setting for the roll P-controller (1.3)
+float PID_I_GAIN_ROLL            = 0.0015;                   //Gain setting for the roll I-controller  (0.0002)
+float PID_D_GAIN_ROLL            = 15.0;                     //Gain setting for the roll D-controller (10.0)
 int PID_MAX_ROLL                 = 400;                      //Maximum output of the PID-controller   (+/-)
                                                                         
 //    (PITCH)                                              
@@ -39,8 +40,8 @@ float PID_D_GAIN_PITCH           = PID_D_GAIN_ROLL;          //Gain setting for 
 int PID_MAX_PITCH                = PID_MAX_ROLL;             //Maximum output of the PID-controller   (+/-)
                                                                             
 //    (YAW)                                          
-float PID_P_GAIN_YAW             = 0.7;                      //Gain setting for the pitch P-controller. (2.0)
-float PID_I_GAIN_YAW             = 0.05;                     //Gain setting for the pitch I-controller. (0.04)
+float PID_P_GAIN_YAW             = 3.0;                      //Gain setting for the pitch P-controller. (2.0)
+float PID_I_GAIN_YAW             = 0.07;                     //Gain setting for the pitch I-controller. (0.04)
 float PID_D_GAIN_YAW             = 0.0;                      //Gain setting for the pitch D-controller. (0.0)
 int PID_MAX_YAW                  = 400;                      //Maximum output of the PID-controller     (+/-)
                                                                                
@@ -57,7 +58,7 @@ int PID_MAX_ALTITUDE             = 400;                      //Maximum output of
  */
 
 //    (FILTER)                                                                    
-float GYROSCOPE_ROLL_FILTER      = 0.96;                      // read your gyroscope data after the calibration, try different values and choose the best one
+float GYROSCOPE_ROLL_FILTER      = 0.999;                      // read your gyroscope data after the calibration, try different values and choose the best one
 float GYROSCOPE_PITCH_FILTER     = GYROSCOPE_PITCH_FILTER;     // read your gyroscope data after the calibration, try different values and choose the best one
 float GYROSCOPE_ROLL_CORR        = 0.;                         // (0.) after set GYROSCOPE_ROLL_FILTER, put here the angle roll you read eneabling DEBUG
 float GYROSCOPE_PITCH_CORR       = 0.;                         // (-1.65.) after set GYROSCOPE_PITCH_FILTER, put here the angle pitch you read eneabling DEBUG
@@ -103,20 +104,35 @@ const int HALF_DUTY_CYCLE        = (int)(0.5*MAX_DUTY_CYCLE);
  */
 
 //    (CIRCUIT SPECIFICS)
-const int DIODE_DROP             = 700;                                   //generally it is -0.7V
+const int DIODE_DROP             = 700;                                   // generally it is -0.7V
 float res3                       = 2.5;                                   // resistance between Vin and vout
 float res2                       = 1.;                                    // load resistance
 float totalDrop                  = res2 / (res2 + res3);                  // IMPORTANT: this is in my case, you have to calculate YOUR total drop
 
 //     (DIGITAL PINS ACCURACY)
+//     Boards measure the pin inputs signals with a certain digit precision, which is adcBits.
+//     maximumWidth is the maximum width the board can measure.
 uint8_t adcBits                  = 12;                                    // (bits) of width when measuring the voltage
 float maximumWidth               = pow(2., (float)adcBits)-1;             // maximum width that the pin can read
 
 //     (CALCULATIONS)
+//     Microcontrollers calculates the input voltage giving a signal output in the range (0., maximumWidth).
+//     fromVtoWidth converts the width to voltage of the signal.
+//     This signal is by the way dropped by your voltage partitor. Thus, maxBatteryLevelDropped is the measure of maximum voltage after the partitor
+//     The correction factor is calculated because some boards accepts 5v input, others 3v3.
+//     Finally, minBatteryLevelThreshold is the board minimum voltage under which it is not safe to go. 
 double fromVtoWidth              = maximumWidth / (double)BOARD_LIMIT_VOLTAGE;
 double maxBatteryLevelDropped    = (double)(MAX_BATTERY_VOLTAGE-DIODE_DROP) * totalDrop;
 double correctionBattery         = (double)BOARD_LIMIT_VOLTAGE/maxBatteryLevelDropped;
 double minBatteryLevelThreshold  = ((double)MIN_BATTERY_VOLTAGE-(double)DIODE_DROP) * totalDrop * correctionBattery;
+
+//     (BATTERY COMPENSATION*)
+//     WORK IN PROGRESS: use these parameters only, or vary by small steps
+//     In the first flight use the parameters here.
+//     STUDY THIS: After a complete flight experience, using the esp-cam telemetryAnalysis tool, you can analyse the data readings saved on your SD.
+//     The analysis program fits the battery data (the plot on the bottom right) and gives you the m rect pendency and the intercept b.
+//     Use put here the results.
+float  batteryCurvePendency      = 1.7e-2;                                 // compensate the rotors power loss when battery drops down
 
 
 /**
@@ -165,12 +181,6 @@ const int dataControllerSize     = 12;
 float dataController[dataControllerSize];
 
 
-
-// // esp-now telemetry
-// uint8_t broadcastAddress[] = {0x58, 0xBF, 0x25, 0x82, 0x4D, 0x08}; // RECEIVER MAC Address
-// // Create an Event Source on /events
-// AsyncEventSource events("/events");
-
 /**
  * @brief NOT DECLARED VARIABLES
  * 
@@ -183,7 +193,7 @@ struct trimPosition{
   int16_t center;                                          // center value for the specific receiver input channel
   int16_t high;                                            // high value for the specific receiver input channel
   int16_t actual;                                          // instantaneous receiver value
-} trimCh[6];
+} trimCh[5];
 
 // flight mode
 byte flightMode;                                           // 1 = only auto leveling (or nothing if AUTO_LEVELING = false), 2 = altitude hold
@@ -228,7 +238,7 @@ float rollLevelAdjust, pitchLevelAdjust;
 long accTotalVector;
 
 // battery
-float batteryVoltage, batteryPercent;
+float batteryVoltage, batteryVoltageV;
 
 // altitude sensor
 float pressure, altitudeMeasure;
@@ -245,3 +255,9 @@ unsigned long int tempRaw, presRaw;
 signed long int tFine;
 signed long int tempCal;
 unsigned long int pressCal;
+
+
+// // esp-now telemetry
+// uint8_t broadcastAddress[] = {0x58, 0xBF, 0x25, 0x82, 0x4D, 0x08}; // RECEIVER MAC Address
+// // Create an Event Source on /events
+// AsyncEventSource events("/events");

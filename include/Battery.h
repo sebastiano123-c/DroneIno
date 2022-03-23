@@ -76,7 +76,7 @@ void batteryVoltageCompensation(){
   // The battery voltage is needed for compensation.
   batteryVoltage = batteryVoltage * 0.92 + analogRead(PIN_BATTERY_LEVEL) / fromVtoWidth * 0.08;
  // batteryPercent = batteryVoltage / correctionBattery / maxBatteryLevelDropped;
-  batteryPercent = fromWidthToVBattery(batteryVoltage)/1e3;///correctionBattery/maxBatteryLevelDropped;
+  batteryVoltageV = fromWidthToVBattery(batteryVoltage)/1e3;///correctionBattery/maxBatteryLevelDropped;
 
 //  if(DEBUG) {
 //    Serial.print("batteryVoltage: "); Serial.print(batteryVoltage);

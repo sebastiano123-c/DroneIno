@@ -237,6 +237,8 @@ void calculateAnglePRY(){
     rollLevelAdjust = 0;                                                     //Set the roll angle correcion to zero.
   }
 
-  if(DEBUG) printGyroscopeStatus();                                          //print gyro status
+  // #if DEBUG == true
+  //   printGyroscopeStatus();                                                  //print gyro status
+  // #endif
   
 }

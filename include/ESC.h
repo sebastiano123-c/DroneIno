@@ -35,21 +35,29 @@ void droneStart(){
 */
 void setEscPulses(){
 
-  throttle = receiverInputChannel3;                                   //We need the throttle signal as a base signal.
+  throttle = receiverInputChannel3;                                 //We need the throttle signal as a base signal.
 
   switch(start){
     case 2:
+      
+      // set throttle for altitude hold
+      if (flightMode >= 2) {                                         //If altitude mode is active.
+        throttle = 1500 + pidOutputAltitude;                           // add the altitude hold
+      }
+
       if (throttle > 1800) throttle = 1800;                            //We need some room to keep full control at full throttle.
+
       esc1 = throttle - pidOutputPitch + pidOutputRoll - pidOutputYaw; //Calculate the pulse for esc 1 (front-right - CCW)
       esc2 = throttle + pidOutputPitch + pidOutputRoll + pidOutputYaw; //Calculate the pulse for esc 2 (rear-right - CW)
       esc3 = throttle + pidOutputPitch - pidOutputRoll - pidOutputYaw; //Calculate the pulse for esc 3 (rear-left - CCW)
       esc4 = throttle - pidOutputPitch - pidOutputRoll + pidOutputYaw; //Calculate the pulse for esc 4 (front-left - CW)
 
-      if (batteryVoltage > 800 && batteryVoltage < 1240){              //Is the battery connected?
-        esc1 += esc1 * ((1240 - batteryVoltage)/(float)3500);          //Compensate the esc-1 pulse for voltage drop.
-        esc2 += esc2 * ((1240 - batteryVoltage)/(float)3500);          //Compensate the esc-2 pulse for voltage drop.
-        esc3 += esc3 * ((1240 - batteryVoltage)/(float)3500);          //Compensate the esc-3 pulse for voltage drop.
-        esc4 += esc4 * ((1240 - batteryVoltage)/(float)3500);          //Compensate the esc-4 pulse for voltage drop.
+      if (batteryVoltageV > 2. && batteryVoltageV < 10.7){              // Is the battery connected?
+        int16_t escCorrection = (int16_t)((10.7 - batteryVoltageV)/batteryCurvePendency);// Compensate the esc-1 pulse for voltage drop.
+        esc1 += escCorrection;                                         // Compensate the esc-1 pulse for voltage drop.
+        esc2 += escCorrection;                                         // Compensate the esc-2 pulse for voltage drop.
+        esc3 += escCorrection;                                         // Compensate the esc-3 pulse for voltage drop.
+        esc4 += escCorrection;                                         // Compensate the esc-4 pulse for voltage drop.
       }
 
       if (esc1 < 1100) esc1 = 1100;                                    //Keep the motors running.
@@ -75,6 +83,12 @@ void setEscPulses(){
   ledcWrite(pwmChannel2, (float)esc2/2000.*(float)MAX_DUTY_CYCLE);
   ledcWrite(pwmChannel3, (float)esc3/2000.*(float)MAX_DUTY_CYCLE);
   ledcWrite(pwmChannel4, (float)esc4/2000.*(float)MAX_DUTY_CYCLE);
+
+  // Serial.printf("%i   %i   %i   %i \n", 
+  //   (uint32_t)(((float)esc1/2000.)*MAX_DUTY_CYCLE), 
+  //   (uint32_t)(((float)esc2/2000.)*MAX_DUTY_CYCLE), 
+  //   (uint32_t)(((float)esc3/2000.)*MAX_DUTY_CYCLE), 
+  //   (uint32_t)(((float)esc4/2000.)*MAX_DUTY_CYCLE));
 }
 
 /**

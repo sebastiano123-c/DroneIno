@@ -379,12 +379,12 @@
     sptr += sprintf(sptr, "<%.6f,", angleRoll);
     sptr += sprintf(sptr, "%.6f,", anglePitch);
     sptr += sprintf(sptr, "%x,", flightMode);
-    sptr += sprintf(sptr, "%.6f,", batteryPercent);
+    sptr += sprintf(sptr, "%.6f,", batteryVoltageV);
     sptr += sprintf(sptr, "%.6f,", altitudeMeasure);
-    sptr += sprintf(sptr, "%i,", receiverInputChannel1);
-    sptr += sprintf(sptr, "%i,", receiverInputChannel2);
-    sptr += sprintf(sptr, "%i,", receiverInputChannel4);
-    sptr += sprintf(sptr, "%i>", receiverInputChannel3);
+    sptr += sprintf(sptr, "%i,", esc1);
+    sptr += sprintf(sptr, "%i,", esc2);
+    sptr += sprintf(sptr, "%i,", esc4);
+    sptr += sprintf(sptr, "%i>", esc3);
 
     // close the string
     *sptr++ = 0;
@@ -458,7 +458,6 @@
     PID_P_GAIN_ALTITUDE = dataController[9];
     PID_I_GAIN_ALTITUDE = dataController[10];
     PID_D_GAIN_ALTITUDE = dataController[11];
-
 
     
     // print in csv format   

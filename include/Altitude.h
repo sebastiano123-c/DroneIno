@@ -253,7 +253,7 @@
  * The manualAltitudeChange variable will indicate if the altitude of the quadcopter is changed by the pilot.
  * 
  */
-void calculateAltitudeAdjustementPID(){
+void calculateAltitudeAdjustmentPID(){
 
   pressureForPID = pressure;                                                   // pressure value used for the PID calculations
   
@@ -306,53 +306,51 @@ void calculateAltitudeHold(){
   // the barometric readings happen in two subsequent loops. This counter is needed for this
   barometerCounter ++;
 
-  switch (barometerCounter)
-  {                                                                                  //When the barometerCounter variable is 1.
+  switch (barometerCounter){                                                                                  
 
-  case 1:
+    case 1:                                                                            //When the barometerCounter variable is 1.
 
-    readPressureData();                                                              //Get pressure data
-    break;
+      readPressureData();                                                              //Get pressure data
+      break;
 
-  case 2:                                                                            //When the barometer counter is 2   
+    case 2:                                                                            //When the barometer counter is 2   
 
-    tempCal = calibration_T(tempRaw);
-    pressCal = calibration_P(presRaw);
-    temperature = (double)tempCal / 100.0;
-    pressure = (double)pressCal / 100.0;
-    altitudeMeasure = 44330 * (1 - pow( ((float)pressure/PRESSURE_SEA_LEVEL), (1/5.255)) );
+      tempCal = calibration_T(tempRaw);
+      pressCal = calibration_P(presRaw);
+      temperature = (double)tempCal / 100.0;
+      pressure = (double)pressCal / 100.0;
+      altitudeMeasure = 44330 * (1 - pow( ((float)pressure/PRESSURE_SEA_LEVEL), (1/5.255)) );
 
-    smoothPressureReadings();                                                        //remove the spikes from the barometer data
-    
-    barometerCounter = 0;                                                            //Set the barometer counter to 0 for the next measurements.
-    
-    //If the altitude hold function is disabled some variables need to be reset to ensure a bumpless start when the altitude hold function is activated again.
-    switch (flightMode)
-    {
+      smoothPressureReadings();                                                        //remove the spikes from the barometer data
+      
+      barometerCounter = 0;                                                            //Set the barometer counter to 0 for the next measurements.
+      
+      //If the altitude hold function is disabled some variables need to be reset to ensure a bumpless start when the altitude hold function is activated again.
+      switch (flightMode) {
 
-    case 1:
+        case 1:
 
-      if(abs(pidAltitudeSetpoint) > 1e-8){                                            // if pidAltitudeSetpoint != 0
-        pidAltitudeSetpoint = 0;                                                      //Reset the PID altitude setpoint.
-        pidOutputAltitude = 0;                                                        //Reset the output of the PID controller.
-        pidIMemAltitude = 0;                                                          //Reset the I-controller.
-        manualThrottle = 0;                                                           //Set the manualThrottle variable to 0 .
-        manualAltitudeChange = 1;                                                     //Set the manualAltitudeChange to 1.
+          if(abs(pidAltitudeSetpoint) > 1e-8){                                            // if pidAltitudeSetpoint != 0
+            pidAltitudeSetpoint = 0;                                                      //Reset the PID altitude setpoint.
+            pidOutputAltitude = 0;                                                        //Reset the output of the PID controller.
+            pidIMemAltitude = 0;                                                          //Reset the I-controller.
+            manualThrottle = 0;                                                           //Set the manualThrottle variable to 0 .
+            manualAltitudeChange = 1;                                                     //Set the manualAltitudeChange to 1.
+          }
+
+          break;
+        
+        default:    // if flightMode != 1                                                  //If the quadcopter is in altitude mode and flying.
+
+          if (abs(pidAltitudeSetpoint) < 1e-8) pidAltitudeSetpoint = actualPressure;       //If not yet set, set the PID altitude setpoint.
+
+          calculateAltitudeAdjustmentPID();
+        
       }
 
       break;
-    
-    default:    // if flightMode != 1                                                  //If the quadcopter is in altitude mode and flying.
 
-      if (abs(pidAltitudeSetpoint) < 1e-8) pidAltitudeSetpoint = actualPressure;       //If not yet set, set the PID altitude setpoint.
-
-      calculateAltitudeAdjustementPID();
-      
-    }
-
-    break;
-
-  default:                                                                            // if barometerCounter is neither 1 or 2
-    barometerCounter = 1;
+    default:                                                                            // if barometerCounter is neither 1 or 2
+      barometerCounter = 1;
   }
 }

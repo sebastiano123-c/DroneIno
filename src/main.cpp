@@ -130,7 +130,6 @@
       if(error == 0)
          checkLed();
 
-   // while(1);// {Serial.println(trimCh[2].actual); delay(100);}
 
       // update EEPROM
       if(error == 0)
@@ -321,13 +320,13 @@
    void loop() {                                           // loop runs at 250Hz => each loop lasts 4000us
 
       // select mode via SWC of the controller:
-      if      (trimCh[5].actual < 1050) flightMode = 1;    // SWC UP: no mode on, (only auto leveling if enabled)
+      if      (trimCh[0].actual < 1050) flightMode = 1;    // SWC UP: no mode on, (only auto leveling if enabled)
 
-      else if (trimCh[5].actual < 1550 &&
-               trimCh[5].actual > 1450) flightMode = 2;    // SWC CENTER: altitude hold 
+      else if (trimCh[0].actual < 1550 &&
+               trimCh[0].actual > 1450) flightMode = 2;    // SWC CENTER: altitude hold 
 
-      else if (trimCh[5].actual < 2050 &&
-               trimCh[5].actual > 1950) flightMode = 3;    // SWC DOWN: GPS*
+      else if (trimCh[0].actual < 2050 &&
+               trimCh[0].actual > 1950) flightMode = 3;    // SWC DOWN: GPS*
 
 
       // calculate the gyroscope values for pitch, roll and yaw

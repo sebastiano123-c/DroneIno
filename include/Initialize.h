@@ -44,7 +44,7 @@ void configureReceiverTrims(){
 
   }
   
-  trimCh[5] = {reverse : 0b00000000, low : 1000, center: 1500, high : 2000};
+  trimCh[0] = {reverse : 0b00000000, low : 1000, center: 1500, high : 2000};
 
 }
 
