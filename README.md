@@ -62,10 +62,10 @@ Optional addons:
 The code is intended to be used with PlatformIO.
 
 ## **Features**
-1) Auto-leveling
-2) Altitude hold
-3) WiFi telemetry system
-4) SD flight data storage
+                                  1) Auto-leveling
+                                  2) Altitude hold
+                                  3) WiFi telemetry system
+                                  4) SD flight data storage
 
 _Important:_ otherwise telemetry system is implemented using the native ESP32 WiFi, I strongly recommend to add DroneIno the [Esp32-cam-telemetry](https://github.com/sebastiano123-c/Esp32-cam-telemetry) for astonishing results (including video streaming and SD card storage).
 
