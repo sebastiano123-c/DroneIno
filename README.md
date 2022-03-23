@@ -62,6 +62,7 @@ Make sure to do all the passages described here below.
   - [**Connection using only ESP32**](#connection-using-only-esp32)
   - [**Connection using ESP32-CAM**](#connection-using-esp32-cam)
     - [**SD card for data storage**](#sd-card-for-data-storage)
+- [Altitude hold](#altitude-hold)
 - [**Roadmap**](#roadmap)
 - [**Previous version**](#previous-version)
 - [**Author**](#author)
@@ -98,7 +99,7 @@ CIRCUITAL SCHEMATIC HERE
 # **Features**
 1) auto-leveling
 2) DroneInoTelemetry web app
-3) altitude hold (developing)
+3) altitude hold
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 ## **Selecting flight mode**
@@ -346,11 +347,21 @@ The directory structure is
         flight_n.csv
 </pre>
 
+
+# Altitude hold
+Altitude hold function uses barometric data from the barometer sensor, for example the BMP280.
+Look at the circuit scheme to connect the barometer and the SWC channel of the radio-controller to the board.
+When DroneIno is flying, switch to the middle the SWC lever to activate altitude hold.
+
+Battery goes down when motors are in use, causing a little performances loss.
+DroneIno uses the `batteryCurvePendency` variable (defined in `include\Globals.h`) to correct this behavior.
+In the first attempts using altitude hold, you may notice that DroneIno loses, or undesirably gains, altitude.
+Tuning `batteryCurvePendency` you may find the expected altitude hold behavior.
+
 # **Roadmap**
 As one can see in the pinmap folder, I am planning to test it on other boards, but at the moment this works only for ESP32.
 
 Future improvements:
-- altitude hold
 - GPS
 - flight plan and autonomous flight
 - Gimbal CAM
