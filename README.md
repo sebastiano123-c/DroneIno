@@ -36,7 +36,7 @@
 The device you are programming can be dangerous, use this code if you are an expert at your own risk.
 Thus, *test it firstly without propellers*.
 
-Read carefully this [documentation](https://github.com/sebastiano123-c/Esp32-cam-telemetry/docs/README.md) before starting to fly.
+Read carefully this [documentation](https://github.com/sebastiano123-c/DroneIno/tree/main/docs) before starting to fly.
 Make sure to do all the passages described there.
 
 
@@ -62,15 +62,15 @@ Optional addons:
 The code is intended to be used with PlatformIO.
 
 ## **Features**
-                                  1) Auto-leveling
-                                  2) Altitude hold
-                                  3) WiFi telemetry system
-                                  4) SD flight data storage
+                                    1) Auto-leveling
+                                    2) Altitude hold
+                                    3) WiFi telemetry system
+                                    4) SD flight data storage
 
 _Important:_ otherwise telemetry system is implemented using the native ESP32 WiFi, I strongly recommend to add DroneIno the [Esp32-cam-telemetry](https://github.com/sebastiano123-c/Esp32-cam-telemetry) for astonishing results (including video streaming and SD card storage).
 
 # **Documentation**
-The circuit scheme and the detailed construction steps are reported in the full [documentation](https://github.com/sebastiano123-c/Esp32-cam-telemetry/docs/README.md). 
+The circuit scheme and the detailed construction steps are reported in the full [documentation](https://github.com/sebastiano123-c/DroneIno/tree/main/docs). 
 I describe the main features of DroneIno.
 
 ## **Auto-leveling**

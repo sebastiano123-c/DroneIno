@@ -20,7 +20,7 @@
 <!-- title -->
 <h1 align="center">
   <b> 
-    DroneIno
+    DroneIno - Full documentation
   </b>
 </h1>
 <h3 align="center"> 
