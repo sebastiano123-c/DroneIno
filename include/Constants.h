@@ -16,10 +16,7 @@
 
 
 //     (Boards)
-#ifdef ESP32
-    #undef ESP32
-    #define ESP32                   2
-#endif
+//      ESP32 is yet defined by compilers
 #define ATMEGA32                    3
 
 
@@ -34,7 +31,7 @@
 #define BMP280                      11
 #define BME280                      12
 #define HCSR04                      13
-
+#define BN_880                      14
 
 //      (WiFi)
 #define NATIVE                      15

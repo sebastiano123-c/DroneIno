@@ -62,6 +62,7 @@ Make sure to do all the passages described here below.
   - [**Connection using ESP32-CAM**](#connection-using-esp32-cam)
     - [**SD card for data storage**](#sd-card-for-data-storage)
 - [**Altitude hold**](#altitude-hold)
+- [**GPS**](#gps)
 - [**Previous version**](#previous-version)
 - [**Author**](#author)
 
@@ -96,27 +97,28 @@ CIRCUITAL SCHEMATIC HERE
 # **Features**
 1) Auto-leveling
 2) Altitude hold
-3) WiFi telemetry system
-4) SD flight data storage
+3) GPS (**_NOT TO USE AT THE MOMENT_**)
+4) WiFi telemetry system
+5) SD flight data storage
 <!-- - : the drone corrects spurious drifts using the gyroscope signals -->
 
 ## **Selecting flight mode**
 Set the SWC switch of the transmitter to channel 5 and connect the receiver channel to the desired pin (mine is the GPIO 4, see the circuit scheme):
 * SWC up: flight mode selected is only auto-leveling;
 * SWC center: flight mode selected is altitude hold (and auto-leveling if enabled);
-* SWC down: flight mode selected is GPS (NOT YET IMPLEMENTED).
+* SWC down: flight mode selected is GPS (**_NOT TO USE AT THE MOMENT_**).
 
 # **Documentation**
 ## **Circuit scheme**
 The power is supplied by the 11.1V 2200mAh 3s 20C LiPo battery.
 The battery powers the motors and the ESP32.
-The resistances (Ohms) R2 = 0.5K and R3 = 1.1K and the diode D1 (1N4001 or similar) handle the current going through the board.
+The resistances R2 = 2.22kOhms and R3 = 5.1kOhms and the diode D1 (1N4001 or similar) handle the current going through the board.
 D1 ensures that the PC is safe while both battery and pc are connected to the ESP32.
 The resistance R1 = 330 is used for the LED. 
 <pre>
     LEGEND:                                                 +-----+--R3--+     
     X-  = disconnected                                      |     |      |                      
-    -+- = sold cables                                       |     R1     |                   __________________ 
+    -+- = sold cables                                       |     R2     |                   __________________ 
     -|- = not touching cables                               |  +--|------+---D1--------++==|+VCC|11.1V, >= 20C | 
     === = 3-5A cables                                       |  |  +----------------++==||==|-GND|2200mAh, 3s   | 
                                                             |  |  |                ||  ||    ## LiPo BATTERY ## 
@@ -126,11 +128,11 @@ The resistance R1 = 330 is used for the LED.
                  | | | +---------------------------|---+ |  |  |  +-->|-GND   |====||==||=============\ CCW /
         ______   | | | | +-------------------------|-+ | |  |  |  |   |      +|====||==++                    
 +------>|SDA°|   | | | | |   _____________________ | | | |  |  |  |   |      -|====++  ||                    
-| +---->|SCL°|   | | | | |   |°IO03         IO39°| | | | |  |  |  |   ##ESC-1##    ||  ||                    
-| |     |VCC+|<--------------------------+  IO38°| | | | |  |  |  |   _________    ||  ||              _____  
-| |   +>|GND-|   | | | | |   |°IO26      |  IO34°| | | | +--|--|--|-->|°INPUT |====||==||=============/     \
-| |   | #baro#   | | | | |   |°IO25      |  IO04°|<+ | |    |  |  | X-|+VIN   |====||==||=============| M2  |
-| |   |          | | | | +-->|°IO17      |  IO02°|<--|-|----+  |  +-->|-GND   |====||==||=============\ CW  /
+| +---->|SCL°|   | | | | |   |°IO03         IO39°|<|-|-|-|--+  |  |   ##ESC-1##    ||  ||                    
+| |     |VCC+|<--------------------------+  IO38°| | | | |     |  |   _________    ||  ||              _____  
+| |   +>|GND-|   | | | | |   |°IO26      |  IO34°| | | | +-----|--|-->|°INPUT |====||==||=============/     \
+| |   | #baro#   | | | | |   |°IO25      |  IO04°|<+ | |       |  | X-|+VIN   |====||==||=============| M2  |
+| |   |          | | | | +-->|°IO17      |  IO02°|   | |       |  +-->|-GND   |====||==||=============\ CW  /
 | |   |          | | | +---->|°IO16      |       |   | |       |  |   |      +|====||==++                    
 | |   |          | | +------>|°IO27      |   VIN+|<--|-|-------+  |   |      -|====++  ||                    
 | |   |  _______ | +-------->|°IO14      |   GND-|<--|-|----------+   ##ESC-2##    ||  ||                    
@@ -355,6 +357,14 @@ Battery goes down when motors are in use, causing a little performances loss.
 DroneIno uses the `batteryCurvePendency` variable (defined in `include\Globals.h`) to correct this behavior.
 In the first attempts using altitude hold, you may notice that DroneIno loses, or undesirably gains, altitude.
 Tuning `batteryCurvePendency` you may find the expected altitude hold behavior.
+
+
+# **GPS**
+**_NOT TO USE AT THE MOMENT_**
+**Now on developing**, DroneIno provides GPS for:
+- flight adjustements;
+- if you use ESP32-CAM telemetry, cool plots showing the flight route of DroneIno.
+
 
 # **Previous version**
 The first version of DroneIno is [here](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/test/DroneIno.zip).

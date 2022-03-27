@@ -20,8 +20,12 @@
  * 
  * Dial these on the serial:
  *  @li r: print receiver signals.
- *  @li a: print quadcopter angles.
+ *  @li g: print quadcopter angles.
+ *  @li l: blinking leds.
+ *  @li a: altitude sensor.
  *  @li e: print EEPROM.
+ *  @li b: battery check.
+ *  @li s: GPS check.
  *  @li 1: check rotation / vibrations for motor 1 (right front CCW).
  *  @li 2: check rotation / vibrations for motor 2 (right rear CW).
  *  @li 3: check rotation / vibrations for motor 3 (left rear CCW).
@@ -54,8 +58,12 @@ void calibrationMsg(){
 
    Serial.println(" Dial these on the serial:");
    Serial.println(  " r: print receiver signals.");
-   Serial.println(  " a: print quadcopter angles.");
+   Serial.println(  " g: print quadcopter angles.");
    Serial.println(  " e: print EEPROM.");
+   Serial.println(  " l: blink leds.");
+   Serial.println(  " a: read altitude readings.");
+   Serial.println(  " b: read battery readings.");
+   Serial.println(  " s: read GPS readings.");
    Serial.println(  " 1: check rotation / vibrations for motor 1 (right front CCW).");
    Serial.println(  " 2: check rotation / vibrations for motor 2 (right rear CW).");
    Serial.println(  " 3: check rotation / vibrations for motor 3 (left rear CCW).");
@@ -71,17 +79,28 @@ void calibrationMsg(){
  */
 void getSerialMsg(){
     msg = Serial.read();                                                               //Read the incoming byte.
-    vTaskDelay(100/portTICK_PERIOD_MS);                                                                         //Wait for any other bytes to come in
-    while(Serial.available() > 0) loopCounter = Serial.read();                          //Empty the Serial buffer.
-    flag = true;                                                        //Set the new request flag.
+    vTaskDelay(100/portTICK_PERIOD_MS);                                                //Wait for any other bytes to come in
+    while(Serial.available() > 0) loopCounter = Serial.read();                         //Empty the Serial buffer.
+    flag = true;                                                                       //Set the new request flag.
     loopCounter = 0;                                                                   //Reset the loopCounter variable.
     calInt = 0;                                                                        //Reset the calInt variable to undo the calibration.
-    start = 0;                                                                          //Set start to 0.
+    start = 0;                                                                         //Set start to 0.
     firstAngle = false;                                                                //Set firstAngle to false.
     //Confirm the choice on the serial monitor.
     if(msg == 'r') Serial.println("Reading receiver signals.");
-    if(msg == 'a') Serial.println("Print the quadcopter angles.");
-    if(msg == 'a') Serial.println("Gyro calibration starts in 2 seconds (don't move the quadcopter).");
+    if(msg == 'g'){
+      Serial.println("Print the quadcopter angles.");
+      calibrateGyroscope();                                                           //  few seconds for calibrating the gyroscope
+    }
+    if(msg == 'a'){
+      Serial.println("Print altitude readings.");
+      checkAltitudeSensor();                                                          // few seconds for calibrating the barometer       
+    }
+    if(msg == 'b') Serial.println("Print battery readings.");
+    if(msg == 's') {
+      setupGPS();
+      Serial.println("Print GPS readings");
+    }
     if(msg == '1') Serial.println("Test motor 1 (right front CCW.)");
     if(msg == '2') Serial.println("Test motor 2 (right rear CW.)");
     if(msg == '3') Serial.println("Test motor 3 (left rear CCW.)");
@@ -100,6 +119,43 @@ void getSerialMsg(){
     }
     vibrationCounter = 0;                                                              //Reset the vibrationCounter variable.
 }
+
+
+/**
+ * @brief Blink leds
+ * 
+ */
+void blinkLed(){
+
+    Serial.println("\nBlinking leds...");
+
+    while (Serial.available() == 0){
+
+      ledcWrite(pwmLedChannel, HALF_DUTY_CYCLE);
+      ledcWrite(pwmLedBatteryChannel, HALF_DUTY_CYCLE);     
+
+      vTaskDelay(100/portTICK_PERIOD_MS);
+
+      ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);
+      ledcWrite(pwmLedBatteryChannel, MAX_DUTY_CYCLE);
+
+      vTaskDelay(100/portTICK_PERIOD_MS);
+
+      ledcWrite(pwmLedChannel, HALF_DUTY_CYCLE);
+      ledcWrite(pwmLedBatteryChannel, HALF_DUTY_CYCLE);     
+
+      vTaskDelay(100/portTICK_PERIOD_MS);
+
+      ledcWrite(pwmLedChannel, 0);
+      ledcWrite(pwmLedBatteryChannel, 0);  
+      vTaskDelay(100/portTICK_PERIOD_MS);
+
+    }
+
+    msg = Serial.read();
+    
+}
+
 
 /**
  * @brief Prints the signals.
@@ -132,7 +188,14 @@ void printSignals(){
   else if(receiverInputChannel2 - 1520 > 0)Serial.print("vvv");
   else Serial.print("-+-");
   Serial.print(receiverInputChannel2);
+
+  Serial.print("  Flight mode:");
+  if(trimCh[0].actual - 1480 < 0)Serial.print("^^^");
+  else if(trimCh[0].actual - 1520 > 0)Serial.print("vvv");
+  else Serial.print("-+-");
+  Serial.print(trimCh[0].actual);
 }
+
 
 /**
  * @brief Main routine used in the sketch.
@@ -163,7 +226,6 @@ void rFunction(){
     esc4 = 1000;                                                                  //Set the pulse for ESC 1 to 1000us.
     setEscPulses();                                                               //Send the ESC control pulses.
 }
-
 
 
 /**

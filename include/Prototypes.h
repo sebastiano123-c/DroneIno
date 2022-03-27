@@ -5,6 +5,8 @@
  * @version 0.1
  * @date 2022-03-20
  * 
+ * Definition of all the functions used by DroneIno.
+ * 
  * @copyright Copyright (c) 2022
  * 
  */
@@ -67,7 +69,7 @@ void configureReceiverTrims();                                // see Initialize.
 
     void writeEEPROM();
 
-#elif UPLOADED_SKETCH == CALIBRATION
+#elif UPLOADED_SKETCH == CALIBRATION                          // functions without comments are in Calibration.h
 
     void calibrationMsg();
 
@@ -78,6 +80,28 @@ void configureReceiverTrims();                                // see Initialize.
     void rFunction();
 
     void escFunction();
+
+    void blinkLed();
+
+    void checkAltitudeSensor();                               // see Altitude.h
+
+    void calculateAltitudeHold();                             // see Altitude.h
+
+    void printBarometer();                                    // see Altitude.h
+
+    void initBattery();                                       // see Battery.h
+
+    void readBatteryVoltage();                                // see Battery.h
+
+    void printBatteryVoltage();                               // see Battery.h
+
+    void setupGPS();                                          // see GPS.h
+
+    void readGPS();                                           // see GPS.h
+    
+    void printGPS();                                          // see GPS.h
+
+    void printGPSSerialLine();                                // see GPS.h
 
 #elif UPLOADED_SKETCH == FLIGHT_CONTROLLER
 
@@ -100,8 +124,29 @@ void configureReceiverTrims();                                // see Initialize.
     void calculatePID();                                      // see PID.h
 
 
-    void batteryVoltageCompensation();                        // see Battery.h
+    void readBatteryVoltage();                                // see Battery.h
 
+
+    void printBatteryVoltage();                               // see Battery.h
+
+    void setupGPS();                                          // see GPS.h
+
+    void readGPS();                                           // see GPS.h
+
+
+    #if WIFI_TELEMETRY == NATIVE
+
+        void notFound(AsyncWebServerRequest *request);
+
+        const char* index_html();
+
+        String processor(const String& var);
+
+    #elif WIFI_TELEMETRY == ESP_CAM
+
+        void writeDataTransfer();
+
+    #endif
 
     void sendWiFiTelemetry();                                 // see WiFi.h
 

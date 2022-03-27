@@ -35,60 +35,72 @@ void droneStart(){
 */
 void setEscPulses(){
 
-  throttle = receiverInputChannel3;                                 //We need the throttle signal as a base signal.
+  throttle = receiverInputChannel3;                                      //We need the throttle signal as a base signal.
+
+  // if(DEBUG) batteryVoltage=10;
 
   switch(start){
     case 2:
       
       // set throttle for altitude hold
-      if (flightMode >= 2) {                                         //If altitude mode is active.
-        throttle = 1500 + pidOutputAltitude;                           // add the altitude hold
+      if (flightMode >= 2) {                                             //If altitude mode is active.
+        throttle = 1500 + pidOutputAltitude;                             // add the altitude hold
+      }
+      if (flightMode >= 3 && waypointGPS == 1) {
+        pidOutputRoll = 1500 + GPSRollAdjust;
+        pidOutputPitch = 1500 + GPSPitchAdjust;
       }
 
-      if (throttle > 1800) throttle = 1800;                            //We need some room to keep full control at full throttle.
+      if (throttle > 1800) throttle = 1800;                              //We need some room to keep full control at full throttle.
 
-      esc1 = throttle - pidOutputPitch + pidOutputRoll - pidOutputYaw; //Calculate the pulse for esc 1 (front-right - CCW)
-      esc2 = throttle + pidOutputPitch + pidOutputRoll + pidOutputYaw; //Calculate the pulse for esc 2 (rear-right - CW)
-      esc3 = throttle + pidOutputPitch - pidOutputRoll - pidOutputYaw; //Calculate the pulse for esc 3 (rear-left - CCW)
-      esc4 = throttle - pidOutputPitch - pidOutputRoll + pidOutputYaw; //Calculate the pulse for esc 4 (front-left - CW)
+      esc1 = throttle - pidOutputPitch + pidOutputRoll - pidOutputYaw;   //Calculate the pulse for esc 1 (front-right - CCW)
+      esc2 = throttle + pidOutputPitch + pidOutputRoll + pidOutputYaw;   //Calculate the pulse for esc 2 (rear-right - CW)
+      esc3 = throttle + pidOutputPitch - pidOutputRoll - pidOutputYaw;   //Calculate the pulse for esc 3 (rear-left - CCW)
+      esc4 = throttle - pidOutputPitch - pidOutputRoll + pidOutputYaw;   //Calculate the pulse for esc 4 (front-left - CW)
 
-      if (batteryVoltageV > 2. && batteryVoltageV < 10.7){              // Is the battery connected?
-        int16_t escCorrection = (int16_t)((10.7 - batteryVoltageV)/batteryCurvePendency);// Compensate the esc-1 pulse for voltage drop.
-        esc1 += escCorrection;                                         // Compensate the esc-1 pulse for voltage drop.
-        esc2 += escCorrection;                                         // Compensate the esc-2 pulse for voltage drop.
-        esc3 += escCorrection;                                         // Compensate the esc-3 pulse for voltage drop.
-        esc4 += escCorrection;                                         // Compensate the esc-4 pulse for voltage drop.
-      }
+      #if BATTERY_COMPENSATION 
+        if (batteryVoltage > 3. && batteryVoltage < MAX_BATTERY_VOLTAGE){// Is the battery connected?
+          escCorr = (int16_t)                                            // correction factor
+          ((MAX_BATTERY_VOLTAGE - batteryVoltage) / batteryCurvePendency);
+          esc1 += escCorr;                                               // Compensate the esc-1 pulse for voltage drop.
+          esc2 += escCorr;                                               // Compensate the esc-2 pulse for voltage drop.
+          esc3 += escCorr;                                               // Compensate the esc-3 pulse for voltage drop.
+          esc4 += escCorr;                                               // Compensate the esc-4 pulse for voltage drop.
+        }
+      #endif
 
-      if (esc1 < 1100) esc1 = 1100;                                    //Keep the motors running.
-      if (esc2 < 1100) esc2 = 1100;                                    //Keep the motors running.
-      if (esc3 < 1100) esc3 = 1100;                                    //Keep the motors running.
-      if (esc4 < 1100) esc4 = 1100;                                    //Keep the motors running.
+      if (esc1 < 1100) esc1 = 1100;                                      // Keep the motors running.
+      if (esc2 < 1100) esc2 = 1100;                                      // Keep the motors running.
+      if (esc3 < 1100) esc3 = 1100;                                      // Keep the motors running.
+      if (esc4 < 1100) esc4 = 1100;                                      // Keep the motors running.
 
-      if(esc1 > 2000) esc1 = 2000;                                     //Limit the esc-1 pulse to 2000us.
-      if(esc2 > 2000) esc2 = 2000;                                     //Limit the esc-2 pulse to 2000us.
-      if(esc3 > 2000) esc3 = 2000;                                     //Limit the esc-3 pulse to 2000us.
-      if(esc4 > 2000) esc4 = 2000;                                     //Limit the esc-4 pulse to 2000us.  
+      if(esc1 > 2000) esc1 = 2000;                                       // Limit the esc-1 pulse to 2000us.
+      if(esc2 > 2000) esc2 = 2000;                                       // Limit the esc-2 pulse to 2000us.
+      if(esc3 > 2000) esc3 = 2000;                                       // Limit the esc-3 pulse to 2000us.
+      if(esc4 > 2000) esc4 = 2000;                                       // Limit the esc-4 pulse to 2000us.  
       break;
     
     default:
-      esc1 = 1000;                                                      //If start is not 2 keep a 1000us pulse for ess-1.
-      esc2 = 1000;                                                      //If start is not 2 keep a 1000us pulse for ess-2.
-      esc3 = 1000;                                                      //If start is not 2 keep a 1000us pulse for ess-3.
-      esc4 = 1000;                                                      //If start is not 2 keep a 1000us pulse for ess-4.
+      esc1 = 1000;                                                       // If start is not 2 keep a 1000us pulse for ess-1.
+      esc2 = 1000;                                                       // If start is not 2 keep a 1000us pulse for ess-2.
+      esc3 = 1000;                                                       // If start is not 2 keep a 1000us pulse for ess-3.
+      esc4 = 1000;                                                       // If start is not 2 keep a 1000us pulse for ess-4.
   }
 
   // write to ESCs
-  ledcWrite(pwmChannel1, (float)esc1/2000.*(float)MAX_DUTY_CYCLE);
-  ledcWrite(pwmChannel2, (float)esc2/2000.*(float)MAX_DUTY_CYCLE);
-  ledcWrite(pwmChannel3, (float)esc3/2000.*(float)MAX_DUTY_CYCLE);
-  ledcWrite(pwmChannel4, (float)esc4/2000.*(float)MAX_DUTY_CYCLE);
+  ledcWrite(pwmChannel1, (uint32_t)((float)esc1/2000.*(float)MAX_DUTY_CYCLE));
+  ledcWrite(pwmChannel2, (uint32_t)((float)esc2/2000.*(float)MAX_DUTY_CYCLE));
+  ledcWrite(pwmChannel3, (uint32_t)((float)esc3/2000.*(float)MAX_DUTY_CYCLE));
+  ledcWrite(pwmChannel4, (uint32_t)((float)esc4/2000.*(float)MAX_DUTY_CYCLE));
 
-  // Serial.printf("%i   %i   %i   %i \n", 
-  //   (uint32_t)(((float)esc1/2000.)*MAX_DUTY_CYCLE), 
-  //   (uint32_t)(((float)esc2/2000.)*MAX_DUTY_CYCLE), 
-  //   (uint32_t)(((float)esc3/2000.)*MAX_DUTY_CYCLE), 
-  //   (uint32_t)(((float)esc4/2000.)*MAX_DUTY_CYCLE));
+  #if DEBUG == true //&& UPLOADED_SKETCH == FLIGHT_CONTROLLER
+    Serial.printf("%u   %u   %u   %u   %i\n", 
+      (float)esc1/2000.*MAX_DUTY_CYCLE, 
+      (float)esc2/2000.*MAX_DUTY_CYCLE, 
+      (float)esc3/2000.*MAX_DUTY_CYCLE, 
+      (float)esc4/2000.*MAX_DUTY_CYCLE,
+      escCorr);
+  #endif
 }
 
 /**

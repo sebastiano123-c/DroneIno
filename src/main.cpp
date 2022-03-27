@@ -49,13 +49,14 @@
  */
 
 
-//       (INCLUDES)
+//    (INCLUDES)
 #include <Arduino.h>
 #include <Wire.h>
 #include <EEPROM.h>
+#include <driver/adc.h>
 
 
-//       (SETUP FILES)
+//    (SETUP FILES)
 #include <Constants.h>
 #include <Config.h>
 #include <Models.h>
@@ -63,7 +64,7 @@
 #include <Prototypes.h>
 
 
-//       (WHICH SKETCH?)
+//    (WHICH SKETCH?)
 #if   UPLOADED_SKETCH == SETUP
 
    void setup() {
@@ -160,39 +161,36 @@
       calibrationMsg();                                    // introduction
 
       
-      initEEPROM();                                        // see Initialize.ino
+      initEEPROM();                                        // see Initialize.h
 
 
-      configureReceiverTrims();                            // see Initialize.ino
+      configureReceiverTrims();                            // see Initialize.h
          
 
       // pinmode
-      setupPins();                                         // see Initialize.ino
+      setupPins();                                         // see Initialize.h
 
 
       //Start the I2C as master.
-      setupWireI2C();                                      // see Initialize.ino           
+      setupWireI2C();                                      // see Initialize.h           
 
 
       //Set the specific gyro registers.  
-      setGyroscopeRegisters();                             // see Gyroscope.ino                      
-
-
-      // few seconds for calibrating the gyroscope
-      calibrateGyroscope();                                // see Gyroscope.ino
+      setGyroscopeRegisters();                             // see Gyroscope.h                      
 
 
       // wait until the rx is connected
       waitController();                                    // wait until the receiver is active.
 
 
+      // set pin precision
+      initBattery();             
+
+
       pidOutputPitch = 0;                                  // make setEscPulses to work
       pidOutputRoll = 0;
       pidOutputYaw = 0;
       batteryVoltage = 0;
-
-
-      Serial.println("\nSetup finished");
 
       loopTimer = micros();                                //Set the zeroTimer for the first loop.
       while(Serial.available()) msg = Serial.read();       //Empty the serial buffer.
@@ -229,9 +227,8 @@
       if(msg == '1' || msg == '2' || msg == '3' || msg == '4' || msg == '5')//If motor 1, 2, 3 or 4 is selected by the user.
          escFunction();
 
-
-      if(msg == 'a'){
-         calculateAnglePRY();                                 // see Gyro.ino
+      if(msg == 'g'){
+         calculateAnglePRY();                                 // see Gyroscope.h
          printGyroscopeStatus();
       }
       
@@ -239,9 +236,34 @@
          printEEPROM();
          msg = 0;
       }
+
+      if(msg == 'l') 
+         blinkLed();
+
+      if(msg == 'a'){
+         calculateAltitudeHold();
+         printBarometer();
+      }
+
+      if(msg == 'b'){
+         readBatteryVoltage();
+         printBatteryVoltage();
+      }
+
+      if(msg == 's'){
+         readGPS();
+         printGPS();
+      }
+
    } 
 
    #include <Calibration.h>
+   #include <Battery.h>
+   // #include <WiFiTelemetry.h>
+   // #include <PID.h>
+   #include <Altitude.h>
+   #include <GPS.h>
+
 
 #elif UPLOADED_SKETCH == FLIGHT_CONTROLLER
 
@@ -251,16 +273,16 @@
 
 
       // setup wifi AP
-      setupWiFiTelemetry();                                // see WiFiTelemtry.ino  
+      setupWiFiTelemetry();                                // see WiFiTelemtry.h  
 
       
       // if(DEBUG) intro();
 
 
-      initEEPROM();                                        // see Initialize.ino
+      initEEPROM();                                        // see Initialize.h
 
 
-      configureReceiverTrims();                            // see Initialize.ino
+      configureReceiverTrims();                            // see Initialize.h
 
 
       //Set start back to zero.
@@ -268,27 +290,31 @@
             
 
       // pinmode
-      setupPins();                                         // see Initialize.ino
+      setupPins();                                         // see Initialize.h
          
 
       // signaling the start point
       ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                                         
-      ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE); 
+      ledcWrite(pwmLedBatteryChannel, MAX_DUTY_CYCLE); 
 
 
       //Start the I2C as master.
-      setupWireI2C();                                      // see Initialize.ino           
+      setupWireI2C();                                      // see Initialize.h           
+
+
+      // GPS
+      setupGPS();
 
 
       //Set the specific gyro registers.  
-      setGyroscopeRegisters();                             // see Gyroscope.ino                      
+      setGyroscopeRegisters();                             // see Gyroscope.h                      
 
       // few seconds for calibrating the gyroscope
-      calibrateGyroscope();                                // see Gyroscope.ino
+      calibrateGyroscope();                                // see Gyroscope.h
 
 
       // check Pressure
-      checkAltitudeSensor();                               // see Altitude.ino
+      checkAltitudeSensor();                               // see Altitude.h
 
 
       // wait until the rx is connected
@@ -299,12 +325,12 @@
       flightMode = 1;                                      // start without any mode (except for autoleveling if true)                                 
 
 
-      initBattery();                                       // see Battery.ino
+      initBattery();                                       // see Battery.h
 
 
       //When everything is done, turn off the led.
       ledcWrite(pwmLedChannel, 0);                         // Turn off the warning led.      
-      ledcWrite(pwmLedFlyChannel, 0);                      // Turn off the warning led.      
+      ledcWrite(pwmLedBatteryChannel, 0);                  // Turn off the warning led.      
 
 
       //Set the timer for the next loop.
@@ -329,12 +355,16 @@
                trimCh[0].actual > 1950) flightMode = 3;    // SWC DOWN: GPS*
 
 
+      // GPS
+      readGPS();
+
+
       // calculate the gyroscope values for pitch, roll and yaw
-      calculateAnglePRY();                                 // see Gyro.ino
+      calculateAnglePRY();                                 // see Gyroscope.h
 
 
       // convert the signal of the rx
-      convertAllSignals();                                 // see ESC.ino
+      convertAllSignals();                                 // see ESC.h
 
 
       // starting sequence of the quadcopter:
@@ -351,19 +381,19 @@
 
 
       // calculate the altitude hold pressure parameters
-      calculateAltitudeHold();                             // see Altitude.ino
+      calculateAltitudeHold();                             // see Altitude.h
 
 
       // calculate PID values
-      calculatePID();                                      // see PID.ino
+      calculatePID();                                      // see PID.h
 
 
       // battery voltage can affect the efficiency 
-      batteryVoltageCompensation();                        // see Battery.ino
+      readBatteryVoltage();                                // see Battery.h
 
 
       // create ESC pulses
-      setEscPulses();                                      // see ESC.ino
+      setEscPulses();                                      // see ESC.h
 
 
       // send telemetry via wifi
@@ -372,8 +402,8 @@
 
       // finish the loop
       if(micros() - loopTimer > 4050)
-               ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  // turn on the LED if the loop time exceeds 4050us
-      else ledcWrite(pwmLedFlyChannel, 0);
+               ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);  // turn on the LED if the loop time exceeds 4050us
+      else ledcWrite(pwmLedChannel, 0);
 
 
       // wait until 4000us are passed
@@ -385,16 +415,17 @@
    }
 
    #include <Battery.h>
-   #include <WiFi.h>
+   #include <WiFiTelemetry.h>
    #include <PID.h>
    #include <Altitude.h>
+   #include <GPS.h>
 
 #else 
    #error "NO SKETCH UPLOADED"
 #endif
 
 
-//       (PROJECT FILES)
+//    (PROJECT FILES)
 #include <Initialize.h>
 #include <Gyroscope.h>
 #include <ISR.h>

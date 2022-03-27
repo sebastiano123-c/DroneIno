@@ -53,8 +53,8 @@ void configureReceiverTrims(){
  */
 void setupWireI2C(){
 
-  // setup wire
-  Wire.setClock(WIRE_CLOCK);
+  // setup wire for
+  Wire.setClock(WIRE_CLOCK);        
   Wire.begin(PIN_SDA, PIN_SCL);
   vTaskDelay(40/portTICK_PERIOD_MS);
   
@@ -67,9 +67,9 @@ void setupPins(){
  
   // LED pinmode
   ledcSetup(pwmLedChannel, freq, resolution);                                       // battery led
-  ledcSetup(pwmLedFlyChannel, freq, resolution);                                    // fly led
+  ledcSetup(pwmLedBatteryChannel, freq, resolution);                                // fly led
   ledcAttachPin(PIN_BATTERY_LED, pwmLedChannel);
-  ledcAttachPin(PIN_SECOND_LED, pwmLedFlyChannel);
+  ledcAttachPin(PIN_SECOND_LED, pwmLedBatteryChannel);
 
 
   // ESCs pinmode  

@@ -247,15 +247,14 @@
 #endif
 
 /**
- * @brief Transforms the barometer readings into the PID output pulses.
+ * @brief  Transforms the barometer readings into the PID output pulses.
  * 
  * When the throttle stick position is increased or decreased the altitude hold function is partially disabled.
  * The manualAltitudeChange variable will indicate if the altitude of the quadcopter is changed by the pilot.
  * 
+ * @param pressureForPID pressure value used for the PID calculations
  */
-void calculateAltitudeAdjustmentPID(){
-
-  pressureForPID = pressure;                                                   // pressure value used for the PID calculations
+void calculateAltitudeAdjustmentPID(float pressureForPID){// 
   
   manualAltitudeChange = 0;                                                    //Preset the manualAltitudeChange variable to 0.
   manualThrottle = 0;                                                          //Set the manualThrottle variable to 0.
@@ -344,7 +343,7 @@ void calculateAltitudeHold(){
 
           if (abs(pidAltitudeSetpoint) < 1e-8) pidAltitudeSetpoint = actualPressure;       //If not yet set, set the PID altitude setpoint.
 
-          calculateAltitudeAdjustmentPID();
+          calculateAltitudeAdjustmentPID(pressure);
         
       }
 
@@ -353,4 +352,13 @@ void calculateAltitudeHold(){
     default:                                                                            // if barometerCounter is neither 1 or 2
       barometerCounter = 1;
   }
+}
+
+
+/**
+ * @brief Print the barometric readings
+ * 
+ */
+void printBarometer(){
+  Serial.printf("pressure: %f,  altitude: %f, temp: %f, actualPressureSlow: %f, actualPressureFast: %f \n", pressure, altitudeMeasure, temperature, actualPressureSlow, actualPressureFast);
 }

@@ -449,15 +449,15 @@ void checkGyroscopeResult(){
  */
 void checkLed(){
 
-    ledcWrite(pwmLedFlyChannel, MAX_DUTY_CYCLE);  // turn on the LED if the loop time exceeds 4050us
-    ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);     // turn on the LED if the loop time exceeds 4050us
+    ledcWrite(pwmLedBatteryChannel, MAX_DUTY_CYCLE);  // turn on the LED if the loop time exceeds 4050us
+    ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);         // turn on the LED if the loop time exceeds 4050us
 
     Serial.println(F("\n\nThe LED should now be lit"));
     Serial.println(F("Move stick 'nose up' and back to center to continue"));
     checkToContinue();
 
-    ledcWrite(pwmLedFlyChannel, 0);  // turn on the LED if the loop time exceeds 4050us
-    ledcWrite(pwmLedChannel, 0);     // turn on the LED if the loop time exceeds 4050us
+    ledcWrite(pwmLedBatteryChannel, 0);               // turn on the LED if the loop time exceeds 4050us
+    ledcWrite(pwmLedChannel, 0);                      // turn on the LED if the loop time exceeds 4050us
 
 }
 

@@ -190,52 +190,54 @@ void calculateAnglePRY(){
   // first of all, read the gyro
   readGyroscopeStatus();
   
-  // gyroSensibility = 1 deg/sec (check the datasheet of the MPU-6050 for more information).
-  gyroRollInput = (gyroRollInput * 0.7) +
-                   ((gyroAxis[1] / gyroSensibility) * 0.3);                 //Gyro pid input is deg/sec.
-  gyroPitchInput = (gyroPitchInput * 0.7) + 
-                   ((gyroAxis[2] / gyroSensibility) * 0.3);                 //Gyro pid input is deg/sec.
-  gyroYawInput = (gyroYawInput * 0.7) +
-                   ((gyroAxis[3] / gyroSensibility) * 0.3);                 //Gyro pid input is deg/sec.
- 
-  //Gyro angle calculations
-  anglePitch += gyroAxis[2] * travelCoeff;                                  //Calculate the traveled pitch angle and add it to the anglePitch variable.
-  angleRoll += gyroAxis[1] * travelCoeff;                                   //Calculate the traveled roll angle and add it to the angleRoll variable. 
+  #if AUTO_LEVELING
+    // gyroSensibility = 1 deg/sec (check the datasheet of the MPU-6050 for more information).
+    gyroRollInput = (gyroRollInput * 0.7) +
+                    ((gyroAxis[1] / gyroSensibility) * 0.3);                 //Gyro pid input is deg/sec.
+    gyroPitchInput = (gyroPitchInput * 0.7) + 
+                    ((gyroAxis[2] / gyroSensibility) * 0.3);                 //Gyro pid input is deg/sec.
+    gyroYawInput = (gyroYawInput * 0.7) +
+                    ((gyroAxis[3] / gyroSensibility) * 0.3);                 //Gyro pid input is deg/sec.
   
-  //The Arduino sin function is in radians
-  anglePitch -= angleRoll * sin(gyroAxis[3] * travelCoeffToRad);            //If the IMU has yawed transfer the roll angle to the pitch angel.
-  angleRoll += anglePitch * sin(gyroAxis[3] * travelCoeffToRad);            //If the IMU has yawed transfer the pitch angle to the roll angel.
+    //Gyro angle calculations
+    anglePitch += gyroAxis[2] * travelCoeff;                                  //Calculate the traveled pitch angle and add it to the anglePitch variable.
+    angleRoll += gyroAxis[1] * travelCoeff;                                   //Calculate the traveled roll angle and add it to the angleRoll variable. 
+    
+    //The Arduino sin function is in radians
+    anglePitch -= angleRoll * sin(gyroAxis[3] * travelCoeffToRad);            //If the IMU has yawed transfer the roll angle to the pitch angel.
+    angleRoll += anglePitch * sin(gyroAxis[3] * travelCoeffToRad);            //If the IMU has yawed transfer the pitch angle to the roll angel.
 
-  //Accelerometer angle calculations
-  accTotalVector = sqrt((accAxis[2]*accAxis[2])+
-                        (accAxis[1]*accAxis[1])+
-                        (accAxis[3]*accAxis[3]));                           //Calculate the total accelerometer vector.
+    //Accelerometer angle calculations
+    accTotalVector = sqrt((accAxis[2]*accAxis[2])+
+                          (accAxis[1]*accAxis[1])+
+                          (accAxis[3]*accAxis[3]));                           //Calculate the total accelerometer vector.
 
-  //The Arduino asin function is in radians
-  if(abs(accAxis[1]) < accTotalVector){                                     //Prevent the asin function to produce a NaN
-    anglePitchAcc = asin((float)accAxis[1]/accTotalVector)* convDegToRad;   //Calculate the pitch angle.
-  }
-  if(abs(accAxis[2]) < accTotalVector){                                     //Prevent the asin function to produce a NaN
-    angleRollAcc = asin((float)accAxis[2]/accTotalVector)* (-convDegToRad); //Calculate the roll angle.
-  }
-  
-  //Place the MPU-6050 spirit level and note the values in the following two lines for calibration.
-  anglePitchAcc -= GYROSCOPE_PITCH_CORR;                                    //Accelerometer calibration value for pitch.
-  angleRollAcc -= GYROSCOPE_ROLL_CORR;                                      //Accelerometer calibration value for roll. 
+    //The Arduino asin function is in radians
+    if(abs(accAxis[1]) < accTotalVector){                                     //Prevent the asin function to produce a NaN
+      anglePitchAcc = asin((float)accAxis[1]/accTotalVector)* convDegToRad;   //Calculate the pitch angle.
+    }
+    if(abs(accAxis[2]) < accTotalVector){                                     //Prevent the asin function to produce a NaN
+      angleRollAcc = asin((float)accAxis[2]/accTotalVector)* (-convDegToRad); //Calculate the roll angle.
+    }
+    
+    //Place the MPU-6050 spirit level and note the values in the following two lines for calibration.
+    anglePitchAcc -= GYROSCOPE_PITCH_CORR;                                    //Accelerometer calibration value for pitch.
+    angleRollAcc -= GYROSCOPE_ROLL_CORR;                                      //Accelerometer calibration value for roll. 
 
-  anglePitch = anglePitchAcc + 
-                GYROSCOPE_PITCH_FILTER * (anglePitch - anglePitchAcc);      //Correct the drift of the gyro pitch angle with the accelerometer pitch angle.
-  angleRoll = angleRollAcc + 
-                GYROSCOPE_ROLL_FILTER * (angleRoll - angleRollAcc);         //Correct the drift of the gyro roll angle with the accelerometer roll angle.
+    anglePitch = anglePitchAcc + 
+                  GYROSCOPE_PITCH_FILTER * (anglePitch - anglePitchAcc);      //Correct the drift of the gyro pitch angle with the accelerometer pitch angle.
+    angleRoll = angleRollAcc + 
+                  GYROSCOPE_ROLL_FILTER * (angleRoll - angleRollAcc);         //Correct the drift of the gyro roll angle with the accelerometer roll angle.
 
 
-  pitchLevelAdjust = anglePitch * correctionPitchRoll;                       //Calculate the pitch angle correction
-  rollLevelAdjust = angleRoll * correctionPitchRoll;                         //Calculate the roll angle correction
-
-  if(AUTO_LEVELING == false){                                                        //If the quadcopter is not in auto-level mode
-    pitchLevelAdjust = 0;                                                    //Set the pitch angle correction to zero.
-    rollLevelAdjust = 0;                                                     //Set the roll angle correcion to zero.
-  }
+    pitchLevelAdjust = anglePitch * correctionPitchRoll;                       //Calculate the pitch angle correction
+    rollLevelAdjust = angleRoll * correctionPitchRoll;                         //Calculate the roll angle correction
+  #else
+    if(AUTO_LEVELING == false){                                                        //If the quadcopter is not in auto-level mode
+      pitchLevelAdjust = 0;                                                    //Set the pitch angle correction to zero.
+      rollLevelAdjust = 0;                                                     //Set the roll angle correcion to zero.
+    }
+  #endif
 
   // #if DEBUG == true
   //   printGyroscopeStatus();                                                  //print gyro status

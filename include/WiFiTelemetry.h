@@ -226,7 +226,8 @@
     if (var == "PITCHANGLE")      return String(anglePitch);
     else if( var == "ROLLANGLE")  return String(angleRoll);
     else if( var == "FLIGHTMODE") return String(flightMode);
-    else if( var == "BATTERY")    return String(batteryPercent);
+    else if( var == "BATTERY")    return String(batteryPercentage);
+
   }
   
   
@@ -324,8 +325,8 @@
         inputMessage = "No message sent";
         inputParam = "none";
       }
-      if(DEBUG) Serial.printf("wifi command: %s\n",inputMessage);
-      if(DEBUG) Serial.printf("wifi tag id: %s\n",inputParam);
+      if(DEBUG) Serial.printf("wifi command: %s\n",inputMessage.c_str());
+      if(DEBUG) Serial.printf("wifi tag id: %s\n",inputParam.c_str());
 
       request->send(200, "text/html", index_html());                         
     });
@@ -333,7 +334,6 @@
     server.onNotFound(notFound);
     server.begin();
   }
-  
 
   /**
    * @brief Updates '\events' of the web server with the sensor readings.
@@ -345,7 +345,6 @@
       return;
   }
   
-
 
 #elif WIFI_TELEMETRY == ESP_CAM
   
@@ -376,15 +375,17 @@
     char * sptr = staticCharToPrint;
 
     // fill data structure before send
-    sptr += sprintf(sptr, "<%.6f,", angleRoll);
-    sptr += sprintf(sptr, "%.6f,", anglePitch);
+    sptr += sprintf(sptr, "<%.2f,", angleRoll);
+    sptr += sprintf(sptr, "%.2f,", anglePitch);
     sptr += sprintf(sptr, "%x,", flightMode);
-    sptr += sprintf(sptr, "%.6f,", batteryVoltageV);
-    sptr += sprintf(sptr, "%.6f,", altitudeMeasure);
-    sptr += sprintf(sptr, "%i,", esc1);
-    sptr += sprintf(sptr, "%i,", esc2);
-    sptr += sprintf(sptr, "%i,", esc4);
-    sptr += sprintf(sptr, "%i>", esc3);
+    sptr += sprintf(sptr, "%.1f,", batteryVoltage);
+    sptr += sprintf(sptr, "%.1f,", altitudeMeasure);
+    sptr += sprintf(sptr, "%i,", receiverInputChannel1);
+    sptr += sprintf(sptr, "%i,", receiverInputChannel2);
+    sptr += sprintf(sptr, "%i,", receiverInputChannel4);
+    sptr += sprintf(sptr, "%i,", receiverInputChannel3);
+    sptr += sprintf(sptr, "%f,", latitudeGPS);
+    sptr += sprintf(sptr, "%f>", longitudeGPS);
 
     // close the string
     *sptr++ = 0;
@@ -488,15 +489,4 @@
     }
   }
   
-  
-  /**
-   * @brief Prints the tranfer data for debugging.
-   * 
-   */
-  void checkMessage(){
-    for(int i = 0; i < dataTransferSize; i++){
-      Serial.printf("%.6f\n", dataTransfer[i]);
-    }
-  }
-
 #endif

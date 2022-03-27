@@ -64,11 +64,18 @@ The code is intended to be used with PlatformIO.
 ## **Features**
                                     1) Auto-leveling
                                     2) Altitude hold
-                                    3) WiFi telemetry system
-                                    4) SD flight data storage
+                                    3) GPS (NOT TO USE AT THE MOMENT, DEVELOPING)
+                                    4) WiFi telemetry system
+                                    5) SD flight data storage
 
 _Important:_ otherwise telemetry system is implemented using the native ESP32 WiFi, I strongly recommend to add DroneIno the [Esp32-cam-telemetry](https://github.com/sebastiano123-c/Esp32-cam-telemetry) for astonishing results (including video streaming and SD card storage).
 
+## **Selecting flight mode**
+Set the SWC switch of the transmitter to channel 5 and connect the receiver channel to the desired pin (mine is the GPIO 4, see the circuit scheme):
+* SWC up: flight mode selected is only auto-leveling;
+* SWC center: flight mode selected is altitude hold (and auto-leveling if enabled);
+* SWC down: flight mode selected is GPS (**_NOT TO USE AT THE MOMENT_**).
+* 
 # **Documentation**
 The circuit scheme and the detailed construction steps are reported in the full [documentation](https://github.com/sebastiano123-c/DroneIno/tree/main/docs). 
 I describe the main features of DroneIno.
@@ -78,6 +85,12 @@ DroneIno automatically corrects spurious drifts using the gyroscope signals.
 
 ## **Altitude hold**
 Altitude hold function uses barometric data of the barometer sensor, for example the BMP280.
+
+## **GPS**
+**_NOT TO USE AT THE MOMENT_**
+**Now on developing**, DroneIno provides GPS for:
+- flight adjustements;
+- if you use ESP32-CAM telemetry, cool plots showing the flight route of DroneIno.
 
 ## **DroneInoTelemetry web app**
 DroneInoTelemetry is a web app that makes everything simple and easy reach.
@@ -110,7 +123,6 @@ All you need is a SD card formatted in FAT32 to put into your ESP32-CAM.
 
 # **Roadmap**
 Future improvements:
-- GPS;
 - flight planned;
 - following me flight;
 - Gimbal CAM;
