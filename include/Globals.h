@@ -147,8 +147,18 @@ const int HALF_DUTY_CYCLE        = (int)(0.5*MAX_DUTY_CYCLE);
  * -----------------------------------------------------------------------------------------------------------
  * @brief BATTERY
  * 
- * @note total resistance calculations, the important quantity is totalDrop
- * 
+ *    (VOLTAGES)  
+ *    A LiPo battery has a certain NUMBER_OF_CELLS (S).
+ *    Each cell can be charged up to 4.2V and must NEVER be discharged below 3V.
+ */
+float MAX_CELL_VOLTAGE           = 4.2;                               // (V) max voltage per each cell
+float DANGER_CELL_VOLTAGE        = 3;                                 // (V) danger voltage for each cell
+float MAX_BATTERY_VOLTAGE        = MAX_CELL_VOLTAGE *                 // (V) battery nominal maximum voltage (use ONLY 11.1V batteries)
+                                   NUMBER_OF_CELLS;       
+float DANGER_BATTERY_VOLTAGE     = DANGER_CELL_VOLTAGE *              // (V) battery level under which it is dangerous to use
+                                   NUMBER_OF_CELLS;
+
+/**
  *    (POWER SUPPLY CIRCUIT SPECIFICS)
  *    IMPORTANT: this is in my case, you have to calculate YOUR total drop
  */
@@ -171,9 +181,8 @@ float maximumWidth               = pow(2., (float)adcBits)-1;             // max
  *     Finally, minBatteryLevelThreshold is the board minimum voltage under which it is not safe to go.
  */ 
 float pinVoltageMax             = MAX_BATTERY_VOLTAGE * totalDrop;
-float pinVoltageMin             = MIN_BATTERY_VOLTAGE * totalDrop;
-float fromWidthToV              = BOARD_LIMIT_VOLTAGE / maximumWidth;           // see https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32c3/api-reference/peripherals/adc.html
-float correctionBattery         = BOARD_LIMIT_VOLTAGE / pinVoltageMax;
+float pinVoltageMin             = DANGER_BATTERY_VOLTAGE * totalDrop;
+float fromWidthToV              = BOARD_LIMIT_VOLTAGE / maximumWidth;    
 
 /**
  *     (BATTERY COMPENSATION*)
@@ -324,3 +333,4 @@ float GPSPitchAdjustNorth, GPSPitchAdjust, GPSRollAdjustNorth, GPSRollAdjust;
 float latGPSAdjust, lonGPSAdjust, GPSManAdjustHeading;
 float latitudeGPS, longitudeGPS;
 
+const char* timeUTC = "";

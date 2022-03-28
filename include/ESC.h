@@ -59,13 +59,16 @@ void setEscPulses(){
       esc4 = throttle - pidOutputPitch - pidOutputRoll + pidOutputYaw;   //Calculate the pulse for esc 4 (front-left - CW)
 
       #if BATTERY_COMPENSATION 
-        if (batteryVoltage > 3. && batteryVoltage < MAX_BATTERY_VOLTAGE){// Is the battery connected?
-          escCorr = (int16_t)                                            // correction factor
-          ((MAX_BATTERY_VOLTAGE - batteryVoltage) / batteryCurvePendency);
-          esc1 += escCorr;                                               // Compensate the esc-1 pulse for voltage drop.
-          esc2 += escCorr;                                               // Compensate the esc-2 pulse for voltage drop.
-          esc3 += escCorr;                                               // Compensate the esc-3 pulse for voltage drop.
-          esc4 += escCorr;                                               // Compensate the esc-4 pulse for voltage drop.
+        if (batteryVoltage > DANGER_BATTERY_VOLTAGE &&
+            batteryVoltage < MAX_BATTERY_VOLTAGE){                       // is the battery connected?
+
+            escCorr = (int16_t)                                          // correction factor
+            ((MAX_BATTERY_VOLTAGE - batteryVoltage) / batteryCurvePendency);
+
+            esc1 += escCorr;                                             // Compensate the esc-1 pulse for voltage drop.
+            esc2 += escCorr;                                             // Compensate the esc-2 pulse for voltage drop.
+            esc3 += escCorr;                                             // Compensate the esc-3 pulse for voltage drop.
+            esc4 += escCorr;                                             // Compensate the esc-4 pulse for voltage drop.
         }
       #endif
 

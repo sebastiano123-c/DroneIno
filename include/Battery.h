@@ -41,7 +41,7 @@ void readBatteryVoltage(){
   batteryPercentage = batteryVoltage / MAX_BATTERY_VOLTAGE * 100;
 
   //Turn on the led if battery voltage is too low.
-  if(batteryVoltage < MIN_BATTERY_VOLTAGE) ledcWrite(pwmLedBatteryChannel, MAX_DUTY_CYCLE);
+  if(batteryVoltage < WARNING_BATTERY_VOLTAGE) ledcWrite(pwmLedBatteryChannel, MAX_DUTY_CYCLE);
   else ledcWrite(pwmLedBatteryChannel, 0);
 
   #if DEBUG

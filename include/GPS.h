@@ -1,7 +1,56 @@
+/**
+ * @file GPS.h
+ * @author @sebastiano123-c
+ * @brief GPS routines.
+ * @version 0.1
+ * @date 2022-02-28
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ * The GPS communication works via RX/TX serial communication.
+ * GPS prints on this serial strings with the informations using the NMEA protocol, for example
+ * 
+ *    $GPGGA,155902.00,4501.502642,N,01434.102644,E,1,12,0.7,15.0,M,44.0,M,,*78
+ * 
+ * The following code reads this string using a char array whose index represents
+ *    @li 0: '$', signalling the beginning of the string
+ *    @li 1-6: string type
+ *    @li 7-16: UTC time
+ *    @li 17-25: latitude in degrees
+ *    @li 30: l8titude dir
+ *    @li 31-43: longitude in degrees
+ *    @li 45: longitude dir
+ *    @li @todo finishing this list
+ * 
+ *  $GPGGA,hhmmss.ss,llll.ll,a,yyyyy.yy,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx*hh
+ * 
+ *   1    = UTC of Position
+ *   2    = Latitude
+ *   3    = N or S
+ *   4    = Longitude
+ *   5    = E or W
+ *   6    = GPS quality indicator (0=invalid; 1=GPS fix; 2=Diff. GPS fix)
+ *   7    = Number of satellites in use [not those in view]
+ *   8    = Horizontal dilution of position
+ *   9    = Antenna altitude above/below mean sea level (geoid)
+ *   10   = Meters  (Antenna height unit)
+ *   11   = Geoidal separation (Diff. between WGS-84 earth ellipsoid and
+ *          mean sea level.  -=geoid is below WGS-84 ellipsoid)
+ *   12   = Meters  (Units of geoidal separation)
+ *   13   = Age in seconds since last update from diff. reference station
+ *   14   = Diff. reference station ID#
+ *   15   = Checksum
+ * 
+ * @link http://aprs.gids.nl/nmea/ @endlink
+ */
 
+// new serial
 HardwareSerial SerialGPS(1);
 
-
+/**
+ * @brief Setup function for the GPS
+ * 
+ */
 void setupGPS(void) {
 
   SerialGPS.begin(GPS_BAUD, SERIAL_8N1, PIN_RX2, PIN_TX2);
@@ -45,11 +94,34 @@ void readGPSSerialLine(){
         NMEANewline = 1;                                                                   // then there will be a new line
 }
 
-void printGPSSerialLine(){
+void printRawGPSSerialLine(){
     Serial.println(SerialGPS.readStringUntil('\n'));
 }
 
+void calculateGPSTimeUTC(){
+  // instantiate objs
+  static char charGPS[30];                                              // the char array that will be filled
+  char* ptr = charGPS;                                                  // pointer to the char array
+
+  // add UTC time zone
+  int hourUTC = ((int)GPSString[7] - 48) * 10 + (int)GPSString[8] - 48; // create the hour integer
+  hourUTC += UTC_TIME_ZONE;                                             // add time zone
+
+  // fill char array
+  ptr += sprintf(ptr, "%i:%c%c:%c%c.%c%c", hourUTC,                     // hh: hours
+                                           GPSString[9],                // mm: minutes
+                                           GPSString[10],
+                                           GPSString[11],               // ss: seconds
+                                           GPSString[12],
+                                           GPSString[14],               // ff: milliseconds
+                                           GPSString[15]);
+  *ptr++ = 0;                                                           // char array must terminate with the null char
+
+  timeUTC = (const char*)charGPS;                                       // convert char array to const char*
+}
+
 void calculateLatLonGPSGA(){
+
     latActualGPS = ((int)GPSString[19] - 48) *  (long)10000000;                              // filter the minutes for the GGA line multiplied by factors 10, ...
     latActualGPS += ((int)GPSString[20] - 48) * (long)1000000;                                                                                       
     latActualGPS += ((int)GPSString[22] - 48) * (long)100000;                                                                                        
@@ -200,7 +272,9 @@ void calculatePIDFromGPS(){
     }
 }
 
-void readGPS(void) {
+#if GPS == BN_880
+
+  void readGPS(void) {
 
     if (GPSAddCounter >= 0) GPSAddCounter --;
 
@@ -227,8 +301,10 @@ void readGPS(void) {
         }
 
         // if the line starts with GA and if there is a GPS fix we can scan the line for the latitude, longitude and number of satellites.
-        if (GPSString[4] == 'G' && GPSString[5] == 'A' && (GPSString[44] == '1' || GPSString[44] == '2')) 
-            calculateLatLonGPSGA();
+        if (GPSString[4] == 'G' && GPSString[5] == 'A' && (GPSString[44] == '1' || GPSString[44] == '2')){
+          calculateGPSTimeUTC();
+          calculateLatLonGPSGA();
+        }
 
         // if the line starts with SA and if there is a GPS fix we can scan the line for the fix type (none, 2D or 3D).
         if (GPSString[4] == 'S' && GPSString[5] == 'A')
@@ -270,30 +346,40 @@ void readGPS(void) {
 
     // if the GPS hold mode is disabled and the waypoints are set
     if (flightMode < 3 && waypointGPS > 0) {                                                              
-        GPSRollAdjust = 0;                                                                                  //Reset the GPSRollAdjust variable to disable the correction.
-        GPSPitchAdjust = 0;                                                                                 //Reset the GPSPitchAdjust variable to disable the correction.
-        if (waypointGPS == 1) {                                                                              //If the waypoints are stored
-        GPSRotatingMemLocation = 0;                                                                      //Set the GPSRotatingMemLocation to zero so we can empty the
-        waypointGPS = 2;                                                                                   //Set the waypointGPS variable to 2 as an indication that the buffer is not cleared.
-        }
-        GPSLonRotatingMem[ GPSRotatingMemLocation] = 0;                                                 //Reset the current GPSLonRotatingMem location.
-        GPSLatRotatingMem[ GPSRotatingMemLocation] = 0;                                                 //Reset the current GPSLonRotatingMem location.
-        GPSRotatingMemLocation++;                                                                          //Increment the GPSRotatingMemLocation variable for the next loop.
-        if (GPSRotatingMemLocation == 36) {                                                                //If the GPSRotatingMemLocation equals 36, all the buffer locations are cleared.
-        waypointGPS = 0;                                                                                   //Reset the waypointGPS variable to 0.
-        //Reset the variables that are used for the D-controller.
-        GPSLatErrorPrevious = 0;
-        GPSLonErrorPrevious = 0;
-        GPSLatAvarage = 0;
-        GPSLonAvarage = 0;
-        GPSRotatingMemLocation = 0;
-        //Reset the waypoints.
-        longLatWaypoint = 0;
-        longLonWaypoint = 0;
-        }
-    }
-}
+          GPSRollAdjust = 0;                                                                                  //Reset the GPSRollAdjust variable to disable the correction.
+          GPSPitchAdjust = 0;                                                                                 //Reset the GPSPitchAdjust variable to disable the correction.
+          if (waypointGPS == 1) {                                                                              //If the waypoints are stored
+          GPSRotatingMemLocation = 0;                                                                      //Set the GPSRotatingMemLocation to zero so we can empty the
+          waypointGPS = 2;                                                                                   //Set the waypointGPS variable to 2 as an indication that the buffer is not cleared.
+          }
+          GPSLonRotatingMem[ GPSRotatingMemLocation] = 0;                                                 //Reset the current GPSLonRotatingMem location.
+          GPSLatRotatingMem[ GPSRotatingMemLocation] = 0;                                                 //Reset the current GPSLonRotatingMem location.
+          GPSRotatingMemLocation++;                                                                          //Increment the GPSRotatingMemLocation variable for the next loop.
+          if (GPSRotatingMemLocation == 36) {                                                                //If the GPSRotatingMemLocation equals 36, all the buffer locations are cleared.
+          waypointGPS = 0;                                                                                   //Reset the waypointGPS variable to 0.
+          //Reset the variables that are used for the D-controller.
+          GPSLatErrorPrevious = 0;
+          GPSLonErrorPrevious = 0;
+          GPSLatAvarage = 0;
+          GPSLonAvarage = 0;
+          GPSRotatingMemLocation = 0;
+          //Reset the waypoints.
+          longLatWaypoint = 0;
+          longLonWaypoint = 0;
+          }
+      }
+  }
+
+#elif GPS == OFF
+
+  void readGPS(){
+    return;
+  }
+
+#else 
+  #error "\n Error: Invalid GPS token "
+#endif
 
 void printGPS(){//696581
-    Serial.printf("lat: %f, lon: %f \n", latitudeGPS, longitudeGPS);
+    Serial.printf("time: %s, lat: %f, lon: %f \n", timeUTC, latitudeGPS, longitudeGPS);
 }

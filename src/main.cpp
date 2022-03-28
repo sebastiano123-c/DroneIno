@@ -354,7 +354,6 @@
       else if (trimCh[0].actual < 2050 &&
                trimCh[0].actual > 1950) flightMode = 3;    // SWC DOWN: GPS*
 
-
       // GPS
       readGPS();
 

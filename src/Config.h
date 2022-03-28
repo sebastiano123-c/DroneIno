@@ -24,26 +24,32 @@
 
 
 /**
- * @brief SKETCH CONFIG
+ * ----------------------------------------------------------------------------------------------------------------------------
+ *  SKETCH CONFIGURATION
  * 
+ *      (MICROCONTROLLER BOARD)
  */
-//      (MICROCONTROLLER BOARD)
 #define PINMAP                      ESP32                    // (OFF**, ATMEGA32**, ESP32) OFF if the board is Arduino Uno (directly write pin)
 
-//      (SKETCH TO BE UPLOADED)
-//      Defines the compiler which sketch is to be uploaded.
-//      Following the list:
-//          1) SETUP               tells the compiler to use the setup sketch,
-//          2) CALIBRATION         ... calibration sketch,
-//          3) FLIGHT_CONTROLLER   ... flight controller
-//      and uploading the sketch each time, you first begin with SETUP.
-//      This way you will calibrate RC-controller and more, and this will save information into EEPROM.
-//      Then, upload with CALIBRATION and calibrate ESC and check that each components behaves in the correct way.
-//      Finally upload with FLIGHT_CONTROLLER and start to fly.
+/**
+ *      (SKETCH TO BE UPLOADED)
+ *      Defines the compiler which sketch is to be uploaded.
+ *      Following the list:
+ *          1) SETUP               tells the compiler to use the setup sketch,
+ *          2) CALIBRATION         ... calibration sketch,
+ *          3) FLIGHT_CONTROLLER   ... flight controller
+ *      and uploading the sketch each time, you first begin with SETUP.
+ *      This way you will calibrate RC-controller and more, and this will save information into EEPROM.
+ *      Then, upload with CALIBRATION and calibrate ESC and check that each components behaves in the correct way.
+ *      Finally upload with FLIGHT_CONTROLLER and start to fly.
+ */
 #define UPLOADED_SKETCH             FLIGHT_CONTROLLER        // (SETUP, CALIBRATION, FLIGHT_CONTROLLER) 
 
-//      (DEBUG MODE)
-//      If true, some serial prints are enabled. Otherwise, it is not auspicable to set DEBUG true when flying
+/**
+ *      (DEBUG MODE)
+ *      If true, some serial prints are enabled.
+ *      Otherwise, it is not auspicable to set DEBUG true when flying.
+ */
 #define DEBUG                       false                    // (true, false) true enable serial prints for debugging
 
 //      (SKETCH CONSTANTS)
@@ -54,11 +60,12 @@
 
 
 /**
- * @brief AUTO LEVELING
+ * ----------------------------------------------------------------------------------------------------------------------------
+ *  AUTO LEVELING
  * 
- * If true, the drone will adjust its flying accordingly to the gyroscope readings.
- * If false, disables every autoleveling compensation.
- * Till now, MPU6050 is the only gyroscope admitted on DroneIno.
+ *      If true, the drone will adjust its flying accordingly to the gyroscope readings.
+ *      If false, disables every autoleveling compensation.
+ *      Till now, MPU6050 is the only gyroscope admitted on DroneIno.
  */
 #define AUTO_LEVELING               true                     // (true, false) 
 #define GYROSCOPE                   MPU6050                  // (MPU6050) unique for now
@@ -66,7 +73,8 @@
 
 
 /**
- * @brief ALTITUDE
+ * ----------------------------------------------------------------------------------------------------------------------------
+ *  ALTITUDE
  * 
  */
 #define ALTITUDE_SENSOR             BMP280                   // (OFF, BMP280*, BME280**)
@@ -74,40 +82,59 @@
 
 
 /**
- * @brief GPS
+ * ----------------------------------------------------------------------------------------------------------------------------
+ *  GPS
  * 
  */
-//      
 #define GPS                         BN_880                   // (OFF, BN_880*)
-#define GPS_BAUD                    9600                     //
+#define GPS_BAUD                    9600                     // (9600, 57600, 115200)
+#define UTC_TIME_ZONE               2                        // (0-23) Put your time zone here, for example 2 stands for UTC+2 
+
+
 
 /**
- * @brief BATTERY CONFIG
+ * ----------------------------------------------------------------------------------------------------------------------------
+ *  BATTERY
  * 
- */
-//      (BATTERY LIMITS)
-#define MAX_BATTERY_VOLTAGE         11.40                    // (V) battery nominal maximum voltage (use ONLY 11.1V batteries)
-#define MIN_BATTERY_VOLTAGE         6.00                     // (V) battery level under which it is dangerous to use
+ *      (BATTERY SPECS)
+ *      I use a 3s LiPo Battery with 11.1V, 2200mAh capacity and 50C discharge rate
+ *      For 3s batteries, the danger voltage is 3*3 V = 9 V, but it is preferable 
+ *      to stop flying before reaching 9V.
+ *      The warning battery voltage defines the value under which a led starts blinking.
+ */     
+#define NUMBER_OF_CELLS             3                        // (V) battery nominal maximum voltage (use ONLY 11.1V batteries)
+#define WARNING_BATTERY_VOLTAGE     10.000                   // (V)
 
-//      (COMPONSATE)
-//      When flying, the motors rotating cause a voltage diminuition.
-//      If true, BATTERY_COMPENSATION will compensate this behavior.
+/**
+ *      (COMPENSATION)
+ *      When flying, the motors rotating cause a voltage diminuition.
+ *      If true, BATTERY_COMPENSATION will compensate this behavior.
+ */
 #define BATTERY_COMPENSATION        true                     // (true, false)
 
-//      (VOLTAGE PARTITOR)
-//      The voltage partitor is: 
-//            11.1V --- res 1 ---+--- res2 --- GND
-//                              Vpin              
+/**
+ *      (VOLTAGE PARTITOR)
+ *      The voltage partitor is: 
+ *            Vin --- res 1 ---+--- res2 --- GND
+ *                            Vpin              
+ */
 #define RESISTANCE_1                5.10                     // (kOhm) the resistance before V_pin
 #define RESISTANCE_2                2.22                     // (kOhm) the resistance after V_pin
 
-//      (WIFI TELEMETRY)
-//      Using WiFi a telemtry system is done, making everything simple and easy reach.
-//      Use it to fine-tune your PID or fix gyroscope set point and altitude hold PID parameters.
-//      Using this you can adjust on the fly these parameters and much more:
-//          *) NATIVE uses the ESP32 wifi AP,
-//          *) ESP_CAM uses the ESP32CAM wifi.
-//      See https://github.com/sebastiano123-c/Esp32-cam-telemetry for more details
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------------------
+ *  TELEMETRY
+ * 
+ *      (WIFI)
+ *      Using WiFi a telemtry system is done, making everything simple and easy reach.
+ *      Use it to fine-tune your PID or fix gyroscope set point and altitude hold PID parameters.
+ *      Using this you can adjust on the fly these parameters and much more:
+ *          *) NATIVE uses the ESP32 wifi AP,
+ *          *) ESP_CAM uses the ESP32CAM wifi.
+ *      See https://github.com/sebastiano123-c/Esp32-cam-telemetry for more details.
+ */
 #define WIFI_TELEMETRY              ESP_CAM                  // (NATIVE, ESP_CAM) 
 
 

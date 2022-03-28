@@ -385,7 +385,8 @@
     sptr += sprintf(sptr, "%i,", receiverInputChannel4);
     sptr += sprintf(sptr, "%i,", receiverInputChannel3);
     sptr += sprintf(sptr, "%f,", latitudeGPS);
-    sptr += sprintf(sptr, "%f>", longitudeGPS);
+    sptr += sprintf(sptr, "%f,", longitudeGPS);
+    sptr += sprintf(sptr, "%s>", timeUTC);
 
     // close the string
     *sptr++ = 0;
