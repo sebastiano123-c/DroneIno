@@ -109,6 +109,7 @@ Set the SWC switch of the transmitter to channel 5 and connect the receiver chan
 * SWC center: flight mode selected is altitude hold (and auto-leveling if enabled);
 * SWC down: flight mode selected is GPS (**_NOT TO USE AT THE MOMENT_**).
 
+
 # **Documentation**
 ## **Circuit scheme**
 The power is supplied by the 11.1V 2200mAh (3800 should be better) 3s 20C LiPo battery.
