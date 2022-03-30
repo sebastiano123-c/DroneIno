@@ -75,7 +75,7 @@ Set the SWC switch of the transmitter to channel 5 and connect the receiver chan
 * SWC up: flight mode selected is only auto-leveling;
 * SWC center: flight mode selected is altitude hold (and auto-leveling if enabled);
 * SWC down: flight mode selected is GPS (**_NOT TO USE AT THE MOMENT_**).
-* 
+
 # **Documentation**
 The circuit scheme and the detailed construction steps are reported in the full [documentation](https://github.com/sebastiano123-c/DroneIno/tree/main/docs).
 Here I will describe the main features of DroneIno.
