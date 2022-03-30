@@ -1,8 +1,18 @@
-// ESP32 pinmap
-// @author: Sebastiano Cocchi
+/**
+ * @file pinmap.ESP32-D1-R32.h
+ * @author @sebastiano123-c
+ * @brief ESP32 D1 R32 pinmap.
+ * @version 0.1
+ * @date 2022-03-30
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 
-// ATmega32 pinmap
-// @author: Sebastiano Cocchi
+
+// board limit voltage of the pins, for ESP32 is 3.3 V
+#define BOARD_LIMIT_VOLTAGE         3.300
+
 
 //      (ESC)
 #define PIN_ESC_1                   17
@@ -45,5 +55,3 @@
 #define PIN_RX2                     36
 #define PIN_TX2                     34
 
-// board limit voltage of the pins, for ESP32 is 3.3 V
-#define BOARD_LIMIT_VOLTAGE         3.300

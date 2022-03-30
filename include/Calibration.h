@@ -175,7 +175,7 @@ void printSignals(){
   if(receiverInputChannel4 - 1480 < 0)Serial.print("<<<");
   else if(receiverInputChannel4 - 1520 > 0)Serial.print(">>>");
   else Serial.print("-+-");
-  Serial.println(receiverInputChannel4);
+  Serial.print(receiverInputChannel4);
   
   Serial.print("  Roll:");
   if(receiverInputChannel1 - 1480 < 0)Serial.print("<<<");
@@ -193,7 +193,7 @@ void printSignals(){
   if(trimCh[0].actual - 1480 < 0)Serial.print("^^^");
   else if(trimCh[0].actual - 1520 > 0)Serial.print("vvv");
   else Serial.print("-+-");
-  Serial.print(trimCh[0].actual);
+  Serial.println(trimCh[0].actual);
 }
 
 

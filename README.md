@@ -77,8 +77,8 @@ Set the SWC switch of the transmitter to channel 5 and connect the receiver chan
 * SWC down: flight mode selected is GPS (**_NOT TO USE AT THE MOMENT_**).
 * 
 # **Documentation**
-The circuit scheme and the detailed construction steps are reported in the full [documentation](https://github.com/sebastiano123-c/DroneIno/tree/main/docs). 
-I describe the main features of DroneIno.
+The circuit scheme and the detailed construction steps are reported in the full [documentation](https://github.com/sebastiano123-c/DroneIno/tree/main/docs).
+Here I will describe the main features of DroneIno.
 
 ## **Auto-leveling**
 DroneIno automatically corrects spurious drifts using the gyroscope signals.
@@ -129,7 +129,7 @@ Future improvements:
 - use other boards.
 
 # **Previous version**
-The first version of DroneIno is [here](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/test/DroneIno.zip).
+The first version of DroneIno is downloadable [here](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/test) as zip file.
 It is intended to work with Arduino IDE.
 
 # **Author**

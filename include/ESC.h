@@ -15,19 +15,28 @@
  */
 void droneStart(){
 
-  start = 2;
+  switch (DANGEROUS_BATTERY_LEVEL) {                  
+    case 0:                                                                // if battery has not reached the dangerous level drone can start
+      start = 2;
 
-  anglePitch = anglePitchAcc;                                          //Set the gyro pitch angle equal to the accelerometer pitch angle when the quadcopter is started.
-  angleRoll = angleRollAcc;                                            //Set the gyro roll angle equal to the accelerometer roll angle when the quadcopter is started.
-  gyroAnglesSet = true;                                                //Set the IMU started flag.
 
-  //Reset the PID controllers for a bumpless start.
-  pidIMemRoll = 0;
-  pidLastRollDError = 0;
-  pidIMemPitch = 0;
-  pidLastPitchDError = 0;
-  pidIMemYaw = 0;
-  pidLastYawDError = 0;
+      anglePitch = anglePitchAcc;                                          //Set the gyro pitch angle equal to the accelerometer pitch angle when the quadcopter is started.
+      angleRoll = angleRollAcc;                                            //Set the gyro roll angle equal to the accelerometer roll angle when the quadcopter is started.
+      gyroAnglesSet = true;                                                //Set the IMU started flag.
+
+      //Reset the PID controllers for a bumpless start.
+      pidIMemRoll = 0;
+      pidLastRollDError = 0;
+      pidIMemPitch = 0;
+      pidLastPitchDError = 0;
+      pidIMemYaw = 0;
+      pidLastYawDError = 0;
+
+      break;
+    
+    default:                                                                // if battery has yet reached the dangerous level drone will not start
+      break;
+  }
 }
 
 /** 

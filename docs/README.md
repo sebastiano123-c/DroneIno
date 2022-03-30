@@ -63,7 +63,8 @@ Make sure to do all the passages described here below.
     - [**SD card for data storage**](#sd-card-for-data-storage)
 - [**Altitude hold**](#altitude-hold)
 - [**GPS**](#gps)
-- [**Previous version**](#previous-version)
+- [**Appendix A: previous version**](#appendix-a-previous-version)
+- [**Appendix B: another circuit scheme**](#appendix-b-another-circuit-scheme)
 - [**Author**](#author)
 
 # **Usage**
@@ -110,18 +111,26 @@ Set the SWC switch of the transmitter to channel 5 and connect the receiver chan
 
 # **Documentation**
 ## **Circuit scheme**
-The power is supplied by the 11.1V 2200mAh 3s 20C LiPo battery.
+The power is supplied by the 11.1V 2200mAh (3800 should be better) 3s 20C LiPo battery.
 The battery powers the motors and the ESP32.
-The resistances R2 = 2.22kOhms and R3 = 5.1kOhms and the diode D1 (1N4001 or similar) handle the current going through the board.
-D1 ensures that the PC is safe while both battery and pc are connected to the ESP32.
-The resistance R1 = 330 is used for the LED. 
+Battery voltage is measured by GPIO-39 using a voltage divider with R1 = 5.1 kOhm and R2 = 1.55 kOhm.
+
+Consider that each of the 3 cells of the battery can have a maximum voltage of 4.2V, thus the total battery voltage should be 4.2V*3 = 12.6V.
+**Warning:** *Do not discharge the battery's cells under 3V, thus never let our battery go under the 3V*3 = 9V.*
+
+ESP32 power is supplied from a voltage regulator (Vreg) connected to the battery.
+Set the maximum output voltage to 11.5V or so.
+The reason is that ESP32 VIN+ should never be supplied more than 12V.
+*Please note that a circuit involving a diode (lighter than a Vreg) is reported in Appendix B.*
+
+The resistance R3 = 330 Ohm is used for the LED. 
 <pre>
-    LEGEND:                                                 +-----+--R3--+     
-    X-  = disconnected                                      |     |      |                      
-    -+- = sold cables                                       |     R2     |                   __________________ 
-    -|- = not touching cables                               |  +--|------+---D1--------++==|+VCC|11.1V, >= 20C | 
+    LEGEND:                                                 +-----+-------R1-----+     
+    X-  = disconnected                                      |     |              |                      
+    -+- = sold cables                                       |     R2             |         _____________________ 
+    -|- = not touching cables                               |  +--|------Vreg----+-----++==|+VCC|11.1V, >= 20C | 
     === = 3-5A cables                                       |  |  +----------------++==||==|-GND|2200mAh, 3s   | 
-                                                            |  |  |                ||  ||    ## LiPo BATTERY ## 
+                                                            |  |  |                ||  ||  ### LiPo BATTERY ####
                  +---------------------------------+        |  |  |   _________    ||  ||              _____    
                  | +-------------------------------|--------|--|--|-->|°INPUT |====||==||=============/     \
                  | | +-----------------------------|-----+  |  |  | X-|+VIN   |====||==||=============| M1  |
@@ -142,13 +151,13 @@ The resistance R1 = 330 is used for the LED.
 | |   |  | CH3°|<----------->|°IO05          RST°| | |            +-->|-GND   |====||==||=============\ CCW /
 | |   |  | CH4°|<----------->|°IO23           5V°| | |            |   |      +|====||==++                    
 | | +-|->| VIN+|       +---->|°IO19  (not in  OD°| | |            |   |      -|====++  ||                    
-| | | +->| GND-|       R1 +->|°IO18    scale)    | | |            |   ##ESC-3##    ||  ||                    
+| | | +->| GND-|       R3 +->|°IO18    scale)    | | |            |   ##ESC-3##    ||  ||                    
 | | | |  ##RX ##       |  |  |-GND               | | |            |   _________    ||  ||              _____ 
 | | | |  _______     (LED)|  |°RST               | | +------------|-->|°INPUT |====||==||=============/     \
 +-|-|-|->| SDA°|<------|--|->|°SDA (GPIO 21)     | |              | X-|+VIN   |====||==||=============| M4  |
   +-|-|->| SCL°|<------|--|->|°SCL (GPIO 22)     | |              +-->|-GND   |====||==||=============\ CW  /
     +-|->| VCC+|       |  |  #### ESP32 D1 R32 ### |              |   |      +|====||==++                  
-    | +->| GND-|       |  R1                       |              |   |      -|====++                        
+    | +->| GND-|       |  R3                       |              |   |      -|====++                        
     | |  #gyro #       | (LEDf)                    |              |   ##ESC-4##                              
     | +----------------+--+------------------------|--------------+                                            
     +----------------------------------------------+                                                                       
@@ -165,7 +174,7 @@ Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/m
 Write "UPLOADED_SKETCH  SETUP" in the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/Config.h) and upload the sketch to your board.
 
 ## **Calibration**
-If the setup sketch exits with succeed, write "UPLOADED_SKETCH  CALIBRATION" in the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/Config.h) and upload the sketch.
+If the setup sketch succeeds, write "UPLOADED_SKETCH  CALIBRATION" in the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/Config.h) and upload the sketch.
 
 Send the following characters to the serial monitor:
 * **r** to check if the transmitter signal is decoded correctly; move the trim and check that:
@@ -173,7 +182,7 @@ Send the following characters to the serial monitor:
   * roll:     left 1000us| right 2000us;
   * pitch:    left 1000us| right 2000us;
   * yaw:      left 1000us| right 2000us;
-* **a** to verify that the gyroscope is set up correctly (the angles should be between approximately [-45°, 45°]):
+* **g** to verify that the gyroscope is set up correctly (the angles should be between approximately [-45°, 45°]):
   * nose down: negative angle;
   * left down: negative angle;
   * yaw left: negative angle;
@@ -188,6 +197,13 @@ Send the following characters to the serial monitor:
 * **5** to use all the motors.
 
 If the motors rotate in the opposite direction, just exchange one of the three cables between the ESC and the motor.
+
+*Note:* if CALIBRATION sketch is uploaded, you can also check the readings of:
+* the altitude sensor (send 'a' on serial);
+* battery readings (send 'b');
+* blinking leds (send 'l');
+* printing the EEPROM memory (send 'e');
+* GPS (send 's').
 
 ### **ESCs calibration**
 Calibrate the ESCs without propellers.
@@ -326,8 +342,9 @@ _Note 1:_ GYROSCOPE_ROLL_FILTER, GYROSCOPE_ROLL_CORR and GYROSCOPE_PITCH_CORR ca
 0
 0
 ```
-Then, depending on the value of the pitch and roll you read on the telemetry web app, change the value of the roll correction and pitch correction.
-These adjustments seem to be crucial to prevent drifts when the drone is hovering.
+Then, place DroneIno onto a 0° horizontal surface.
+After the drone initialization, depending on the value of the pitch and roll you read on the telemetry web app, change the value of the roll correction and pitch correction.
+<!-- These adjustments seem to be crucial to prevent drifts when the drone is hovering. -->
 
 SD card feature is recommended because when you change some settings in the web app, the `src\config.txt` file will be automatically updated.
 With SD card your flight data, such as roll angle, pitch angles, battery and altitude will be save in a file in the folder `data\flight_i.csv`, which is automatically created.
@@ -365,10 +382,58 @@ Tuning `batteryCurvePendency` you may find the expected altitude hold behavior.
 - flight adjustements;
 - if you use ESP32-CAM telemetry, cool plots showing the flight route of DroneIno.
 
-
-# **Previous version**
+# **Appendix A: previous version**
 The first version of DroneIno is [here](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/test/DroneIno.zip).
 It is intended to work with Arduino IDE.
+
+# **Appendix B: another circuit scheme**
+In the previous DroneIno version, I used the following circuit scheme which involves a diode (and not a voltage regulator).
+This solution provide lighter drone weight and will supply 12.6V - 0.7V = 11.9V to the board.
+Otherwise, I wanted to have a 'modulate' tension supplier, in order to test the minimum tension one can give to the board.
+
+The resistances R2 = 2.22kOhms and R1 = 5.1kOhms and the diode D1 (1N4001 or similar) handle the current going through the board.
+Remember that the diodes typically drop the voltage about 0.7V.
+D1 ensures that the PC is safe while both battery and pc are connected to the ESP32.
+
+<pre>
+    LEGEND:                                                 +-----+--R1--+     
+    X-  = disconnected                                      |     |      |                      
+    -+- = sold cables                                       |     R2     |                 _____________________ 
+    -|- = not touching cables                               |  +--|------+---D1--------++==|+VCC|11.1V, >= 20C | 
+    === = 3-5A cables                                       |  |  +----------------++==||==|-GND|2200mAh, 3s   | 
+                                                            |  |  |                ||  ||  #### LiPo BATTERY ###
+                 +---------------------------------+        |  |  |   _________    ||  ||              _____    
+                 | +-------------------------------|--------|--|--|-->|°INPUT |====||==||=============/     \
+                 | | +-----------------------------|-----+  |  |  | X-|+VIN   |====||==||=============| M1  |
+                 | | | +---------------------------|---+ |  |  |  +-->|-GND   |====||==||=============\ CCW /
+        ______   | | | | +-------------------------|-+ | |  |  |  |   |      +|====||==++                    
++------>|SDA°|   | | | | |   _____________________ | | | |  |  |  |   |      -|====++  ||                    
+| +---->|SCL°|   | | | | |   |°IO03         IO39°|<|-|-|-|--+  |  |   ##ESC-1##    ||  ||                    
+| |     |VCC+|<--------------------------+  IO38°| | | | |     |  |   _________    ||  ||              _____  
+| |   +>|GND-|   | | | | |   |°IO26      |  IO34°| | | | +-----|--|-->|°INPUT |====||==||=============/     \
+| |   | #baro#   | | | | |   |°IO25      |  IO04°|<+ | |       |  | X-|+VIN   |====||==||=============| M2  |
+| |   |          | | | | +-->|°IO17      |  IO02°|   | |       |  +-->|-GND   |====||==||=============\ CW  /
+| |   |          | | | +---->|°IO16      |       |   | |       |  |   |      +|====||==++                    
+| |   |          | | +------>|°IO27      |   VIN+|<--|-|-------+  |   |      -|====++  ||                    
+| |   |  _______ | +-------->|°IO14      |   GND-|<--|-|----------+   ##ESC-2##    ||  ||                    
+| |   |  | CH5°|<+           |           |   GND-|   | |          |   _________    ||  ||              _____ 
+| |   |  | CH1°|<----------->|°IO12      |    5V°|<+ | +----------|-->|°INPUT |====||==||=============/     \
+| |   |  | CH2°|<----------->|°IO13      +-->3V3°| | |            | X-|+VIN   |====||==||=============| M3  |
+| |   |  | CH3°|<----------->|°IO05          RST°| | |            +-->|-GND   |====||==||=============\ CCW /
+| |   |  | CH4°|<----------->|°IO23           5V°| | |            |   |      +|====||==++                    
+| | +-|->| VIN+|       +---->|°IO19  (not in  OD°| | |            |   |      -|====++  ||                    
+| | | +->| GND-|       R3 +->|°IO18    scale)    | | |            |   ##ESC-3##    ||  ||                    
+| | | |  ##RX ##       |  |  |-GND               | | |            |   _________    ||  ||              _____ 
+| | | |  _______     (LED)|  |°RST               | | +------------|-->|°INPUT |====||==||=============/     \
++-|-|-|->| SDA°|<------|--|->|°SDA (GPIO 21)     | |              | X-|+VIN   |====||==||=============| M4  |
+  +-|-|->| SCL°|<------|--|->|°SCL (GPIO 22)     | |              +-->|-GND   |====||==||=============\ CW  /
+    +-|->| VCC+|       |  |  #### ESP32 D1 R32 ### |              |   |      +|====||==++                  
+    | +->| GND-|       |  R3                       |              |   |      -|====++                        
+    | |  #gyro #       | (LEDf)                    |              |   ##ESC-4##                              
+    | +----------------+--+------------------------|--------------+                                            
+    +----------------------------------------------+                                                                       
+</pre>
+
 
 # **Author**
 Sebastiano Cocchi

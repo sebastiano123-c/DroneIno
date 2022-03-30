@@ -33,7 +33,7 @@
  */
 float PID_P_GAIN_ROLL            = 1.1;                      //Gain setting for the roll P-controller (1.3)
 float PID_I_GAIN_ROLL            = 0.0015;                   //Gain setting for the roll I-controller  (0.0002)
-float PID_D_GAIN_ROLL            = 14.0;                     //Gain setting for the roll D-controller (10.0)
+float PID_D_GAIN_ROLL            = 10.0;                     //Gain setting for the roll D-controller (10.0)
 int PID_MAX_ROLL                 = 400;                      //Maximum output of the PID-controller   (+/-)
                                                                         
 /**
@@ -47,8 +47,8 @@ int PID_MAX_PITCH                = PID_MAX_ROLL;             //Maximum output of
 /**
  *    (YAW PID)
  */                                       
-float PID_P_GAIN_YAW             = 3.0;                      //Gain setting for the pitch P-controller. (2.0)
-float PID_I_GAIN_YAW             = 0.05;                     //Gain setting for the pitch I-controller. (0.04)
+float PID_P_GAIN_YAW             = 9.0;                      //Gain setting for the pitch P-controller. (2.0)
+float PID_I_GAIN_YAW             = 0.5;                      //Gain setting for the pitch I-controller. (0.04)
 float PID_D_GAIN_YAW             = 0.0;                      //Gain setting for the pitch D-controller. (0.0)
 int PID_MAX_YAW                  = 400;                      //Maximum output of the PID-controller     (+/-)
                                                                                
@@ -122,20 +122,30 @@ long accTotalVector;
 
 /**
  * -----------------------------------------------------------------------------------------------------------
- * @brief PWM
+ * PWM
  * 
- * @note PWM is used for ESC pulses and LEDs
- * 
- *    (CHANNELS)
+ *    (PWM used LEDs)
+ *    Pulse Width Modulation (PWM) has 16 channel for ESP32
  */
-const int pwmLedChannel          = 0;
-const int pwmChannel1            = 1;
-const int pwmChannel2            = 2;
-const int pwmChannel3            = 3;
-const int pwmChannel4            = 4;
-const int pwmLedBatteryChannel   = 5;
-
-//    (SPECIFICS)
+const int pwmLedChannel          = 0;                            // system led pwm channel
+const int pwmLedBatteryChannel   = 5;                            // battery led pwm channel
+/**
+ *    (PWM used for ESCs) 
+ */
+const int pwmChannel1            = 1;                            // ESC1 pwm channel
+const int pwmChannel2            = 2;                            // ESC2 pwm channel
+const int pwmChannel3            = 3;                            // ESC3 pwm channel
+const int pwmChannel4            = 4;                            // ESC4 pwm channel
+/**
+ *    (PWM used for RC-controller inputs) 
+ */
+const int pwmInputChannel1       = 6;                            // RC-controller input1 pwm channel 
+const int pwmInputChannel2       = 7;                            // RC-controller input2 pwm channel 
+const int pwmInputChannel3       = 8;                            // RC-controller input3 pwm channel 
+const int pwmInputChannel4       = 9;                            // RC-controller input4 pwm channel 
+/**
+ * (SPECS.)
+ */
 const int freq                   = 500;                           // (Hz) for what I know, 500 is the best 
 const int resolution             = 11;                            // (bits) 11 is the best guess
 const int MAX_DUTY_CYCLE         = (int)(pow(2, resolution) - 1);
@@ -157,12 +167,7 @@ float MAX_BATTERY_VOLTAGE        = MAX_CELL_VOLTAGE *                 // (V) bat
                                    NUMBER_OF_CELLS;       
 float DANGER_BATTERY_VOLTAGE     = DANGER_CELL_VOLTAGE *              // (V) battery level under which it is dangerous to use
                                    NUMBER_OF_CELLS;
-
-/**
- *    (POWER SUPPLY CIRCUIT SPECIFICS)
- *    IMPORTANT: this is in my case, you have to calculate YOUR total drop
- */
-float totalDrop                  = RESISTANCE_2 / (RESISTANCE_2 + RESISTANCE_1);// (V) total drop due to the voltage partitor
+uint8_t DANGEROUS_BATTERY_LEVEL  = false;                             // when reaching DANGER_BATTERY_VOLTAGE, this become true
 
 /**
  *     (DIGITAL PINS ACCURACY)
@@ -180,9 +185,9 @@ float maximumWidth               = pow(2., (float)adcBits)-1;             // max
  *     The correction factor is calculated because some boards accepts 5v input, others 3v3.
  *     Finally, minBatteryLevelThreshold is the board minimum voltage under which it is not safe to go.
  */ 
-float pinVoltageMax             = MAX_BATTERY_VOLTAGE * totalDrop;
-float pinVoltageMin             = DANGER_BATTERY_VOLTAGE * totalDrop;
-float fromWidthToV              = BOARD_LIMIT_VOLTAGE / maximumWidth;    
+float pinVoltageMax             = MAX_BATTERY_VOLTAGE * TOTAL_DROP;
+float pinVoltageMin             = DANGER_BATTERY_VOLTAGE * TOTAL_DROP;
+float fromWidthToV              = (BOARD_LIMIT_VOLTAGE / maximumWidth) / (TOTAL_DROP);    
 
 /**
  *     (BATTERY COMPENSATION*)
@@ -192,10 +197,10 @@ float fromWidthToV              = BOARD_LIMIT_VOLTAGE / maximumWidth;
  *     The analysis program fits the battery data (the plot on the bottom right) and gives you the m rect pendency and the intercept b.
  *     Use put here the results.
  */
-float  batteryCurvePendency      = 6e-2;                                 // compensate the rotors power loss when battery drops down
+float  batteryCurvePendency      = 6e-1;                                 // compensate the rotors power loss when battery drops down
 
 //    (MISC.)
-float pinPulseWidth, pinPulseVoltage, batteryVoltage, batteryPercentage;
+float pinPulseWidth, batteryVoltage, batteryPercentage;
 int16_t escCorr;
 
 

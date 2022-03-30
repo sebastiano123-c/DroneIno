@@ -15,7 +15,7 @@
   #include "pinmaps/pinmap.ATmega32.h"
 #elif PINMAP == ESP32                                   // ESP32 
   #define PINMAP_STR "ESP32"
-  #include "pinmaps/pinmap.ESP32.h"
+  #include "pinmaps/pinmap.ESP32-D1-R32.h"
 #endif
 
 // GYROSCOPE SENSOR

@@ -76,6 +76,10 @@
  * ----------------------------------------------------------------------------------------------------------------------------
  *  ALTITUDE
  * 
+ *      Altitude readings are relevant for the 'altitude hold' feature.
+ *      Leave OFF if you don't have any pressure sensor installed on DroneIno.
+ *      BMP280 is the only sensor I have tested and, probably, not the most sensitive one.
+ *      In the future, I will test other sensors.
  */
 #define ALTITUDE_SENSOR             BMP280                   // (OFF, BMP280*, BME280**)
 
@@ -85,9 +89,16 @@
  * ----------------------------------------------------------------------------------------------------------------------------
  *  GPS
  * 
+ *      GPS sensor is useful to recover the latitude and longitude position of DroneIno.
+ *      GPSs talk with DroneIno using a serial communication (TX/RX).
+ *      String printed on serial are then read by the board and converted into information in the file GPS.h.
+ *      Leave OFF if you don't have a GPS installed.
+ *      Till now I have tested the Beitian BN 880 (which also incorporates the compass).
+ *      For what I know, BN 880 should be very similar to the Ubox M8N. 
+ * 
  */
 #define GPS                         BN_880                   // (OFF, BN_880*)
-#define GPS_BAUD                    9600                     // (9600, 57600, 115200)
+#define GPS_BAUD                    9600                     // (9600, 57600, 115200) 9600 should be ok
 #define UTC_TIME_ZONE               2                        // (0-23) Put your time zone here, for example 2 stands for UTC+2 
 
 
@@ -103,24 +114,30 @@
  *      The warning battery voltage defines the value under which a led starts blinking.
  */     
 #define NUMBER_OF_CELLS             3                        // (V) battery nominal maximum voltage (use ONLY 11.1V batteries)
-#define WARNING_BATTERY_VOLTAGE     10.000                   // (V)
+#define WARNING_BATTERY_VOLTAGE     10.00                    // (V) when drone reaches this value, it will not take off 
 
 /**
- *      (COMPENSATION)
+ *      (COMPENSATION*)
  *      When flying, the motors rotating cause a voltage diminuition.
  *      If true, BATTERY_COMPENSATION will compensate this behavior.
+ *       
+ *      WARNING: THIS FEATURE IS DISABLED DUE TO INCORRECTNESS, PLEASE LEAVE false.
+ * 
  */
-#define BATTERY_COMPENSATION        true                     // (true, false)
+#define BATTERY_COMPENSATION        false                     // (true, false) IMPORTANT: leave false for now
 
 /**
- *      (VOLTAGE PARTITOR)
- *      The voltage partitor is: 
+ *      (VOLTAGE DIVIDER)
+ *      The voltage divider is: 
  *            Vin --- res 1 ---+--- res2 --- GND
- *                            Vpin              
+ *                             |
+ *                           V_pin     
+ * 
+ *      @note choose res1 and res2 so that the maximum V_pin is less than BOARD_MAXIMUM_VOLTAGE         
  */
-#define RESISTANCE_1                5.10                     // (kOhm) the resistance before V_pin
-#define RESISTANCE_2                2.22                     // (kOhm) the resistance after V_pin
-
+#define RESISTANCE_1                5.11                     // (kOhm) the resistance before V_pin
+#define RESISTANCE_2                1.55                     // (kOhm) the resistance after V_pin
+#define TOTAL_DROP                  RESISTANCE_2 / (RESISTANCE_1 + RESISTANCE_2)
 
 
 /**
@@ -135,7 +152,7 @@
  *          *) ESP_CAM uses the ESP32CAM wifi.
  *      See https://github.com/sebastiano123-c/Esp32-cam-telemetry for more details.
  */
-#define WIFI_TELEMETRY              ESP_CAM                  // (NATIVE, ESP_CAM) 
+#define WIFI_TELEMETRY              ESP_CAM                     // (NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
 
 
 
