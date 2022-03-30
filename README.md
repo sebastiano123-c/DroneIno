@@ -70,14 +70,15 @@ The code is intended to be used with PlatformIO.
 
 _Important:_ otherwise telemetry system is implemented using the native ESP32 WiFi, I strongly recommend to add DroneIno the [Esp32-cam-telemetry](https://github.com/sebastiano123-c/Esp32-cam-telemetry) for astonishing results (including video streaming and SD card storage).
 
-## **Selecting flight mode**
+<!-- ## **Selecting flight mode**
 Set the SWC switch of the transmitter to channel 5 and connect the receiver channel to the desired pin (mine is the GPIO 4, see the circuit scheme):
 * SWC up: flight mode selected is only auto-leveling;
 * SWC center: flight mode selected is altitude hold (and auto-leveling if enabled);
-* SWC down: flight mode selected is GPS (**_NOT TO USE AT THE MOMENT_**).
+* SWC down: flight mode selected is GPS (**_NOT TO USE AT THE MOMENT_**). -->
 
 # **Documentation**
-The circuit scheme and the detailed construction steps are reported in the full [documentation](https://github.com/sebastiano123-c/DroneIno/tree/main/docs).
+See the full [documentation](https://github.com/sebastiano123-c/DroneIno/tree/main/docs) for the circuit scheme and the detailed construction steps.
+
 Here I will describe the main features of DroneIno.
 
 ## **Auto-leveling**
