@@ -1,10 +1,10 @@
 /**
  *
- *                      **********************************     
- *                      *           DroneIno !           *
- *                      **********************************
- *                     
- *                     Pilot your ESP32 based DIY quadcopter.
+ *                       **********************************     
+ *                       *           DroneIno !           *
+ *                       **********************************
+ *                      
+ *                      Pilot your ESP32 based DIY quadcopter.
  * 
  *                
  * 
@@ -28,6 +28,17 @@
  * THE SOFTWARE.
  * 
  * 
+ * 
+ *                               DOCUMENTATION:
+ * 
+ * This is the main file governing DroneIno and contains the architecture of
+ * the software, including the setup, the calibration and the flight controller.
+ * The constants, the global variables and the functions are all defined in the 
+ * '../include' directory.
+ * Take a look at the Config.h file and modify it accordingly to your drone hardware.
+ * See '../docs/README.md' for the full documentation.
+ * 
+ * 
  *                            
  *                       ! TRY FIRST WITHOUT PROPELLERS !
  *  
@@ -37,15 +48,11 @@
  * 
  * 
  * @file main.cpp
- * 
  * @author Sebastiano Cocchi (@sebastiano123-c)
- * 
+ * @brief Main DroneIno file, defining the architecture of the software.
  * @version 1.1
- * 
- * @date 2022-03-23 
- * 
+ * @date 2022-03-30 
  * @copyright Copyright (c) 2022
- * 
  */
 
 

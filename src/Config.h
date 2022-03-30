@@ -1,24 +1,107 @@
 /**
+ *
+ *   
+ *                      **********************************     
+ *                      *       Configuration file       *
+ *                      **********************************
+ *                     
+ *             Config.h is intended to fit as your drone developing.
+ *          
+ * 
+ * 
+ * 
+ *                           SKETCH CONFIGURATION:
+ *      
+ * Accordingly to the documentation, after you building the hardware, set the proper
+ * variable as BOARD, BAUD_RATE and EEPROM size in the sketch configuration.
+ * Then:
+ *       @li define UPLOADED_SKETCH as SETUP, upload the sketch and follow the
+ *           instruction appearing in the serial monitor;
+ *       @li define UPLOADED_SKETCH as CALIBRATION, upload the sketch and write,
+ *           using the commads suggested in the documentation, the sensor or the 
+ *           the part of the drone you want to check.
+ *           Finally, dial, one at a time, in the serial 1, 2, 3 and 4; The number 
+ *           showing in the monitor represent the accelerometer readings.
+ *           Use them to calibrate (i.e. add scotch) to the propeller in order to make
+ *           them more balanced;
+ *       @li define UPLOADED_SKETCH as FLIGHT_CONTROLLER and upload the sketch.
+ *           DEBUG mode enables the Serial for debugging, otherwise, no serial monitor.
+ *           To start the drone: move the left stick to the bottom left.
+ *           To stop the drone: move the left stick to the bottom right.
+ *  
+ * 
+ * 
+ *                              AUTOLEVELING:
+ *
+ * Set to true, if you want to compensate the drone oscillations, accordingly to the
+ * gyroscope readings.
+ * Set to false, if you are not intend to autolevel.
+ * 
+ * 
+ * 
+ *                                ALTITUDE:
+ * 
+ * Set the name of the barometer sensor you are using.
+ * For now, only BMP280 is allowed.
+ * 
+ * 
+ * 
+ *                                  GPS:
+ * 
+ * Set GPS type, if you got, or leave OFF if you are not using a GPS at all.
+ * I recommend to use a baud rate about 9600, it is sufficient.
+ * Set you current UTC time zone (e.g. for UTC+2 set 2) to adjust the time readings
+ * to your region.
+ * 
+ * 
+ * 
+ *                                BATTERY:        
+ * 
+ * In this part you set the battery specs, the resistances R1 and R2 you have used for
+ * the voltage divider, and more.
+ * Battery readings can be useful to compensate the voltage lowering, but, until now, this
+ * feature is not stable, thus leave BATTERY_COMPENSATION false.
+ * 
+ * 
+ * 
+ *                               TELEMETRY:
+ * 
+ * DroneIno uses WiFi for telemetry.
+ * It involves the NATIVE ESP32 WiFi access point (AP). Using this, you can easily set PID
+ * parameters for the PID adjustment (without continuing stopping and uploading the code).
+ * Remember to write the PID changing on a paper or whatever. Indeed, when you turn off the drone, 
+ * the PID parameterchanged are NOT saved anywhere.
+ * On the other hand, as said in the documentation, it is preferable to configure an 
+ * external ESP32-CAM. This choice will bring:
+ *      @li video streaming;
+ *      @li SD card storage for PID parameter savings and flight data recordings.
+ * 
+ * 
+ * 
+ *                             TERMS OF USE:
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * 
+ * 
+ * 
+ *               ! ALWAYS TRY FIRST WITHOUT PROPELLERS FIRST !
+ * 
+ * 
+ * 
  * @file Config.h
  * @author @sebastiano123-c
- * @brief Configuration file.
- * 
- * Config.h is intended to fit as your drone developing.
- * 
- * Accordingly to the documentation, after you built your drone:
- *  @li define UPLOADED_SKETCH as SETUP and upload the sketch
- *  @li define UPLOADED_SKETCH as CALIBRATION and upload the sketch
- *  @li define UPLOADED_SKETCH as FLIGHT_CONTROLLER and upload the sketch
- * 
- * ! ALWAYS WITHOUT PROPELLERS FIRST !
- * 
+ * @brief Configuration file. 
  * @note * = developing
  * @note ** = not available at the moment
  * @version 0.1
- * @date 2022-02-28
- * 
+ * @date 2022-03-30
  * @copyright Copyright (c) 2022
- * 
  */
 
 
@@ -30,7 +113,6 @@
  *      (MICROCONTROLLER BOARD)
  */
 #define PINMAP                      ESP32                    // (OFF**, ATMEGA32**, ESP32) OFF if the board is Arduino Uno (directly write pin)
-
 /**
  *      (SKETCH TO BE UPLOADED)
  *      Defines the compiler which sketch is to be uploaded.
@@ -44,15 +126,15 @@
  *      Finally upload with FLIGHT_CONTROLLER and start to fly.
  */
 #define UPLOADED_SKETCH             FLIGHT_CONTROLLER        // (SETUP, CALIBRATION, FLIGHT_CONTROLLER) 
-
 /**
  *      (DEBUG MODE)
  *      If true, some serial prints are enabled.
  *      Otherwise, it is not auspicable to set DEBUG true when flying.
  */
 #define DEBUG                       false                    // (true, false) true enable serial prints for debugging
-
-//      (SKETCH CONSTANTS)
+/**
+ *      (SKETCH CONSTANTS)
+ */
 #define BAUD_RATE                   115200                   // (9600, 57600, 115200)
 #define WIRE_CLOCK                  400000L                  // (100000L, 400000L) 400000L is suggested
 #define EEPROM_SIZE                 36                       // EEPROM size for the allocatable memory
@@ -94,8 +176,7 @@
  *      String printed on serial are then read by the board and converted into information in the file GPS.h.
  *      Leave OFF if you don't have a GPS installed.
  *      Till now I have tested the Beitian BN 880 (which also incorporates the compass).
- *      For what I know, BN 880 should be very similar to the Ubox M8N. 
- * 
+ *      For what I know, BN 880 should be very similar to the Ubox M8N.
  */
 #define GPS                         BN_880                   // (OFF, BN_880*)
 #define GPS_BAUD                    9600                     // (9600, 57600, 115200) 9600 should be ok
@@ -115,7 +196,6 @@
  */     
 #define NUMBER_OF_CELLS             3                        // (V) battery nominal maximum voltage (use ONLY 11.1V batteries)
 #define WARNING_BATTERY_VOLTAGE     10.00                    // (V) when drone reaches this value, it will not take off 
-
 /**
  *      (COMPENSATION*)
  *      When flying, the motors rotating cause a voltage diminuition.
@@ -125,7 +205,6 @@
  * 
  */
 #define BATTERY_COMPENSATION        false                     // (true, false) IMPORTANT: leave false for now
-
 /**
  *      (VOLTAGE DIVIDER)
  *      The voltage divider is: 
