@@ -53,6 +53,7 @@ Make sure to do all the passages described here below.
     - [**ESCs calibration**](#escs-calibration)
     - [**Propellers calibration**](#propellers-calibration)
   - [**Flight controller**](#flight-controller)
+    - [**Start and stop commands**](#start-and-stop-commands)
   - [**PID tuning**](#pid-tuning)
     - [**Step 1: reset variables**](#step-1-reset-variables)
     - [**Step 2: yaw tuning**](#step-2-yaw-tuning)
@@ -220,6 +221,15 @@ Try to lower these numbers by adding some scotch.
 Finally, write "UPLOADED_SKETCH  FLIGHT_CONTROLLER" in the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/Config.h) and upload the sketch.
 
 <ins>_Try first without the propellers!_</ins>
+
+### **Start and stop commands**
+Turn on the battery and the RC-controller, and wait until all the calibration is done (signaled by the led blinking).
+Move the left stick:
+* to the bottom-left to **start** the motors;
+* to the botom-right to **stop** the motors.
+
+If this is done correctly, move to the following step.
+Otherwise, you may have problem in the RC signals, thus check it using the CALIBRATION.
 
 ## **PID tuning**
 PID may be different from case to case and plays a very important role in the flight stability.
