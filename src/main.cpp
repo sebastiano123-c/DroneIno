@@ -4,11 +4,11 @@
  *                       *           DroneIno !           *
  *                       **********************************
  *                      
- *                      Pilot your ESP32 based DIY quadcopter.
+ *                     Pilot your ESP32 based DIY quadcopter.
  * 
  *                
  * 
- *                                DISCLAIMER: 
+ *                                 DISCLAIMER: 
  * 
  * This version is compatible with the PlatformIO IDE.
  * This project can be casted to Arduino IDE with the following steps: 
@@ -17,7 +17,7 @@
  * 
  * 
  * 
- *                               TERMS OF USE:
+ *                                TERMS OF USE:
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

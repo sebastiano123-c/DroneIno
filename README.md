@@ -30,6 +30,13 @@
 </h3>
 <br>
 
+<!-- badges -->
+<p align="center">
+  <img src="https://img.shields.io/badge/IDE-PlatformIO-orange" /> 
+  <img src="https://img.shields.io/badge/PIO core-5-red" />
+  <img src="https://img.shields.io/badge/cpp-11-blue" /> 
+</p>
+
 <h2>
 <b><ins><i>Disclaimer</i></ins></b>
 </h2>
@@ -58,8 +65,9 @@ Based on the [YMFC](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved)
 Optional addons:
 * ESP32-CAM;
 * BMP280 pressure sensor.
+* GPS Beitian BN-80.
 
-The code is intended to be used with PlatformIO.
+The code is intended to be used with PlatformIO IDE.
 
 ## **Features**
                                     1) Auto-leveling

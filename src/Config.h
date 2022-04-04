@@ -1,9 +1,9 @@
 /**
  *
  *   
- *                      **********************************     
- *                      *       Configuration file       *
- *                      **********************************
+ *                       **********************************     
+ *                       *       Configuration file       *
+ *                       **********************************
  *                     
  *             Config.h is intended to fit as your drone developing.
  *          
