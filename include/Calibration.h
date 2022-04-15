@@ -19,6 +19,7 @@
  * @note Always remove the propellers and stay away from the motors unless you are 100% certain of what you are doing.
  * 
  * Dial these on the serial:
+ *  @li h: help.
  *  @li r: print receiver signals.
  *  @li g: print quadcopter angles.
  *  @li l: blinking leds.
@@ -42,6 +43,26 @@ boolean firstAngle;
 long accAvVector,  accVectorNorm[20], vibrationTotalResult;
 
 
+void dialInstructions(){
+
+  Serial.println(" Dial these on the serial:");
+  Serial.println("   h: help.");
+  Serial.println("   r: print receiver signals.");
+  Serial.println("   g: print quadcopter angles.");
+  Serial.println("   e: print EEPROM.");
+  Serial.println("   l: blink leds.");
+  Serial.println("   a: print altitude readings.");
+  Serial.println("   b: print battery readings.");
+  Serial.println("   s: print GPS readings.");
+  Serial.println("   1: check rotation / vibrations for motor 1 (right front CCW).");
+  Serial.println("   2: check rotation / vibrations for motor 2 (right rear CW).");
+  Serial.println("   3: check rotation / vibrations for motor 3 (left rear CCW).");
+  Serial.println("   4: check rotation / vibrations for motor 4 (left front CW).");
+  Serial.println("   5: check vibrations for all motors together.");
+  Serial.println();
+
+}
+
 /**
  * @brief Print the commands
  * 
@@ -56,20 +77,8 @@ void calibrationMsg(){
   
   delay(2000);
 
-   Serial.println(" Dial these on the serial:");
-   Serial.println(  " r: print receiver signals.");
-   Serial.println(  " g: print quadcopter angles.");
-   Serial.println(  " e: print EEPROM.");
-   Serial.println(  " l: blink leds.");
-   Serial.println(  " a: read altitude readings.");
-   Serial.println(  " b: read battery readings.");
-   Serial.println(  " s: read GPS readings.");
-   Serial.println(  " 1: check rotation / vibrations for motor 1 (right front CCW).");
-   Serial.println(  " 2: check rotation / vibrations for motor 2 (right rear CW).");
-   Serial.println(  " 3: check rotation / vibrations for motor 3 (left rear CCW).");
-   Serial.println(  " 4: check rotation / vibrations for motor 4 (left front CW).");
-   Serial.println(  " 5: check vibrations for all motors together.");
-   Serial.println();
+  dialInstructions();
+
 }
 
 
@@ -87,6 +96,7 @@ void getSerialMsg(){
     start = 0;                                                                         //Set start to 0.
     firstAngle = false;                                                                //Set firstAngle to false.
     //Confirm the choice on the serial monitor.
+    if(msg == 'h') dialInstructions();
     if(msg == 'r') Serial.println("Reading receiver signals.");
     if(msg == 'g'){
       Serial.println("Print the quadcopter angles.");
