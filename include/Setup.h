@@ -29,7 +29,7 @@ void welcomeMsg(){
 
     intro();
 
-    Serial.println(F("==================================================="));
+    Serial.println();
     vTaskDelay(1500 / portTICK_PERIOD_MS);
     Serial.println(F(""));
     Serial.println(F("      Setup sketch"));
@@ -331,7 +331,7 @@ void findSticksLimits(){
  * @param movement 
  */
 void checkGyroAxes(byte movement){
-  byte triggerAxis = 0;
+  uint8_t triggerAxis = 0;
   float gyroAngleRoll, gyroAnglePitch, gyroAngleYaw;
   //Reset all axes
   gyroAngleRoll = 0;
@@ -389,10 +389,11 @@ void checkGyroAxes(byte movement){
     error = 1;
     Serial.println(F("No angular motion is detected in the last 10 seconds!!! (ERROR 4)"));
   }
-  else
-  if(movement == 1) gyroCalibratedAxis[1] = triggerAxis;
-  if(movement == 2) gyroCalibratedAxis[2] = triggerAxis;
-  if(movement == 3) gyroCalibratedAxis[3] = triggerAxis;
+  else{
+    if(movement == 1) gyroCalibratedAxis[1] = triggerAxis;
+    if(movement == 2) gyroCalibratedAxis[2] = triggerAxis;
+    if(movement == 3) gyroCalibratedAxis[3] = triggerAxis;
+  }
 }
 
 
