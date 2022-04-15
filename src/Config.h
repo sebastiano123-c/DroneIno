@@ -108,7 +108,7 @@
 
 /**
  * ----------------------------------------------------------------------------------------------------------------------------
- *  SKETCH CONFIGURATION
+ *  SKETCH CONFIGURATION:
  * 
  *      (MICROCONTROLLER BOARD)
  */
@@ -125,7 +125,7 @@
  *      Then, upload with CALIBRATION and calibrate ESC and check that each components behaves in the correct way.
  *      Finally upload with FLIGHT_CONTROLLER and start to fly.
  */
-#define UPLOADED_SKETCH             FLIGHT_CONTROLLER        // (SETUP, CALIBRATION, FLIGHT_CONTROLLER) 
+#define UPLOADED_SKETCH             SETUP        // (SETUP, CALIBRATION, FLIGHT_CONTROLLER) 
 /**
  *      (DEBUG MODE)
  *      If true, some serial prints are enabled.
@@ -156,7 +156,7 @@
 
 /**
  * ----------------------------------------------------------------------------------------------------------------------------
- *  ALTITUDE
+ *  ALTITUDE:
  * 
  *      Altitude readings are relevant for the 'altitude hold' feature.
  *      Leave OFF if you don't have any pressure sensor installed on DroneIno.
@@ -169,7 +169,7 @@
 
 /**
  * ----------------------------------------------------------------------------------------------------------------------------
- *  GPS
+ *  GPS:
  * 
  *      GPS sensor is useful to recover the latitude and longitude position of DroneIno.
  *      GPSs talk with DroneIno using a serial communication (TX/RX).
@@ -179,14 +179,14 @@
  *      For what I know, BN 880 should be very similar to the Ubox M8N.
  */
 #define GPS                         BN_880                   // (OFF, BN_880*)
-#define GPS_BAUD                    9600                     // (9600, 57600, 115200) 9600 should be ok
+#define GPS_BAUD                    115200                   // (9600, 57600, 115200) 9600 should be ok
 #define UTC_TIME_ZONE               2                        // (0-23) Put your time zone here, for example 2 stands for UTC+2 
 
 
 
 /**
  * ----------------------------------------------------------------------------------------------------------------------------
- *  BATTERY
+ *  BATTERY:
  * 
  *      (BATTERY SPECS)
  *      I use a 3s LiPo Battery with 11.1V, 2200mAh capacity and 50C discharge rate
@@ -194,8 +194,17 @@
  *      to stop flying before reaching 9V.
  *      The warning battery voltage defines the value under which a led starts blinking.
  */     
-#define NUMBER_OF_CELLS             3                        // (V) battery nominal maximum voltage (use ONLY 11.1V batteries)
-#define WARNING_BATTERY_VOLTAGE     10.00                    // (V) when drone reaches this value, it will not take off 
+#define BATTERY_NUMBER_OF_CELLS     3                        // (V) battery nominal maximum voltage (use ONLY 11.1V batteries)
+#define WARNING_BATTERY_VOLTAGE     10.00                    // (V) when drone reaches this value, it will not take off
+/**
+ *      (BATTERY_EMERGENCY_STOP)
+ *      If the battery reaches the danger WARNING_BATTERY_VOLTAGE, at the next take off the motors will not run.
+ *      This feature will reduce battery damages.
+ *      Otherwise, this feature may signal a battery low level while, when DroneIno is still at ground, the battery level is above 
+ *      the WARNING_BATTERY_VOLTAGE.
+ *      This is so because battery typically requires more power during the ascension. 
+ */
+#define BATTERY_EMERGENCY_STOP      false
 /**
  *      (COMPENSATION*)
  *      When flying, the motors rotating cause a voltage diminuition.
@@ -221,7 +230,7 @@
 
 /**
  * ----------------------------------------------------------------------------------------------------------------------------
- *  TELEMETRY
+ *  TELEMETRY:
  * 
  *      (WIFI)
  *      Using WiFi a telemtry system is done, making everything simple and easy reach.
@@ -231,7 +240,7 @@
  *          *) ESP_CAM uses the ESP32CAM wifi.
  *      See https://github.com/sebastiano123-c/Esp32-cam-telemetry for more details.
  */
-#define WIFI_TELEMETRY              ESP_CAM                     // (NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
+#define WIFI_TELEMETRY              ESP_CAM                   // (NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
 
 
 

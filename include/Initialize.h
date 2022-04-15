@@ -117,7 +117,7 @@ void setupPins(){
  */
 void intro(){
 
-  vTaskDelay(1000/portTICK_PERIOD_MS);
+  vTaskDelay(1500/portTICK_PERIOD_MS);
   Serial.println();
   Serial.println();
   Serial.print("    |                      |   \n");
@@ -148,7 +148,7 @@ void intro(){
  */
 void printEEPROM(){
    //print eeprom data on serial
-  Serial.println("==================================");
+  Serial.println("");
   Serial.println("EEPROM data:");
   Serial.println("");
   for (int i = 0; i < EEPROM_SIZE; i++){

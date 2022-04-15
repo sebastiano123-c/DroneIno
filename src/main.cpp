@@ -63,15 +63,22 @@
 #include <driver/adc.h>
 
 
-//    (SETUP FILES)
+//    (DRONEINO FILES)
 #include <Constants.h>
 #include <Config.h>
 #include <Models.h>
 #include <Globals.h>
 #include <Prototypes.h>
 
-
-//    (WHICH SKETCH?)
+/**
+ * ------------------------------------------------------------------------------------------------------
+ * SKETCHES:
+ * 
+ *    (SETUP)
+ *    This is the first sketch you have to upload, by changing the UPLOADED_SETUP in the Config.h file.
+ *    Follow the instructions you read on serial monitor.
+ *  
+ */
 #if   UPLOADED_SKETCH == SETUP
 
    void setup() {
@@ -126,7 +133,7 @@
 
       if(error == 0){                                       // detect the nose right movement
          Serial.println("\n\nROTATE the nose of the "
-            "quadcopter to a 45 degree angle within 10 seconds");  
+            "quadcopter to the right within 10 seconds");  
          configureGyroscopeAxes(3);
       }
 
@@ -146,8 +153,8 @@
 
       // finish
       if(error == 0){
-         Serial.println(F("Setup is finished."));
-         Serial.println(F("You can now calibrate the esc's. Write in the Config.h file 'UPLOADED_SKETCH CALIBRATION' and upload."));
+         Serial.println(F("\nSetup is finished."));
+         Serial.println(F("\nYou can now calibrate the esc's. Write in the Config.h file 'UPLOADED_SKETCH CALIBRATION' and upload."));
       }
       else{
          Serial.println(F("ERROR! The setup is aborted."));
@@ -157,6 +164,11 @@
 
    #include <Setup.h>
 
+/**
+ *    (CALIBRATION)
+ *    If the setup sketch exited with success, change the UPLOADED_FILE token in the Config.h file to CALIBRATION.
+ *    See the ../include/Calibration.h file to for more details.
+ */
 #elif UPLOADED_SKETCH == CALIBRATION
 
    void setup(){
@@ -271,7 +283,12 @@
    #include <Altitude.h>
    #include <GPS.h>
 
-
+/**
+ *    (FLIGHT_CONTROLLER)
+ *    After the props calibration (see ../docs/README.md), if all the previous passes have successfully being done,
+ *    change the UPLOADED_SKETCH to FLIGHT_CONTROLLER and upload the sketch.
+ *    You can now adjust the PID parameters.
+ */
 #elif UPLOADED_SKETCH == FLIGHT_CONTROLLER
 
    void setup() {
@@ -425,6 +442,7 @@
    #include <PID.h>
    #include <Altitude.h>
    #include <GPS.h>
+   // #include <Compass.h>
 
 #else 
    #error "NO SKETCH UPLOADED"

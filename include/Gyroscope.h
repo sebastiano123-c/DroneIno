@@ -94,22 +94,26 @@ void readGyroscopeStatus(){
   gyroAxis[1] = Wire.read()<<8|Wire.read();                     // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
   gyroAxis[2] = Wire.read()<<8|Wire.read();                     // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
   gyroAxis[3] = Wire.read()<<8|Wire.read();                     // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
+  
+  #if UPLOADED_SKETCH == CALIBRATION || UPLOADED_SKETCH == FLIGHT_CONTROLLER
+
+    if(eepromData[28] & 0b10000000)gyroAxis[1] *= -1;               //Invert gyroAxis[1] if the MSB of EEPROM bit 28 is set.
+    if(eepromData[29] & 0b10000000)gyroAxis[2] *= -1;               //Invert gyroAxis[2] if the MSB of EEPROM bit 29 is set.
+    if(eepromData[30] & 0b10000000)gyroAxis[3] *= -1;               //Invert gyroAxis[3] if the MSB of EEPROM bit 30 is set.
+    if(eepromData[28] & 0b10000000)accAxis[1] *= -1;                //Invert accAxis[1] if the MSB of EEPROM bit 28 is set.
+    if(eepromData[29] & 0b10000000)accAxis[2] *= -1;                //Invert accAxis[2] if the MSB of EEPROM bit 29 is set.
+    if(eepromData[30] & 0b10000000)accAxis[3] *= -1;                //Invert accAxis[3] if the MSB of EEPROM bit 30 is set.
+  
+  #endif
 
   if(calInt >= 2000){
     gyroAxis[1] -= gyroAxisCalibration[1];                       //Only compensate after the calibration.
     gyroAxis[2] -= gyroAxisCalibration[2];                       //Only compensate after the calibration.
     gyroAxis[3] -= gyroAxisCalibration[3];                       //Only compensate after the calibration.
-    //accAxis[1]  -= accAxisCalibration[1];
-    //accAxis[2]  -= accAxisCalibration[2];
-    //accAxis[3]  -= accAxisCalibration[3];
+    // accAxis[1]  -= accAxisCalibration[1];
+    // accAxis[2]  -= accAxisCalibration[2];
+    // accAxis[3]  -= accAxisCalibration[3];
   }
-
-  if(eepromData[28] & 0b10000000)gyroAxis[1] *= -1;               //Invert gyroAxis[1] if the MSB of EEPROM bit 28 is set.
-  if(eepromData[29] & 0b10000000)gyroAxis[2] *= -1;               //Invert gyroAxis[2] if the MSB of EEPROM bit 29 is set.
-  if(eepromData[30] & 0b10000000)gyroAxis[3] *= -1;               //Invert gyroAxis[3] if the MSB of EEPROM bit 30 is set.
-  if(eepromData[28] & 0b10000000)accAxis[1] *= -1;                //Invert accAxis[1] if the MSB of EEPROM bit 28 is set.
-  if(eepromData[29] & 0b10000000)accAxis[2] *= -1;                //Invert accAxis[2] if the MSB of EEPROM bit 29 is set.
-  if(eepromData[30] & 0b10000000)accAxis[3] *= -1;                //Invert accAxis[3] if the MSB of EEPROM bit 30 is set.
 
 }
 
@@ -129,13 +133,13 @@ void calibrateGyroscope(){
   gyroAxisCalibration[2] = 0;                                       //Ad pitch value to gyro_pitch_cal.
   gyroAxisCalibration[3] = 0;                                       //Ad yaw value to gyro_yaw_cal.
   
-  vTaskDelay(5000/portTICK_PERIOD_MS);                              //Wait 2 seconds before continuing.
+  vTaskDelay(1000/portTICK_PERIOD_MS);                              //Wait before continuing.
   
   //Let's take multiple gyro data samples so we can determine the average gyro offset (calibration).
   for (calInt = 0; calInt < 2000; calInt ++){                       //Take 2000 readings for calibration.
     
-    if(calInt % 25 == 0) ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);  //Change the led status to indicate calibration.
-    else ledcWrite(pwmLedChannel, 0);
+    if(calInt % 25 == 0)                                            //Change the led status to indicate calibration.
+      ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - ledcRead(pwmLedChannel)));  
     
     readGyroscopeStatus();                                           //Read the gyro output.
     
@@ -168,18 +172,21 @@ void calibrateGyroscope(){
 void printGyroscopeStatus(){
 
   Serial.print("Pitch: ");
-  Serial.print(anglePitch, 2);
+  Serial.print(anglePitch, 3);
   Serial.print(" Roll: ");
-  Serial.print(angleRoll, 2);
+  Serial.print(angleRoll, 3);
   Serial.print(" Yaw: ");
-  Serial.print(gyroAxis[3] / 65.5 ,0);
+  Serial.print(gyroAxis[3]/65.5 , 3);
 
-  Serial.print(" Fileter: ");
-  Serial.print(GYROSCOPE_ROLL_FILTER, 6);
-  Serial.print(" GYROSCOPE_ROLL_CORR: ");
-  Serial.print(GYROSCOPE_ROLL_CORR, 2);
-  Serial.print(" GYROSCOPE_PITCH_CORR: ");
-  Serial.println(GYROSCOPE_PITCH_CORR ,0);
+  // Serial.print(" Fileter: ");
+  // Serial.print(GYROSCOPE_ROLL_FILTER, 6);
+  // Serial.print(" GYROSCOPE_ROLL_CORR: ");
+  // Serial.print(GYROSCOPE_ROLL_CORR, 2);
+  // Serial.print(" GYROSCOPE_PITCH_CORR: ");
+  // Serial.print(GYROSCOPE_PITCH_CORR ,0);
+
+  Serial.println();
+
 }
 
 /**
