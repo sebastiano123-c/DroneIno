@@ -23,19 +23,23 @@
 
 /**
  * -----------------------------------------------------------------------------------------------------------
- * @brief PID parameters for roll, pitch, yaw and altitude.
+ * PID
  * 
- * @note Roll and pitch parameters have the same values.
  * 
- */
-/**
+ *    @brief PID parameters for roll, pitch, yaw and altitude.
+ *    @note Roll and pitch parameters have the same values.
+ * 
+ *    P = proportional -> P_output = (gyro - receiver) * P_gain
+ *    I = integral     -> I_output = I_output + (gyro - receiver) * I_gain
+ *    D = derivative   -> D_output = (gyro - receiver - (gyro_prev - receiver_prev) ) * D_gain 
+ * 
+ * 
  *    (ROLL PID)
  */
 float PID_P_GAIN_ROLL            = 1.1;                      //Gain setting for the roll P-controller (1.3)
-float PID_I_GAIN_ROLL            = 0.0015;                   //Gain setting for the roll I-controller  (0.0002)
-float PID_D_GAIN_ROLL            = 10.0;                     //Gain setting for the roll D-controller (10.0)
+float PID_I_GAIN_ROLL            = 0.006;                    //Gain setting for the roll I-controller  (0.0002)
+float PID_D_GAIN_ROLL            = 13.0;                     //Gain setting for the roll D-controller (10.0)
 int PID_MAX_ROLL                 = 400;                      //Maximum output of the PID-controller   (+/-)
-                                                                        
 /**
  *    (PITCH PID)
  */                                             
@@ -43,15 +47,13 @@ float PID_P_GAIN_PITCH           = PID_P_GAIN_ROLL;          //Gain setting for 
 float PID_I_GAIN_PITCH           = PID_I_GAIN_ROLL;          //Gain setting for the pitch I-controller
 float PID_D_GAIN_PITCH           = PID_D_GAIN_ROLL;          //Gain setting for the pitch D-controller
 int PID_MAX_PITCH                = PID_MAX_ROLL;             //Maximum output of the PID-controller   (+/-)
-                                                                            
 /**
  *    (YAW PID)
  */                                       
-float PID_P_GAIN_YAW             = 9.0;                      //Gain setting for the pitch P-controller. (2.0)
-float PID_I_GAIN_YAW             = 0.5;                      //Gain setting for the pitch I-controller. (0.04)
+float PID_P_GAIN_YAW             = 1.5;                      //Gain setting for the pitch P-controller. (2.0)
+float PID_I_GAIN_YAW             = 0.06;                     //Gain setting for the pitch I-controller. (0.04)
 float PID_D_GAIN_YAW             = 0.0;                      //Gain setting for the pitch D-controller. (0.0)
 int PID_MAX_YAW                  = 400;                      //Maximum output of the PID-controller     (+/-)
-                                                                               
 /**
  *    (ALTITUDE PID)
  */
@@ -59,12 +61,11 @@ float PID_P_GAIN_ALTITUDE        = 1.4;                      //Gain setting for 
 float PID_I_GAIN_ALTITUDE        = 0.3;                      //Gain setting for the altitude I-controller (default = 0.2).
 float PID_D_GAIN_ALTITUDE        = 0.75;                     //Gain setting for the altitude D-controller (default = 0.75).
 int PID_MAX_ALTITUDE             = 400;                      //Maximum output of the PID-controller (+/-).
-
 /**
  *    (GPS PID) 
  */
-float GPS_P_GAIN = 2.7;                    //Gain setting for the GPS P-controller (default = 2.7).
-float GPS_D_GAIN = 6.5;                    //Gain setting for the GPS D-controller (default = 6.5).
+float GPS_P_GAIN                 = 2.7;                      //Gain setting for the GPS P-controller (default = 2.7).
+float GPS_D_GAIN                 = 6.5;                      //Gain setting for the GPS D-controller (default = 6.5).
 
 
 //    (PID MISC.)
@@ -88,11 +89,12 @@ int16_t manualThrottle;
 
 /**
  * -----------------------------------------------------------------------------------------------------------
- * @brief GYROSCOPE
+ * GYROSCOPE
+ * 
  * 
  *    (HIGH-LOW FILTER)                                                                    
  */
-float GYROSCOPE_ROLL_FILTER      = 0.96;                       // read your gyroscope data after the calibration, try different values and choose the best one
+float GYROSCOPE_ROLL_FILTER      = 0.996;                      // read your gyroscope data after the calibration, try different values and choose the best one
 float GYROSCOPE_PITCH_FILTER     = GYROSCOPE_PITCH_FILTER;     // read your gyroscope data after the calibration, try different values and choose the best one
 
 //    (ANGLE CORRECTION)
@@ -124,8 +126,11 @@ long accTotalVector;
  * -----------------------------------------------------------------------------------------------------------
  * PWM
  * 
- *    (PWM used LEDs)
- *    Pulse Width Modulation (PWM) has 16 channel for ESP32
+ * 
+ *    Pulse Width Modulation (PWM) has 16 channel for ESP32.
+ * 
+ *    
+ *    (PWM used for LEDs)
  */
 const int pwmLedChannel          = 0;                            // system led pwm channel
 const int pwmLedBatteryChannel   = 5;                            // battery led pwm channel
@@ -158,17 +163,16 @@ const int HALF_DUTY_CYCLE        = (int)(0.5*MAX_DUTY_CYCLE);
  * @brief BATTERY
  * 
  *    (VOLTAGES)  
- *    A LiPo battery has a certain NUMBER_OF_CELLS (S).
+ *    A LiPo battery has a certain BATTERY_NUMBER_OF_CELLS (S).
  *    Each cell can be charged up to 4.2V and must NEVER be discharged below 3V.
  */
 float MAX_CELL_VOLTAGE           = 4.2;                               // (V) max voltage per each cell
 float DANGER_CELL_VOLTAGE        = 3;                                 // (V) danger voltage for each cell
 float MAX_BATTERY_VOLTAGE        = MAX_CELL_VOLTAGE *                 // (V) battery nominal maximum voltage (use ONLY 11.1V batteries)
-                                   NUMBER_OF_CELLS;       
+                                   BATTERY_NUMBER_OF_CELLS;       
 float DANGER_BATTERY_VOLTAGE     = DANGER_CELL_VOLTAGE *              // (V) battery level under which it is dangerous to use
-                                   NUMBER_OF_CELLS;
+                                   BATTERY_NUMBER_OF_CELLS;
 uint8_t DANGEROUS_BATTERY_LEVEL  = false;                             // when reaching DANGER_BATTERY_VOLTAGE, this become true
-
 /**
  *     (DIGITAL PINS ACCURACY)
  *     Boards measure the pin inputs signals with a certain digit precision, which is adcBits (ADC stands for analog to digital converter).
@@ -176,7 +180,6 @@ uint8_t DANGEROUS_BATTERY_LEVEL  = false;                             // when re
  */
 uint8_t adcBits                  = 12;                                    // (bits) of width when measuring the voltage
 float maximumWidth               = pow(2., (float)adcBits)-1;             // maximum width that the pin can read
-
 /**
  *     (CONVERSIONS)
  *     Microcontrollers calculates the input voltage giving a signal output in the range (0., maximumWidth).
@@ -188,7 +191,6 @@ float maximumWidth               = pow(2., (float)adcBits)-1;             // max
 float pinVoltageMax             = MAX_BATTERY_VOLTAGE * TOTAL_DROP;
 float pinVoltageMin             = DANGER_BATTERY_VOLTAGE * TOTAL_DROP;
 float fromWidthToV              = (BOARD_LIMIT_VOLTAGE / maximumWidth) / (TOTAL_DROP);    
-
 /**
  *     (BATTERY COMPENSATION*)
  *     WORK IN PROGRESS: use these parameters only, or vary by small steps
@@ -224,7 +226,7 @@ signed long int tempCal;
 unsigned long int pressCal;
 
 //    (MISC.)
-float pressure, altitudeMeasure;
+float pressure, altitudeMeasure, pressureSampled;
 float temperature;
 uint8_t barometerCounter;
 float actualPressure, actualPressureSlow, actualPressureFast, actualPressureDiff, pressureForPID;
@@ -233,7 +235,7 @@ float actualPressure, actualPressureSlow, actualPressureFast, actualPressureDiff
 
 /**
  * -----------------------------------------------------------------------------------------------------------
- * @brief TELEMETRY
+ * TELEMETRY
  * 
  *    (WIFI AP)
  *    Defines the name of the access point (AP) and the PSW.
@@ -243,8 +245,9 @@ const char *ssid                 = "DroneInoTelemetry";
 const char *password             = "DroneIno";                            
 const int refreshRate            = 200;                                   // (ms) the refresh rate of the page
 int refreshCounter               = 0;
-
-//    (ESP32 BROWSER TAGS)
+/**
+ *    (ESP32 BROWSER TAGS)
+ */
 const char* P_ROLL_GET           = "rollP";
 const char* I_ROLL_GET           = "rollI";
 const char* D_ROLL_GET           = "rollD";
@@ -257,7 +260,6 @@ const char* PITCH_CORR_GET       = "correctionPitch";
 const char* P_ALTITUDE_GET       = "altitudeP";
 const char* I_ALTITUDE_GET       = "altitudeI";
 const char* D_ALTITUDE_GET       = "altitudeD";
-
 /**
  *    (RX)
  *    Defines the number of elements and the that ESP32 waits to receive from telemetry system
@@ -269,7 +271,7 @@ float dataController[dataControllerSize];
 
 /**
  * -----------------------------------------------------------------------------------------------------------
- * @brief RC-CONTROLLER
+ * RC-CONTROLLER
  * 
  *    (CONTROLLER STICKS)
  *    Structure defined for the controller's sticks, trims and switches
@@ -281,7 +283,6 @@ struct trimPosition{
   int16_t high;                                            // high value for the specific receiver input channel
   int16_t actual;                                          // instantaneous receiver value
 } trimCh[5];
-
 /**
  *    (ISR)
  */
@@ -290,7 +291,6 @@ byte lastChannel1, lastChannel2, lastChannel3, lastChannel4, lastChannel5;
 unsigned long timer1, timer2, timer3, timer4, timer5, currentTime, loopTimer;
 int16_t esc1, esc2, esc3, esc4;
 int16_t throttle;
-
 /**
  *   (FLIGHT MODE)
  *    1 = only auto leveling (or nothing if AUTO_LEVELING = false)
@@ -317,8 +317,17 @@ bool flag;
  * always with a '$' and ends always with a '*' char.
  */
 uint8_t NMEANewline              = false;
-
-//    (MISC.)
+/**
+ *    (COMPASS) 
+ */
+int16_t compassX, compassY, compassZ;
+int16_t compassCalValues[6];
+float compassXHorizontal, compassYHorizontal, actualCompassHeading;
+float compassScaleY, compassScaleZ;
+int16_t compassOffsetX, compassOffsetY, compassOffsetZ, compassCalibrationOn;
+/**
+ *    (MISC.) 
+ */
 static char GPSString[100];
 char GPSIncomingString;
 uint8_t GPSSatNumber, latNorth, lonEast, GPSFixType, newGPSDataCounter, newGPSDataAvailable, waypointGPS;

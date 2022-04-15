@@ -44,7 +44,9 @@ void readBatteryVoltage(){
 
   //Turn on the led if battery voltage is too low.
   if(batteryVoltage <= WARNING_BATTERY_VOLTAGE){
-    DANGEROUS_BATTERY_LEVEL = 1;
+    #if BATTERY_EMERGENCY_STOP == true
+      DANGEROUS_BATTERY_LEVEL = 1;
+    #endif
     ledcWrite(pwmLedBatteryChannel, MAX_DUTY_CYCLE);
   }
 
