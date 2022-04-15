@@ -41,3 +41,11 @@
 #elif WIFI_TELEMETRY == NATIVE
   #include "sensors/wifi_telemetry.native.h"
 #endif
+
+
+/**
+ *  GPS 
+ */
+#if GPS == BN_880
+  #include "sensors/gps.BN_880.h"
+#endif

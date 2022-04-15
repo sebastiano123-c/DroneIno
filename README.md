@@ -7,7 +7,7 @@
     | \                  / |   
        \                /      
          ---------------       
-         |  DRONEINO!  |       
+         |  DroneIno!  |       
          ---------------       
        /                \      
     | /                  \ |   
@@ -138,7 +138,7 @@ Future improvements:
 - use other boards.
 
 # **Previous version**
-The first version of DroneIno is downloadable [here](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/test) as zip file.
+The first version of DroneIno can be downloaded [here](https://github.com/sebastiano123-c/DroneIno/tree/main/test) as zip file.
 It is intended to work with Arduino IDE.
 
 # **Author**
