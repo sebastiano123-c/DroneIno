@@ -200,7 +200,7 @@ void calculatePIDFromGPS(){
 
     if (flightMode >= 3 && waypointGPS == 1) {                                                          //If the GPS hold mode and the waypoints are stored.
       //GPS stick move adjustments
-      if (flightMode == 3 /*&& takeoff_detected == 1*/) {
+      if (flightMode == 3 /*&& takeoffDetected == 1*/) {
         if (!latNorth) {
           latGPSAdjust += 0.0015 * (((trimCh[2].actual - 1500) * cos(GPSManAdjustHeading * 0.017453)) + ((trimCh[1].actual - 1500) * cos((GPSManAdjustHeading - 90) * 0.017453))); //South correction
         }

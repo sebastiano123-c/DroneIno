@@ -7,3 +7,12 @@
 
 test/*
 !test/DroneIno.zip
+
+# gps
+Compass.h
+
+#wifi
+include/wifi/serial.web_serial.h
+
+#hardware
+hardware

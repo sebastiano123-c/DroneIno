@@ -71,9 +71,13 @@ void configureReceiverTrims();                                // see Initialize.
 
 #elif UPLOADED_SKETCH == CALIBRATION                          // functions without comments are in Calibration.h
 
+    void setupSerial();
+
     void calibrationMsg();
 
     void printEEPROM();
+
+    void printSignals();
 
     void getSerialMsg();
 

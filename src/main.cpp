@@ -83,8 +83,8 @@
 
    void setup() {
 
-      Serial.begin(BAUD_RATE);                             // begin serial and eeprom
-      EEPROM.begin(EEPROM_SIZE);
+      Serial.begin(BAUD_RATE);                             // begin serial 
+      EEPROM.begin(EEPROM_SIZE);                           // and EEPROM
       
       welcomeMsg();
 
@@ -300,8 +300,9 @@
       setupWiFiTelemetry();                                // see WiFiTelemtry.h  
 
       
-      // if(DEBUG) intro();
-
+      #if DEBUG == true 
+       intro();
+      #endif
 
       initEEPROM();                                        // see Initialize.h
 
@@ -327,7 +328,9 @@
 
 
       // GPS
-      setupGPS();
+      #if GPS!=OFF
+         setupGPS();
+      #endif
 
 
       //Set the specific gyro registers.  
@@ -338,7 +341,9 @@
 
 
       // check Pressure
-      checkAltitudeSensor();                               // see Altitude.h
+      #if ALTITUDE_SENSOR != OFF
+         checkAltitudeSensor();                               // see Altitude.h
+      #endif
 
 
       // wait until the rx is connected
@@ -370,17 +375,19 @@
    void loop() {                                           // loop runs at 250Hz => each loop lasts 4000us
 
       // select mode via SWC of the controller:
-      if      (trimCh[0].actual < 1050) flightMode = 1;    // SWC UP: no mode on, (only auto leveling if enabled)
+      if      (trimCh[0].actual < 1050) flightMode = 1;    // SWC UP: only auto leveling if enabled
 
       else if (trimCh[0].actual < 1550 &&
                trimCh[0].actual > 1450) flightMode = 2;    // SWC CENTER: altitude hold 
 
-      else if (trimCh[0].actual < 2050 &&
+           if (trimCh[0].actual < 2050 &&
                trimCh[0].actual > 1950) flightMode = 3;    // SWC DOWN: GPS*
 
       // GPS
-      readGPS();
-
+      #if GPS != OFF
+         readGPS();
+      #endif
+      
 
       // calculate the gyroscope values for pitch, roll and yaw
       calculateAnglePRY();                                 // see Gyroscope.h
@@ -404,7 +411,9 @@
 
 
       // calculate the altitude hold pressure parameters
-      calculateAltitudeHold();                             // see Altitude.h
+      #if ALTITUDE_SENSOR != OFF
+         calculateAltitudeHold();                          // see Altitude.h
+      #endif
 
 
       // calculate PID values

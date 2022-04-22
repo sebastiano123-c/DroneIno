@@ -6,7 +6,7 @@
  * Depending on the ALTITUDE_SENSOR macro value:
  * 
  *  @li BMP280: uses the I2C communication WITHOUT using the ADAFRUIT library to better performances;
- *  @li BME280: not yet implemented;
+ *  @li BME280*: not yet implemented;
  *  @li OFF: no altitude sensor, so there is no pressure data acquisition.
  * 
  * @note For now, the only sensor available is the BMP280, otherwise these routines return void.
@@ -18,6 +18,9 @@
  * 
  */
 
+uint32_t sampleNumber = 5;
+uint8_t sampleCounter = 0;
+float samplePressure = 0.0f;
 
 #if ALTITUDE_SENSOR == BMP280
 
@@ -111,30 +114,6 @@
   
 
   /**
-   * @brief Reads pressure data
-   * 
-   */
-  void readPressureData(){
-
-    uint32_t barometerData[8];
-
-    Wire.beginTransmission(ALTITUDE_SENSOR_ADDRESS);
-    Wire.write(0xF7);
-    Wire.endTransmission();
-    Wire.requestFrom(ALTITUDE_SENSOR_ADDRESS, 8);
-
-    int i = 0;
-
-    while(Wire.available()){
-        barometerData[i] = Wire.read();
-        i++;
-    }
-
-    presRaw = (barometerData[0] << 12) | (barometerData[1] << 4) | (barometerData[2] >> 4);
-    tempRaw = (barometerData[3] << 12) | (barometerData[4] << 4) | (barometerData[5] >> 4);
-  }
-
-  /**
    * @brief Calibrates temperature readings.
    * 
    * @param adc_T 
@@ -184,6 +163,57 @@
     var2 = (((signed long int)(P>>2)) * ((signed long int)dig_P8))>>13;
     P = (unsigned long int)((signed long int)P + ((var1 + var2 + dig_P7) >> 4));
     return P;
+  }
+
+/**
+   * @brief Reads pressure data
+   * 
+   */
+  void readPressureData(){
+
+    uint32_t barometerData[8];
+
+    Wire.beginTransmission(ALTITUDE_SENSOR_ADDRESS);
+    Wire.write(0xF7);
+    Wire.endTransmission();
+    Wire.requestFrom(ALTITUDE_SENSOR_ADDRESS, 8);
+
+    int i = 0;
+
+    while(Wire.available()){
+        barometerData[i] = Wire.read();
+        i++;
+    }
+
+    presRaw = (barometerData[0] << 12) | (barometerData[1] << 4) | (barometerData[2] >> 4);
+    tempRaw = (barometerData[3] << 12) | (barometerData[4] << 4) | (barometerData[5] >> 4);
+
+    tempCal = calibration_T(tempRaw);
+    pressCal = calibration_P(presRaw);
+    temperature = (double)tempCal / 100.0;
+    
+    pressure = (double)pressCal / 100.0;
+    
+    altitudeMeasure = 44330 * (1 - pow( ((float)pressure/PRESSURE_SEA_LEVEL), (1/5.255)) );
+
+  }
+
+  
+  /**
+   * @brief Sample the pressure readings.
+   * 
+   */
+  void samplePressureReadings(){
+
+    samplePressure += pressure;                                                 // increment the readings
+    sampleCounter = sampleCounter + 1;                                          // increment counter
+    
+    if(sampleCounter == sampleNumber){                                          // after 10 samplings
+      pressureSampled = samplePressure/sampleNumber;                            // create the mean value
+      sampleCounter = 0;                                                        // reset
+      samplePressure = 0.0f;
+    }
+
   }
 
   /**
@@ -242,7 +272,12 @@
   void smoothPressureReadings(){
     return;
   }
-  void void readPressureData() return;
+  void samplePressureReadings(){
+    return;
+  }
+  void readPressureData(){ 
+    return;
+  }
 
 #endif
 
@@ -302,55 +337,51 @@ void calculateAltitudeAdjustmentPID(float pressureForPID){//
  * 
  */
 void calculateAltitudeHold(){
-  // the barometric readings happen in two subsequent loops. This counter is needed for this
-  barometerCounter ++;
+
+  barometerCounter ++;                                                                    // the barometric readings happen in two subsequent loops
 
   switch (barometerCounter){                                                                                  
 
-    case 1:                                                                            //When the barometerCounter variable is 1.
+    case 1:                                                                                // when the barometerCounter variable is 1.
 
-      readPressureData();                                                              //Get pressure data
+      readPressureData();                                                                  // get pressure data
+      // SEBA__________  05/04/2022
+      samplePressureReadings();                                                            // remove the spikes from the barometer data
       break;
 
-    case 2:                                                                            //When the barometer counter is 2   
+    case 2:                                                                                // when the barometer counter is 2   
 
-      tempCal = calibration_T(tempRaw);
-      pressCal = calibration_P(presRaw);
-      temperature = (double)tempCal / 100.0;
-      pressure = (double)pressCal / 100.0;
-      altitudeMeasure = 44330 * (1 - pow( ((float)pressure/PRESSURE_SEA_LEVEL), (1/5.255)) );
-
-      smoothPressureReadings();                                                        //remove the spikes from the barometer data
-      
-      barometerCounter = 0;                                                            //Set the barometer counter to 0 for the next measurements.
-      
       //If the altitude hold function is disabled some variables need to be reset to ensure a bumpless start when the altitude hold function is activated again.
       switch (flightMode) {
 
-        case 1:
+        case 1:                                                                            // if the altitude hold is disabled
 
-          if(abs(pidAltitudeSetpoint) > 1e-8){                                            // if pidAltitudeSetpoint != 0
-            pidAltitudeSetpoint = 0;                                                      //Reset the PID altitude setpoint.
-            pidOutputAltitude = 0;                                                        //Reset the output of the PID controller.
-            pidIMemAltitude = 0;                                                          //Reset the I-controller.
-            manualThrottle = 0;                                                           //Set the manualThrottle variable to 0 .
-            manualAltitudeChange = 1;                                                     //Set the manualAltitudeChange to 1.
+          if(abs(pidAltitudeSetpoint) > 1e-8){                                             // if pidAltitudeSetpoint != 0
+            pidAltitudeSetpoint = 0;                                                       // reset the PID altitude setpoint.
+            pidOutputAltitude = 0;                                                         // reset the output of the PID controller.
+            pidIMemAltitude = 0;                                                           // reset the I-controller.
+            manualThrottle = 0;                                                            // set the manualThrottle variable to 0 .
+            manualAltitudeChange = 1;                                                      // set the manualAltitudeChange to 1.
           }
 
           break;
         
-        default:    // if flightMode != 1                                                  //If the quadcopter is in altitude mode and flying.
+        default:                                                                           // if the quadcopter is in altitude mode and flying.
 
-          if (abs(pidAltitudeSetpoint) < 1e-8) pidAltitudeSetpoint = actualPressure;       //If not yet set, set the PID altitude setpoint.
+          if (abs(pidAltitudeSetpoint) < 1e-8) pidAltitudeSetpoint = pressureSampled;      // if not yet set, set the PID altitude setpoint.
 
-          calculateAltitudeAdjustmentPID(pressure);
+          calculateAltitudeAdjustmentPID(pressureSampled);                                 // calculate PID for altitude hold
         
       }
 
+      barometerCounter = 0;                                                                // set the barometer counter to 0 for the next measurements.
+
       break;
 
-    default:                                                                            // if barometerCounter is neither 1 or 2
+    default:                                                                               // if barometerCounter is neither 1 or 2
+
       barometerCounter = 1;
+
   }
 }
 
@@ -360,5 +391,5 @@ void calculateAltitudeHold(){
  * 
  */
 void printBarometer(){
-  Serial.printf("pressure: %f,  altitude: %f, temp: %f, actualPressureSlow: %f, actualPressureFast: %f \n", pressure, altitudeMeasure, temperature, actualPressureSlow, actualPressureFast);
+  Serial.printf("pressure: %f,  altitude: %f, temp: %f\n", pressure, altitudeMeasure, temperature);
 }

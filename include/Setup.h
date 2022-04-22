@@ -389,11 +389,11 @@ void checkGyroAxes(byte movement){
     error = 1;
     Serial.println(F("No angular motion is detected in the last 10 seconds!!! (ERROR 4)"));
   }
-  else{
+  else
     if(movement == 1) gyroCalibratedAxis[1] = triggerAxis;
     if(movement == 2) gyroCalibratedAxis[2] = triggerAxis;
     if(movement == 3) gyroCalibratedAxis[3] = triggerAxis;
-  }
+  
 }
 
 

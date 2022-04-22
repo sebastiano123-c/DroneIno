@@ -18,12 +18,18 @@
 //     (Boards)
 //      ESP32 is yet defined by compilers
 #define ATMEGA32                    3
+#define ESP32_D1_R32                4
+#define ESP32_DEVKIT                5
 
+//      (Serial type)
+#define COMMON_SERIAL               20
+#define WEB_SERIAL                  21
 
 //      (Sketch type)
-#define SETUP                       4
-#define CALIBRATION                 5
-#define FLIGHT_CONTROLLER           6
+#define SETUP                       6
+#define TEST_COMPONENTS             7
+#define PROPELLERS_CALIBRATION      8
+#define FLIGHT_CONTROLLER           9
 
 
 //      (Sensors)

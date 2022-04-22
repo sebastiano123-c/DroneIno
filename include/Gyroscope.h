@@ -139,7 +139,10 @@ void calibrateGyroscope(){
   for (calInt = 0; calInt < 2000; calInt ++){                       //Take 2000 readings for calibration.
     
     if(calInt % 25 == 0)                                            //Change the led status to indicate calibration.
-      ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - ledcRead(pwmLedChannel)));  
+      ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - ledcRead(pwmLedChannel)));
+    else
+      ledcWrite(pwmLedBatteryChannel, abs(MAX_DUTY_CYCLE - ledcRead(pwmLedChannel)));
+
     
     readGyroscopeStatus();                                           //Read the gyro output.
     
@@ -198,7 +201,7 @@ void calculateAnglePRY(){
   readGyroscopeStatus();
   
   #if AUTO_LEVELING
-    // gyroSensibility = 1 deg/sec (check the datasheet of the MPU-6050 for more information).
+    // gyroSensibility = [deg/sec] (check the datasheet of the MPU-6050 for more information).
     gyroRollInput = (gyroRollInput * 0.7) +
                     ((gyroAxis[1] / gyroSensibility) * 0.3);                 //Gyro pid input is deg/sec.
     gyroPitchInput = (gyroPitchInput * 0.7) + 
@@ -246,8 +249,8 @@ void calculateAnglePRY(){
     }
   #endif
 
-  // #if DEBUG == true
-  //   printGyroscopeStatus();                                                  //print gyro status
-  // #endif
+  #if DEBUG == true
+    printGyroscopeStatus();                                                  //print gyro status
+  #endif
   
 }

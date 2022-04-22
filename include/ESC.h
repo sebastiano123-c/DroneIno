@@ -46,8 +46,6 @@ void setEscPulses(){
 
   throttle = receiverInputChannel3;                                      //We need the throttle signal as a base signal.
 
-  // if(DEBUG) batteryVoltage=10;
-
   switch(start){
     case 2:
       
@@ -106,12 +104,18 @@ void setEscPulses(){
   ledcWrite(pwmChannel4, (uint32_t)((float)esc4/2000.*(float)MAX_DUTY_CYCLE));
 
   #if DEBUG == true //&& UPLOADED_SKETCH == FLIGHT_CONTROLLER
-    Serial.printf("%u   %u   %u   %u   %i\n", 
-      (float)esc1/2000.*MAX_DUTY_CYCLE, 
-      (float)esc2/2000.*MAX_DUTY_CYCLE, 
-      (float)esc3/2000.*MAX_DUTY_CYCLE, 
-      (float)esc4/2000.*MAX_DUTY_CYCLE,
-      escCorr);
+    // Serial.printf("%u   %u   %u   %u   %i\n", 
+    //   (float)esc1/2000.*MAX_DUTY_CYCLE, 
+    //   (float)esc2/2000.*MAX_DUTY_CYCLE, 
+    //   (float)esc3/2000.*MAX_DUTY_CYCLE, 
+    //   (float)esc4/2000.*MAX_DUTY_CYCLE,
+    //   escCorr);
+    
+    // Serial.printf("%i   %i   %i   %i \n", 
+    //   esc1, 
+    //   esc2, 
+    //   esc3, 
+    //   esc4);
   #endif
 }
 

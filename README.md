@@ -55,7 +55,6 @@ or download the .zip file.
 
 # **Description**
 Based on the [YMFC](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
-* ESP32 D1 R32 board, like [this](https://github.com/sebastiano123-c/Motorize-a-1980-telescope/blob/main/Setup/D1%20R32%20Board%20Pinout.pdf);
 * gyroscope MPU6050;
 * radio controller and a receiver (_e.g._ FlySky);
 * 11.1V 3S >20C LiPo battery (2200mAh or 3800mAh);
@@ -64,10 +63,15 @@ Based on the [YMFC](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved)
   
 Optional addons:
 * ESP32-CAM;
-* BMP280 pressure sensor.
-* GPS Beitian BN-80.
+* BMP280 pressure sensor;
+* GPS Beitian BN-880.
 
 The code is intended to be used with PlatformIO IDE.
+
+## **Boards supported**
+* [ESP32 D1 R32](https://github.com/sebastiano123-c/Motorize-a-1980-telescope/blob/main/Setup/D1%20R32%20Board%20Pinout.pdf) (_note: the Wemos D1 R32 has shown problems with UART communication, so I recommend to choose an AZ-Delivery board_);
+* [ESP32 DevKit](https://www.espressif.com/en/products/devkits/esp32-devkitc).
+
 
 ## **Features**
                                     1) Auto-leveling
@@ -98,7 +102,7 @@ Altitude hold function uses barometric data of the barometer sensor, for example
 ## **GPS**
 **_NOT TO USE AT THE MOMENT_**
 **Now on developing**, DroneIno provides GPS for:
-- flight adjustements;
+- flight adjustments;
 - if you use ESP32-CAM telemetry, cool plots showing the flight route of DroneIno.
 
 ## **DroneInoTelemetry web app**

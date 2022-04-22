@@ -45,7 +45,8 @@ Make sure to do all the passages described here below.
 - [**Features**](#features)
   - [**Selecting flight mode**](#selecting-flight-mode)
 - [**Documentation**](#documentation)
-  - [**Circuit scheme**](#circuit-scheme)
+  - [**ESP32 D1 R32 - Circuit scheme**](#esp32-d1-r32---circuit-scheme)
+  - [**ESP32 DevKit V1 - Circuit scheme**](#esp32-devkit-v1---circuit-scheme)
   - [**Pinmap**](#pinmap)
   - [**Configuration**](#configuration)
   - [**Setup**](#setup)
@@ -66,6 +67,7 @@ Make sure to do all the passages described here below.
 - [**GPS**](#gps)
 - [**Appendix A: previous version**](#appendix-a-previous-version)
 - [**Appendix B: another circuit scheme**](#appendix-b-another-circuit-scheme)
+- [**Appendix C: components voltages**](#appendix-c-components-voltages)
 - [**Author**](#author)
 
 # **Usage**
@@ -112,7 +114,18 @@ Set the SWC switch of the transmitter to channel 5 and connect the receiver chan
 
 
 # **Documentation**
-## **Circuit scheme**
+I first start drawing the circuital scheme for:
+* [ESP32 D1 R32](https://github.com/sebastiano123-c/Motorize-a-1980-telescope/blob/main/Setup/D1%20R32%20Board%20Pinout.pdf) (_note: the Wemos D1 R32 has shown problems with UART communication, so I recommend to choose an AZ-Delivery board_);
+* [ESP32 DevKit](https://www.espressif.com/en/products/devkits/esp32-devkitc).
+
+_ALERT READ CAREFULLY_
+Some boards come with no protection circuit.
+Thus, if you power your board via both USB and externally using a power supply, you will fry your board.
+To eradicate this issue from the roots, I recommend to use separate connectors: one for the motors and
+one for the board.
+So, when calibrating the propellers, connect the battery to the motor BUT NOT TO THE BOARD.
+
+## **ESP32 D1 R32 - Circuit scheme**
 The power is supplied by the 11.1V 2200mAh (3800 should be better) 3s 20C LiPo battery.
 The battery powers the motors and the ESP32.
 Battery voltage is measured by GPIO-39 using a voltage divider with R1 = 5.1 kOhm and R2 = 1.55 kOhm.
@@ -164,6 +177,56 @@ The resistance R3 = 330 Ohm is used for the LED.
     | +----------------+--+------------------------|--------------+                                            
     +----------------------------------------------+                                                                       
 </pre>
+
+## **ESP32 DevKit V1 - Circuit scheme**
+The ESP32 DevKit seems to offer a more compact solution, if you are looking to compactness.
+The battery specifications are the same as before.
+Here I use a 1n4007 diode D1, which drops the battery voltage about 0.7V.
+The Vin pin is the 5V pin. This can be problem if you need 5V for some component.
+In this case, you can also add a voltage regulator (Vreg) after the diode and tune it to give 5V.
+The voltage divider is composed by the resistances R1 = 5.1kOhm and R2 = 1.22kOhm.
+For the LEDs, R3 = 330Ohm.
+
+_Note_: with this scheme BE VERY CAREFUL, when connecting the USB cable disconnect the battery otherwise the battery will be damaged.
+<pre>
+    LEGEND:                                                 +---+-----R1-----+                                   
+    X-  = disconnected                                      |   |            |                                    
+    -+- = sold cables                                       |   R2           |           ____________________ 
+    -|- = not touching cables                               | +-|------------+--D1---++==| + |11.1V, >= 20C | 
+    === = 3-5A cables                                       | | +----------------++==||==| - |2200mAh, 3s   | 
+   - \- = switch                                            | | |                ||  ||  ### LiPo BATTERY ###
+                                                            | | |   _________    ||  ||              _____    
+                   +----------------------------------------|-|-|-->|°INPUT |====||==||=============/     \
+                   | +------------------------------------+ | | | X-|+VIN   |====||==||=============| M1  |
+                   | | +--------------------------------+ | | | +-->|-GND   |====||==||=============\ CCW /
+                   | | | +----------------------------+ | | | | |   |      +|====||==++                    
+                   | | | |   ____________________     | | | | | |   |      -|====++  ||                    
+ +-----------------|-|-|-|-->|°3V3          GND°|<----|-|-|-|-|-+   ##ESC-1##    ||  ||                    
+ |   _______       | | | |   |°RST    IO23(SCL)°|<--+ | | | | | |   _________    ||  ||              _____  
+ |   | CH1°|<------|-|-|-|-->|°IO36        IO22°|   | | | +-|-|-|-->|°INPUT |====||==||=============/     \
+ |   | CH2°|<------|-|-|-|-->|°IO39   IO01(TX0)°|   | | |   | | | X-|+VIN   |====||==||=============| M2  |
+ |   | CH3°|<------|-|-|-|-->|°IO34   IO03(RX0)°|   | | |   | | +-->|-GND   |====||==||=============\ CW  /
+ |   | CH4°|<------|-|-|-|-->|°IO35   IO21(SDA)°|<+ | | |   | | |   |      +|====||==++                    
+ |   | CH5°|<------|-|-|-|-->|°IO32         GND°| | | | |   | | |   |      -|====++  ||                    
+ +-->| 3V3+|       | | | +-->|°IO33        IO19°| | | | |   | | |   ##ESC-2##    ||  ||                    
+ |   | GND-|<---+  | | +---->|°IO25        IO18°| | | | |   | | |   _________    ||  ||              _____ 
+ |   ##RX ##    |  | +------>|°IO26        IO05°| | | | +---|-|-|-->|°INPUT |====||==||=============/     \
+ |      ______  |  +-------->|°IO27   IO17(TX1)°| | | |     | | | X-|+VIN   |====||==||=============| M3  |
+ | +--->|SCL°|  +-+    +---->|°IO14   IO16(RX1)°| | | |     | | +-->|-GND   |====||==||=============\ CCW /
+ | | +->|SDA°|    |    |  +->|°IO12        IO04°| | | |     | | |   |      +|====||==++                    
+ +-|-|->|3V3+|    +----|--|->|°GND         IO00°| | | |     | | |   |      -|====++  ||                    
+ | | |  |GND-|<---+    R3 |  |°IO13 <-------------|-|-|-----+ | |   ##ESC-3##    ||  ||                    
+ | | |  #baro#    |    |  |  |°IO09        IO15°| | | |       | |   _________    ||  ||              _____ 
+ | | |   ______   |  (LED)|  |°IO10        IO08°| | | +-------|-|-->|°INPUT |====||==||=============/     \
+ | | +-->|SDA°|   |    |  |  |°IO11        IO07°| | |         | | X-|+VIN   |====||==||=============| M4  |
+ | +-|-->|SCL°|   |    |  |  |°5V <---------------|-|---- \---+ +-->|-GND   |====||==||=============\ CW  /
+ +-|-|-->|3V3+|   |    |  R3 ### ESP32 DevKit ### | |               |      +|====||==++                     
+   | |   |GND-|<--+    |  |                       | |               |      -|====++                        
+   | |   #gyro#        | (LED)                    | |               ##ESC-4##                              
+   | +----------------+--+------------------------+ |                                                          
+   +------------------------------------------------+                                                           
+</pre>
+
 After building the circuit, place it on the drone and proceed with the following passages.
 
 ## **Pinmap**
@@ -174,9 +237,13 @@ Take a look at the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/m
 
 ## **Setup**
 Write "UPLOADED_SKETCH  SETUP" in the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/Config.h) and upload the sketch to your board.
+This step, battery remains still disconnected.
 
 ## **Calibration**
 If the setup sketch succeeds, write "UPLOADED_SKETCH  CALIBRATION" in the [Config.h](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/src/Config.h) and upload the sketch.
+To check the propellers direction and the propeller calibration you can connect the battery to the motors.
+
+_Note_: DO NOT connect the battery to the board (but only to the motors) in this configuration since the USB is connected. 
 
 Send the following characters to the serial monitor:
 * **r** to check if the transmitter signal is decoded correctly; move the trim and check that:
@@ -444,6 +511,16 @@ D1 ensures that the PC is safe while both battery and pc are connected to the ES
     | +----------------+--+------------------------|--------------+                                            
     +----------------------------------------------+                                                                       
 </pre>
+
+# **Appendix C: components voltages**
+Name | type | voltage (V) 
+--- | --- | --- | ---
+ESP32 Vin | board | 3.3 - 11.7
+ESP32 pin | board pin | 3.3
+MPU6050 | gyro | 5
+BMP280 | baro | 3.3
+FSi6 | RC receiv. | 4.8 - 6 
+BN 880 | GPS | 3.3 - 5
 
 
 # **Author**

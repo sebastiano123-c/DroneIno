@@ -37,8 +37,8 @@
  *    (ROLL PID)
  */
 float PID_P_GAIN_ROLL            = 1.1;                      //Gain setting for the roll P-controller (1.3)
-float PID_I_GAIN_ROLL            = 0.006;                    //Gain setting for the roll I-controller  (0.0002)
-float PID_D_GAIN_ROLL            = 13.0;                     //Gain setting for the roll D-controller (10.0)
+float PID_I_GAIN_ROLL            = 0.002;                    //Gain setting for the roll I-controller  (0.0002)
+float PID_D_GAIN_ROLL            = 10.0;                     //Gain setting for the roll D-controller (10.0)
 int PID_MAX_ROLL                 = 400;                      //Maximum output of the PID-controller   (+/-)
 /**
  *    (PITCH PID)
@@ -51,7 +51,7 @@ int PID_MAX_PITCH                = PID_MAX_ROLL;             //Maximum output of
  *    (YAW PID)
  */                                       
 float PID_P_GAIN_YAW             = 1.5;                      //Gain setting for the pitch P-controller. (2.0)
-float PID_I_GAIN_YAW             = 0.06;                     //Gain setting for the pitch I-controller. (0.04)
+float PID_I_GAIN_YAW             = 0.04;                     //Gain setting for the pitch I-controller. (0.04)
 float PID_D_GAIN_YAW             = 0.0;                      //Gain setting for the pitch D-controller. (0.0)
 int PID_MAX_YAW                  = 400;                      //Maximum output of the PID-controller     (+/-)
 /**
@@ -94,7 +94,7 @@ int16_t manualThrottle;
  * 
  *    (HIGH-LOW FILTER)                                                                    
  */
-float GYROSCOPE_ROLL_FILTER      = 0.996;                      // read your gyroscope data after the calibration, try different values and choose the best one
+float GYROSCOPE_ROLL_FILTER      = 0.9996;                     // read your gyroscope data after the calibration, try different values and choose the best one
 float GYROSCOPE_PITCH_FILTER     = GYROSCOPE_PITCH_FILTER;     // read your gyroscope data after the calibration, try different values and choose the best one
 
 //    (ANGLE CORRECTION)
@@ -188,8 +188,8 @@ float maximumWidth               = pow(2., (float)adcBits)-1;             // max
  *     The correction factor is calculated because some boards accepts 5v input, others 3v3.
  *     Finally, minBatteryLevelThreshold is the board minimum voltage under which it is not safe to go.
  */ 
-float pinVoltageMax             = MAX_BATTERY_VOLTAGE * TOTAL_DROP;
-float pinVoltageMin             = DANGER_BATTERY_VOLTAGE * TOTAL_DROP;
+float pinVoltageMax             = (MAX_BATTERY_VOLTAGE - DIODE_DROP) * TOTAL_DROP;
+float pinVoltageMin             = (DANGER_BATTERY_VOLTAGE - DIODE_DROP) * TOTAL_DROP;
 float fromWidthToV              = (BOARD_LIMIT_VOLTAGE / maximumWidth) / (TOTAL_DROP);    
 /**
  *     (BATTERY COMPENSATION*)

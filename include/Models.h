@@ -13,9 +13,12 @@
 #elif PINMAP == ATmega32                                // ATmega32 
   #define PINMAP_STR "ATmega32"
   #include "pinmaps/pinmap.ATmega32.h"
-#elif PINMAP == ESP32                                   // ESP32 
-  #define PINMAP_STR "ESP32"
+#elif PINMAP == ESP32_D1_R32                            // ESP32 D1 R32
+  #define PINMAP_STR "ESP32D1R32"
   #include "pinmaps/pinmap.ESP32-D1-R32.h"
+#elif PINMAP == ESP32_DEVKIT                            // ESP32 Dev Kit
+  #define PINMAP_STR "ESP32DevKit"
+  #include "pinmaps/pinmap.ESP32.h"
 #endif
 
 // GYROSCOPE SENSOR
@@ -35,11 +38,16 @@
   #include <HCSR04.h>
 #endif
 
+// SERIAL
+#if UPLOADED_SKETCH == CALIBRATION && SERIAL_TYPE == WEB_SERIAL
+  #include "wifi/serial.web_serial.h"
+#endif
+
 // WIFI TELEMETRY
-#if WIFI_TELEMETRY == ESP_CAM
-  #include "sensors/wifi_telemetry.esp_cam.h"
-#elif WIFI_TELEMETRY == NATIVE
-  #include "sensors/wifi_telemetry.native.h"
+#if UPLOADED_SKETCH == FLIGHT_CONTROLLER && WIFI_TELEMETRY == ESP_CAM
+  #include "wifi/wifi_telemetry.esp_cam.h"
+#elif UPLOADED_SKETCH == FLIGHT_CONTROLLER && WIFI_TELEMETRY == NATIVE
+  #include "wifi/wifi_telemetry.native.h"
 #endif
 
 

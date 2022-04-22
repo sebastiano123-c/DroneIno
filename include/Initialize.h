@@ -54,9 +54,10 @@ void configureReceiverTrims(){
 void setupWireI2C(){
 
   // setup wire for
-  Wire.setClock(WIRE_CLOCK);        
+  // Wire.begin(21, 22);
   Wire.begin(PIN_SDA, PIN_SCL);
   vTaskDelay(40/portTICK_PERIOD_MS);
+  Wire.setClock(WIRE_CLOCK);        
   
 }
 
@@ -152,6 +153,6 @@ void printEEPROM(){
   Serial.println("EEPROM data:");
   Serial.println("");
   for (int i = 0; i < EEPROM_SIZE; i++){
-    Serial.println(eepromData[i]);
+    Serial.printf("EEPROM[%i] => %i\n", i, eepromData[i]);
   }
 }

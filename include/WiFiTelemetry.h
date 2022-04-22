@@ -337,7 +337,7 @@
 
   /**
    * @brief Updates '\events' of the web server with the sensor readings.
-   * @note refresh rate browser is about 20 Hertz (i.e. they refresh the screen about 20 times per second) - i.e. every 50 milliseconds
+   * @note refresh rate browser is about 20 Hertz (i.e. they refresh the screen about 20 times per second) - i.e. every 50 milliseconds, thus for flight stability, with NATIVE WiFi, no telemetry is available.
    * 
    * @return * void 
    */
@@ -348,7 +348,7 @@
 
 #elif WIFI_TELEMETRY == ESP_CAM
   
-  HardwareSerial SUART(2); 
+  // HardwareSerial SUART(2); 
 
   /**
    * @brief Setup the UART communication with ESP32-CAM.
@@ -356,8 +356,8 @@
    * 
    */
   void setupWiFiTelemetry(){
-      SUART.begin(115200, SERIAL_8N1, PIN_RX1, PIN_TX1);
-      // Serial.println("SUART enabled");
+      Serial2.begin(WIFI_BAUD_RATE, SERIAL_8N1, PIN_RX1, PIN_TX1);
+      // Serial.println("Serial2 enabled");
   }
   
 
@@ -380,10 +380,11 @@
     sptr += sprintf(sptr, "%x,", flightMode);
     sptr += sprintf(sptr, "%.1f,", batteryVoltage);
     sptr += sprintf(sptr, "%.1f,", altitudeMeasure);
-    sptr += sprintf(sptr, "%i,", receiverInputChannel1);
-    sptr += sprintf(sptr, "%i,", receiverInputChannel2);
-    sptr += sprintf(sptr, "%i,", receiverInputChannel4);
-    sptr += sprintf(sptr, "%i,", receiverInputChannel3);
+    sptr += sprintf(sptr, "%i,", trimCh[1].actual);
+    sptr += sprintf(sptr, "%i,", trimCh[2].actual);
+    sptr += sprintf(sptr, "%i,", trimCh[4].actual);
+    sptr += sprintf(sptr, "%i,", trimCh[3].actual);
+    sptr += sprintf(sptr, "%f,", (float)gyroTemp/340. + 36.53f);
     sptr += sprintf(sptr, "%.7f,", latitudeGPS);
     sptr += sprintf(sptr, "%.7f,", longitudeGPS);
     sptr += sprintf(sptr, "%s>", timeUTC);
@@ -394,14 +395,10 @@
     // print in csv format
     stringToPrint = (const char*)staticCharToPrint;
 
-    SUART.println(stringToPrint);
+    Serial2.println(stringToPrint);
 
     // print
-    // Serial.println("");
-    // for(int i = 0; i < dataTransferSize; i++){
-    //   Serial.print(dataTransfer[i]);
-    //   Serial.print(",");
-    // }
+    // Serial.println(stringToPrint);
 
   }
 
@@ -418,7 +415,7 @@
     
     // read from serial
     if(DEBUG) Serial.printf("I'm reading...\n");
-    str = SUART.readStringUntil('\n');
+    str = Serial2.readStringUntil('\n');
   
     // find positions of ","
     //Serial.println("indices...");
@@ -485,7 +482,7 @@
     }
     
     // reading from ESP32-CAM
-    if(SUART.available()){
+    if(Serial2.available()){
       readDataTransfer();
     }
   }

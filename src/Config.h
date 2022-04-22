@@ -20,8 +20,17 @@
  *       @li define UPLOADED_SKETCH as CALIBRATION, upload the sketch and write,
  *           using the commads suggested in the documentation, the sensor or the 
  *           the part of the drone you want to check.
- *           Finally, dial, one at a time, in the serial 1, 2, 3 and 4; The number 
- *           showing in the monitor represent the accelerometer readings.
+ *           Propellers calibration.
+ *           The readings will be printed on the Web Serial (see docs for connection).
+ *           Dial, one at a time, in the web serial 1, 2, 3 and 4 (each number corresponds
+ *           to a specifics motor:
+ *                      1, right front CCW,
+ *                      2, right rear CW,
+ *                      3, left rear CCW,
+ *                      4, left front CW,
+ *                      5, all motors together. 
+ *           On the web serial will compare the accelerometer readings.
+ *           The lower these number, the stabler the props.
  *           Use them to calibrate (i.e. add scotch) to the propeller in order to make
  *           them more balanced;
  *       @li define UPLOADED_SKETCH as FLIGHT_CONTROLLER and upload the sketch.
@@ -112,22 +121,31 @@
  * 
  *      (MICROCONTROLLER BOARD)
  */
-#define PINMAP                      ESP32                    // (OFF**, ATMEGA32**, ESP32) OFF if the board is Arduino Uno (directly write pin)
+#define PINMAP                      ESP32_DEVKIT              // (OFF**, ATMEGA32**, ESP32_D1_R32, ESP32_DEVKIT)
 /**
  *      (SKETCH TO BE UPLOADED)
  *      Defines the compiler which sketch is to be uploaded.
  *      Following the list:
  *          1) SETUP               tells the compiler to use the setup sketch,
  *          2) CALIBRATION         ... calibration sketch,
+ *              -- ALERT READ CAREFULLY --
+ *              Some boards come with no protection circuit.
+ *              Thus, if you power your board via both USB and externally using a power supply, you will fry your board.
+ *              To eradicate this issue from the roots, I recommend to use separate connectors: one for the motors and
+ *              one for the board.
+ *              So, when calibrating the propellers, connect the battery to the motor BUT NOT TO THE BOARD.
  *          3) FLIGHT_CONTROLLER   ... flight controller
  *      and uploading the sketch each time, you first begin with SETUP.
  *      This way you will calibrate RC-controller and more, and this will save information into EEPROM.
  *      Then, upload with CALIBRATION and calibrate ESC and check that each components behaves in the correct way.
  *      Finally upload with FLIGHT_CONTROLLER and start to fly.
  */
-#define UPLOADED_SKETCH             SETUP        // (SETUP, CALIBRATION, FLIGHT_CONTROLLER) 
+// #define UPLOADED_SKETCH             SETUP         
+// #define UPLOADED_SKETCH             CALIBRATION         
+#define UPLOADED_SKETCH             FLIGHT_CONTROLLER        
 /**
  *      (DEBUG MODE)
+ *      Works only when the UPLOADED_SKETCH is FLIGHT_CONTROLLER.
  *      If true, some serial prints are enabled.
  *      Otherwise, it is not auspicable to set DEBUG true when flying.
  */
@@ -178,8 +196,8 @@
  *      Till now I have tested the Beitian BN 880 (which also incorporates the compass).
  *      For what I know, BN 880 should be very similar to the Ubox M8N.
  */
-#define GPS                         BN_880                   // (OFF, BN_880*)
-#define GPS_BAUD                    115200                   // (9600, 57600, 115200) 9600 should be ok
+#define GPS                         OFF                   // (OFF, BN_880*)
+#define GPS_BAUD                    9600                   // (9600, 57600, 115200) 9600 should be ok
 #define UTC_TIME_ZONE               2                        // (0-23) Put your time zone here, for example 2 stands for UTC+2 
 
 
@@ -223,8 +241,9 @@
  * 
  *      @note choose res1 and res2 so that the maximum V_pin is less than BOARD_MAXIMUM_VOLTAGE         
  */
-#define RESISTANCE_1                5.11                     // (kOhm) the resistance before V_pin
-#define RESISTANCE_2                1.55                     // (kOhm) the resistance after V_pin
+#define RESISTANCE_1                5.100                    // (kOhm) the resistance before V_pin
+#define RESISTANCE_2                1.22                     // (kOhm) the resistance after V_pin
+#define DIODE_DROP                  0.70                     // (V) voltage drop due to the diode
 #define TOTAL_DROP                  RESISTANCE_2 / (RESISTANCE_1 + RESISTANCE_2)
 
 
@@ -241,6 +260,7 @@
  *      See https://github.com/sebastiano123-c/Esp32-cam-telemetry for more details.
  */
 #define WIFI_TELEMETRY              ESP_CAM                   // (NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
+#define WIFI_BAUD_RATE              115200                    // (9600, 57600, 115200)
 
 
 

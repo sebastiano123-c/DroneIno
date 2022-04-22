@@ -7,6 +7,11 @@
  * The convertReceiverChannel() routine converts the input signal into the range 1000-2000us.
  * waitController() routine is called in the setup() function and waits until DroneIno recognizes a readable radio controller input.
  * 
+ * 
+ * 
+ * 
+ * 
+ * 
  * @version 0.1
  * @date 2022-02-28
  * 
@@ -69,7 +74,6 @@ int convertReceiverChannel(byte ch){
 void waitController(){
 
   #if UPLOADED_SKETCH == SETUP
-
     byte zero = 0;
     unsigned long timeLast = 20; // s
     Serial.printf("Wait for receiver, you have %lus from now ", timeLast);
@@ -88,7 +92,7 @@ void waitController(){
       Serial.println(F("."));
       Serial.println(F("No valid receiver signals found!!! (ERROR 1)"));
     }
-    else Serial.println(F(" OK"));
+    else Serial.printf(" OK (zero=%i)\n", zero);
 
   #else
 
@@ -98,7 +102,7 @@ void waitController(){
       receiverInputChannel3 = convertReceiverChannel(3);                 //Convert the actual receiver signals for throttle to the standard 1000 - 2000us
       receiverInputChannel4 = convertReceiverChannel(4);                 //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
       
-        start ++;                                                          //While waiting increment start whith every loop.
+        start ++;                                                          //While waiting increment start with every loop.
 
         switch (start)
         {
