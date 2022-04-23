@@ -77,8 +77,8 @@ The code is intended to be used with PlatformIO IDE.
                                     1) Auto-leveling
                                     2) Altitude hold
                                     3) GPS (NOT TO USE AT THE MOMENT, DEVELOPING)
-                                    4) WiFi telemetry system
-                                    5) SD flight data storage
+                                    4) WiFi telemetry system 
+                                    5) SD flight data storage (only with ESP32-CAM)
 
 _Important:_ otherwise telemetry system is implemented using the native ESP32 WiFi, I strongly recommend to add DroneIno the [Esp32-cam-telemetry](https://github.com/sebastiano123-c/Esp32-cam-telemetry) for astonishing results (including video streaming and SD card storage).
 
@@ -127,7 +127,7 @@ With the ESP32-CAM, the flying experience is much more interactive including:
 - set PID parameters;
 - pitch, roll, altitude pressure, flight mode and battery telemetry system.
 
-See the complete [esp32-cam-telemetry](https://github.com/sebastiano123-c/Esp32-cam-telemetry) repo for more information.
+See the complete [esp32-cam-telemetry](https://github.com/sebastiano123-c/Esp32-cam-telemetry) repo for the sketch and more information.
 
 ### **SD card for data storage**
 With esp32-cam-telemetry, you can also save your flight data on a SD card.
