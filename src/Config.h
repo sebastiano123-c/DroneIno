@@ -120,6 +120,9 @@
  *  SKETCH CONFIGURATION:
  * 
  *      (MICROCONTROLLER BOARD)
+ *      Accordingly to the documentation (\docs\README.md), two microcontroller boards are now available: ESP32 D1 R32, which
+ *      has the same shape as the Arduino Uno board but using an ESP32-WROOM-32 processor, and ESP32 Dev Kit, which comes with
+ *      the typical ESP32 shape.
  */
 #define PINMAP                      ESP32_DEVKIT              // (OFF**, ATMEGA32**, ESP32_D1_R32, ESP32_DEVKIT)
 /**
@@ -239,11 +242,14 @@
  *                             |
  *                           V_pin     
  * 
- *      @note choose res1 and res2 so that the maximum V_pin is less than BOARD_MAXIMUM_VOLTAGE         
+ *      @note choose res1 and res2 so that the maximum V_pin is less than BOARD_MAXIMUM_VOLTAGE        
+ *      
+ *      If you appply a diode D1 before the voltage divider, as for the ESP32 DevKit circuit (see \docs), 
+ *      write DIODE_DROP 0.7. Otherwise DIODE_DROP 0.
  */
 #define RESISTANCE_1                5.100                    // (kOhm) the resistance before V_pin
 #define RESISTANCE_2                1.22                     // (kOhm) the resistance after V_pin
-#define DIODE_DROP                  0.70                     // (V) voltage drop due to the diode
+#define DIODE_DROP                  0.70                     // (V) voltage drop due to the diode. If not used put it to 0
 #define TOTAL_DROP                  RESISTANCE_2 / (RESISTANCE_1 + RESISTANCE_2)
 
 

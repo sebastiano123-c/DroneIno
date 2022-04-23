@@ -126,13 +126,13 @@
       }
 
       if(error == 0){                                        // detect the nose up movement
-         Serial.println("\n\nLIFT the nose of the "
+         Serial.println("\n\nLIFT the NOSE of the "
             "quadcopter to a 45 degree angle within 10 seconds");
          configureGyroscopeAxes(2);
       }
 
       if(error == 0){                                       // detect the nose right movement
-         Serial.println("\n\nROTATE the nose of the "
+         Serial.println("\n\nROTATE the NOSE of the "
             "quadcopter to the right within 10 seconds");  
          configureGyroscopeAxes(3);
       }
@@ -153,7 +153,7 @@
 
       // finish
       if(error == 0){
-         Serial.println(F("\nSetup is finished."));
+         Serial.println(F("\nSetup is finished SUCCESSFULLY."));
          Serial.println(F("\nYou can now calibrate the esc's. Write in the Config.h file 'UPLOADED_SKETCH CALIBRATION' and upload."));
       }
       else{
@@ -167,7 +167,12 @@
 /**
  *    (CALIBRATION)
  *    If the setup sketch exited with success, change the UPLOADED_FILE token in the Config.h file to CALIBRATION.
- *    See the ../include/Calibration.h file to for more details.
+ *    In this part you have to connect for the first time the battery to the motors.
+ *    Since also USB cable will be connected (to reed the serial) please,
+ *    
+ *             DO NOT CONNECT THE BATTERY TO THE BOARD IN THIS STEP FOR ANY REASONS, otherwise the board will be demaged.
+ * 
+ *    See the ../include/Calibration.h file for more details.
  */
 #elif UPLOADED_SKETCH == CALIBRATION
 
@@ -278,16 +283,15 @@
 
    #include <Calibration.h>
    #include <Battery.h>
-   // #include <WiFiTelemetry.h>
-   // #include <PID.h>
    #include <Altitude.h>
    #include <GPS.h>
 
 /**
  *    (FLIGHT_CONTROLLER)
- *    After the props calibration (see ../docs/README.md), if all the previous passes have successfully being done,
+ *    After the props calibration (see ../docs/README.md), if all the previous steps have successfully being done,
  *    change the UPLOADED_SKETCH to FLIGHT_CONTROLLER and upload the sketch.
- *    You can now adjust the PID parameters.
+ *    If USB cable is detached, you can connect the battery safely also to the board.
+ *    Now you can adjust the PID parameters.
  */
 #elif UPLOADED_SKETCH == FLIGHT_CONTROLLER
 
