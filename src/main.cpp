@@ -370,7 +370,7 @@
       loopTimer = micros();  
 
       
-      if(DEBUG) Serial.println("setup finished");
+      if(DEBUG) Serial.println("Setup finished");
 
    }
 

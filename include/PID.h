@@ -93,3 +93,32 @@ void calculatePID(){
   pidLastYawDError = pidErrorTemp;
 
 }
+
+
+/**
+ * @brief Prints the PID gain values.
+ * 
+ */
+void printPIDGainParameters(){
+  Serial.printf(" Roll ");
+  Serial.printf("%f ,",PID_P_GAIN_ROLL);
+  Serial.printf("%f ,",PID_I_GAIN_ROLL);
+  Serial.printf("%f ,",PID_D_GAIN_ROLL);
+  Serial.printf(" Pitch ");
+  Serial.printf("%f ,",PID_P_GAIN_PITCH);
+  Serial.printf("%f ,",PID_I_GAIN_PITCH);
+  Serial.printf("%f ,",PID_D_GAIN_PITCH);
+  Serial.printf(" Yaw ");
+  Serial.printf("%f ,",PID_P_GAIN_YAW);
+  Serial.printf("%f ,",PID_I_GAIN_YAW);
+  Serial.printf("%f ,",PID_D_GAIN_YAW);
+  Serial.printf(" Filter ");
+  Serial.printf("%f ,",GYROSCOPE_ROLL_FILTER);
+  Serial.printf("%f ,",GYROSCOPE_ROLL_CORR);
+  Serial.printf("%f ,",GYROSCOPE_PITCH_CORR);
+  Serial.printf(" Alt ");
+  Serial.printf("%f ,",PID_P_GAIN_ALTITUDE);
+  Serial.printf("%f ,",PID_I_GAIN_ALTITUDE);
+  Serial.printf("%f ,",PID_D_GAIN_ALTITUDE);
+  Serial.println();
+}

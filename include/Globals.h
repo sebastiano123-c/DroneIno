@@ -9,8 +9,8 @@
  *  @li PWM channels: for the use of the ledWrite;
  *  @li BATTERY: battery constants and calculation of the battery level;
  *  @li ALTIMETER: constants;
- *  @li TELEMETRY: data transfer and data controller size and array;
- *  @li UNDEFINED: variables not yet defined;
+ *  @li RC-CONTROLLER: structure and variables used for the RX;
+ *  @li GPS: variables used for the GPS calculations.
  * 
  * @version 0.1
  * @date 2022-02-28
@@ -66,15 +66,16 @@ int PID_MAX_ALTITUDE             = 400;                      //Maximum output of
  */
 float GPS_P_GAIN                 = 2.7;                      //Gain setting for the GPS P-controller (default = 2.7).
 float GPS_D_GAIN                 = 6.5;                      //Gain setting for the GPS D-controller (default = 6.5).
-
-
-//    (PID MISC.)
+/**
+ *    (PID UNDECLARED VARIABLES) 
+ */
 float pidIMemRoll, pidRollSetpoint, gyroRollInput, pidOutputRoll, pidLastRollDError;
 float pidIMemPitch, pidPitchSetpoint, gyroPitchInput, pidOutputPitch, pidLastPitchDError;
 float pidIMemYaw, pidYawSetpoint, gyroYawInput, pidOutputYaw, pidLastYawDError;
 float pidErrorTemp;                                                     
-
-//    (ALTITUDE PID MISC.)
+/**
+ *    (ALTITUDE PID UNDECLARED VARIABLES) 
+ */
 float pidErrorGainAltitude;
 float pidIMemAltitude, pidAltitudeSetpoint, pidAltitudeInput, pidOutputAltitude;
 uint8_t parachuteRotatingMemLocation;
@@ -92,27 +93,37 @@ int16_t manualThrottle;
  * GYROSCOPE
  * 
  * 
- *    (HIGH-LOW FILTER)                                                                    
+ *    (HIGH-LOW FILTER)
+ *    The gyroscope data is filtered using a hig-low filter. GYROSCOPE_ROLL_FILTER is the percentage the filter
+ * 
+ *                  data_filtered = data_prev * GYROSCOPE_ROLL_FILTER + data_now * (1-GYROSCOPE_ROLL_FILTER).
+ * 
  */
-float GYROSCOPE_ROLL_FILTER      = 0.9996;                     // read your gyroscope data after the calibration, try different values and choose the best one
-float GYROSCOPE_PITCH_FILTER     = GYROSCOPE_PITCH_FILTER;     // read your gyroscope data after the calibration, try different values and choose the best one
-
-//    (ANGLE CORRECTION)
-float GYROSCOPE_ROLL_CORR        = 0.;                         // (0.) after set GYROSCOPE_ROLL_FILTER, put here the angle roll you read eneabling DEBUG
-float GYROSCOPE_PITCH_CORR       = 0.;                         // (-1.65.) after set GYROSCOPE_PITCH_FILTER, put here the angle pitch you read eneabling DEBUG
-
-//    (DATASHEET)
+float GYROSCOPE_ROLL_FILTER      = 0.9996;                     // stabler value is 0.9996
+float GYROSCOPE_PITCH_FILTER     = GYROSCOPE_PITCH_FILTER;    
+/**
+ *    (ANGLE CORRECTION)
+ *    Find the most horizontal plane you got, and turn on the drone on it.
+ *    Read the values of the gyroscope (for example in the CALIBRATION sketch) and put them in the following two lines.
+ */
+float GYROSCOPE_ROLL_CORR        = 0.;                         // (0.) after set GYROSCOPE_ROLL_FILTER, put here the angle roll you read
+float GYROSCOPE_PITCH_CORR       = 0.;                         // (-1.65.) after set GYROSCOPE_PITCH_FILTER, put here the angle pitch you read
+/**
+ *    (DATASHEET)
+ *    Here are reported the gyroscope datasheet relevant quantities and some other constants used.
+ */
 const int gyroFrequency          = 250;                         // (Hz)
 const float gyroSensibility      = 65.5;                                
 const int correctionPitchRoll    = 15;                          // correction for the pitch and roll
-float convDegToRad               = 180.0 / PI;                                 
-float travelCoeff                = 1/((float)gyroFrequency *
+float convDegToRad               = 180.0 / PI;                  // convertion between degrees and radians  
+float travelCoeff                = 1/((float)gyroFrequency *    // converts gyro into an angular distance
                                    gyroSensibility);     
-float travelCoeffToRad           = travelCoeff / convDegToRad;
-float anglePitchOffset           = 0;                           // NOT touch, for future 
-float angleRollOffset            = 0;                           // NOT touch, for future 
-
-//      (MISC.)
+float travelCoeffToRad           = travelCoeff / convDegToRad;  // converts gyro distance in radians
+float anglePitchOffset           = 0;                           // NOT touch, for future improvements
+float angleRollOffset            = 0;                           // NOT touch, for future improvements
+/**
+ *    (GYROSCOPE UNDECLARED VARIABLES)
+ */
 boolean gyroAnglesSet;
 int16_t gyroTemp, accAxis[4], gyroAxis[4];   
 double gyroAxisCalibration[4], accAxisCalibration[4];
@@ -149,7 +160,7 @@ const int pwmInputChannel2       = 7;                            // RC-controlle
 const int pwmInputChannel3       = 8;                            // RC-controller input3 pwm channel 
 const int pwmInputChannel4       = 9;                            // RC-controller input4 pwm channel 
 /**
- * (SPECS.)
+ *    (PWM SPECIFICS)
  */
 const int freq                   = 500;                           // (Hz) for what I know, 500 is the best 
 const int resolution             = 11;                            // (bits) 11 is the best guess
@@ -200,8 +211,9 @@ float fromWidthToV              = (BOARD_LIMIT_VOLTAGE / maximumWidth) / (TOTAL_
  *     Use put here the results.
  */
 float  batteryCurvePendency      = 6e-1;                                 // compensate the rotors power loss when battery drops down
-
-//    (MISC.)
+/**
+ *    (BATTERY UNDECLARED VARIABLES)
+ */
 float pinPulseWidth, batteryVoltage, batteryPercentage;
 int16_t escCorr;
 
@@ -214,8 +226,9 @@ int16_t escCorr;
  *    (CONSTS.)
  */
 const float PRESSURE_SEA_LEVEL   = 1013.25;                              // (hPa) sea level pressure reference
-
-//    (BMP280)
+/**
+ *    (BMP280)
+ */
 uint16_t dig_P1, dig_T1;
 int16_t dig_T2, dig_T3, dig_P2, dig_P3, dig_P4, dig_P5, dig_P6, dig_P7, dig_P8, dig_P9, dig_H2, dig_H4, dig_H5;
 int8_t dig_H1, dig_H3, dig_H6;
@@ -224,8 +237,9 @@ unsigned long int tempRaw, presRaw;
 signed long int tFine;
 signed long int tempCal;
 unsigned long int pressCal;
-
-//    (MISC.)
+/**
+ *    (ALTIMETER UNDECLARED VARIABLES)
+ */
 float pressure, altitudeMeasure, pressureSampled;
 float temperature;
 uint8_t barometerCounter;
@@ -245,21 +259,6 @@ const char *ssid                 = "DroneInoTelemetry";
 const char *password             = "DroneIno";                            
 const int refreshRate            = 200;                                   // (ms) the refresh rate of the page
 int refreshCounter               = 0;
-/**
- *    (ESP32 BROWSER TAGS)
- */
-const char* P_ROLL_GET           = "rollP";
-const char* I_ROLL_GET           = "rollI";
-const char* D_ROLL_GET           = "rollD";
-const char* P_YAW_GET            = "yawP";
-const char* I_YAW_GET            = "yawI";
-const char* D_YAW_GET            = "yawD";
-const char* FILTER_P_R_GET       = "filterPitchRoll";
-const char* ROLL_CORR_GET        = "correctionRoll";
-const char* PITCH_CORR_GET       = "correctionPitch";
-const char* P_ALTITUDE_GET       = "altitudeP";
-const char* I_ALTITUDE_GET       = "altitudeI";
-const char* D_ALTITUDE_GET       = "altitudeD";
 /**
  *    (RX)
  *    Defines the number of elements and the that ESP32 waits to receive from telemetry system
@@ -281,7 +280,7 @@ struct trimPosition{
   int16_t low;                                             // low value for the specific receiver input channel
   int16_t center;                                          // center value for the specific receiver input channel
   int16_t high;                                            // high value for the specific receiver input channel
-  int16_t actual;                                          // instantaneous receiver value
+  int16_t actual;                                      // instantaneous receiver value
 } trimCh[5];
 /**
  *    (ISR)
@@ -298,8 +297,9 @@ int16_t throttle;
  *    3 = GPS**
  */
 byte flightMode;                                           
-
-//    (MISC.)
+/**
+ *    (RC-CONTROLLER UNDECLARED VARIABLES) 
+ */
 byte eepromData[EEPROM_SIZE], errWire, msg;
 int16_t calInt, start;
 unsigned long timer;
@@ -326,7 +326,7 @@ float compassXHorizontal, compassYHorizontal, actualCompassHeading;
 float compassScaleY, compassScaleZ;
 int16_t compassOffsetX, compassOffsetY, compassOffsetZ, compassCalibrationOn;
 /**
- *    (MISC.) 
+ *    (GPS UNDECLARED VARIABLES) 
  */
 static char GPSString[100];
 char GPSIncomingString;

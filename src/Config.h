@@ -152,7 +152,7 @@
  *      If true, some serial prints are enabled.
  *      Otherwise, it is not auspicable to set DEBUG true when flying.
  */
-#define DEBUG                       false                    // (true, false) true enable serial prints for debugging
+#define DEBUG                       true                    // (true, false) true enable serial prints for debugging
 /**
  *      (SKETCH CONSTANTS)
  */

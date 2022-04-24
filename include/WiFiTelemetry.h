@@ -32,6 +32,22 @@
 #if WIFI_TELEMETRY == NATIVE
 
   /**
+   *    (ESP32 BROWSER TAGS)
+   */
+  const char* P_ROLL_GET           = "rollP";
+  const char* I_ROLL_GET           = "rollI";
+  const char* D_ROLL_GET           = "rollD";
+  const char* P_YAW_GET            = "yawP";
+  const char* I_YAW_GET            = "yawI";
+  const char* D_YAW_GET            = "yawD";
+  const char* FILTER_P_R_GET       = "filterPitchRoll";
+  const char* ROLL_CORR_GET        = "correctionRoll";
+  const char* PITCH_CORR_GET       = "correctionPitch";
+  const char* P_ALTITUDE_GET       = "altitudeP";
+  const char* I_ALTITUDE_GET       = "altitudeI";
+  const char* D_ALTITUDE_GET       = "altitudeD";
+
+  /**
    * @brief Not found response.
    * 
    * @param request 
@@ -348,7 +364,7 @@
 
 #elif WIFI_TELEMETRY == ESP_CAM
   
-  // HardwareSerial SUART(2); 
+  // HardwareSerial Serial2(2); 
 
   /**
    * @brief Setup the UART communication with ESP32-CAM.
@@ -409,60 +425,69 @@
    */
   void readDataTransfer(){
   
-    // declair index array
-    int indices[dataControllerSize-1];
-    String str;
-    
-    // read from serial
-    if(DEBUG) Serial.printf("I'm reading...\n");
-    str = Serial2.readStringUntil('\n');
-  
-    // find positions of ","
-    //Serial.println("indices...");
-    int i = 0;
-    indices[i] = str.indexOf(',');
-    for( i = 1; i < dataControllerSize-1; i++){
-      indices[i] = str.indexOf(',', indices[i-1]+1);
-    }
-  
-    // substring the data and convert it to floats
-    i = 0;
-    dataController[i] = str.substring(0, indices[i]).toFloat();
-    //Serial.printf("%i: %f \n", i, dataController[i]);
-    for( i = 1; i < dataControllerSize - 1; i++){
-      dataController[i] = str.substring(indices[i-1] + 1, indices[i]).toFloat();
-      //Serial.printf("%i: %f \n", i, dataController[i]);
-    }
-    dataController[dataControllerSize - 1] = str.substring(indices[dataControllerSize - 2] +1 ).toFloat();
-    //Serial.printf("%i: %f %s \n", indices[dataControllerSize - 2], dataController[dataControllerSize - 1], str.substring(39+1 ));
-  
-    // fill data structure after receiving
-    PID_P_GAIN_ROLL = dataController[0];
-    PID_I_GAIN_ROLL = dataController[1];
-    PID_D_GAIN_ROLL = dataController[2];
-    
-    PID_P_GAIN_PITCH = PID_P_GAIN_ROLL;
-    PID_I_GAIN_PITCH = PID_I_GAIN_ROLL;
-    PID_D_GAIN_PITCH = PID_D_GAIN_ROLL;
-    
-    PID_P_GAIN_YAW = dataController[3];
-    PID_I_GAIN_YAW = dataController[4];
-    PID_D_GAIN_YAW = dataController[5];
+    if(Serial2.available() > 0){
+      // declair index array
+      int indices[dataControllerSize];
+      String str = "";
+      
+      // read from serial
+      str = Serial2.readStringUntil('\n');
 
-    GYROSCOPE_ROLL_FILTER = dataController[6];
-    GYROSCOPE_PITCH_FILTER = GYROSCOPE_ROLL_FILTER;
-    GYROSCOPE_ROLL_CORR = dataController[7];
-    GYROSCOPE_PITCH_CORR = dataController[8];
-  
-    PID_P_GAIN_ALTITUDE = dataController[9];
-    PID_I_GAIN_ALTITUDE = dataController[10];
-    PID_D_GAIN_ALTITUDE = dataController[11];
+      // find position of the last <
+      int posStart = str.lastIndexOf('<') + 1;
+      
+      // find positions of ","
+      int i = 0;
+      indices[i] = str.indexOf(',', posStart);
+      for( i = 1; i < dataControllerSize - 1; i++){
+          indices[i] = str.indexOf(',', indices[i-1]+1);
+      }
+      indices[dataControllerSize - 1] = str.indexOf('>');                                 // find end position >
 
-    
-    // print in csv format   
-    //for(int i = 0; i < dataControllerSize; i++){
-    //  Serial.printf("%.6f\n", dataController[i]);
-    //}
+      // substring the data
+      i = 0;
+      dataController[i] = str.substring(posStart, indices[i]).toFloat();
+      for( i = 1; i < dataControllerSize; i++){
+          dataController[i] = str.substring(indices[i-1] + 1, indices[i]).toFloat();
+      }
+      
+      // fill data structure after receiving if the incoming message is not fake
+      if(
+        dataController[0] < 1e-11 && dataController[1] < 1e-11 && dataController[2] < 1e-11
+        && dataController[3] < 1e-11 && dataController[4] < 1e-11 && dataController[5] < 1e-11
+        && dataController[6] < 1e-11 && dataController[7] < 1e-11 && dataController[8] < 1e-11
+        && dataController[9] < 1e-11 && dataController[10] < 1e-11 && dataController[11] < 1e-11
+      );
+      else {
+        PID_P_GAIN_ROLL = dataController[0];
+        PID_I_GAIN_ROLL = dataController[1];
+        PID_D_GAIN_ROLL = dataController[2];
+        
+        PID_P_GAIN_PITCH = PID_P_GAIN_ROLL;
+        PID_I_GAIN_PITCH = PID_I_GAIN_ROLL;
+        PID_D_GAIN_PITCH = PID_D_GAIN_ROLL;
+        
+        PID_P_GAIN_YAW = dataController[3];
+        PID_I_GAIN_YAW = dataController[4];
+        PID_D_GAIN_YAW = dataController[5];
+
+        GYROSCOPE_ROLL_FILTER = dataController[6];
+        GYROSCOPE_PITCH_FILTER = GYROSCOPE_ROLL_FILTER;
+        GYROSCOPE_ROLL_CORR = dataController[7];
+        GYROSCOPE_PITCH_CORR = dataController[8];
+      
+        PID_P_GAIN_ALTITUDE = dataController[9];
+        PID_I_GAIN_ALTITUDE = dataController[10];
+        PID_D_GAIN_ALTITUDE = dataController[11];
+      }
+
+      
+      // print 
+      #if DEBUG  
+        // Serial.println("..............");
+        // printPIDGainParameters();
+      #endif
+    }
   }
       
 

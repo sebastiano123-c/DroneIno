@@ -36,7 +36,7 @@ float samplePressure = 0.0f;
     Wire.beginTransmission(ALTITUDE_SENSOR_ADDRESS);
     Wire.write(reg_address);
     Wire.write(msg);
-    Wire.endTransmission();    
+    error = Wire.endTransmission();    
 
   }
 
@@ -107,9 +107,17 @@ float samplePressure = 0.0f;
 
     writeRegister(0xF4, 0x27);
     writeRegister(0xF5, 0xA0);
+
+    while(error != 0){
+      Serial.printf("ALTITUDE SENSOR ERROR, not found\n");
+      ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - ledcRead(pwmLedChannel)));
+    }
+
     readTrim();                                     
 
-    if(DEBUG) Serial.println("checkAltitudeSensor: OK");
+    #if(DEBUG)
+      Serial.println("\nAltitude sensor: OK");
+    #endif
   }
   
 

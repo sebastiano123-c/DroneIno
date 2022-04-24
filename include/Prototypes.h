@@ -127,6 +127,7 @@ void configureReceiverTrims();                                // see Initialize.
 
     void calculatePID();                                      // see PID.h
 
+    void printPIDGainParameters();
 
     void readBatteryVoltage();                                // see Battery.h
 
