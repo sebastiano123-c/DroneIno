@@ -129,6 +129,7 @@ So, when calibrating the propellers, connect the battery to the motor BUT NOT TO
 The power is supplied by the 11.1V 2200mAh (3800 should be better) 3s 20C LiPo battery.
 The battery powers the motors and the ESP32.
 Battery voltage is measured by GPIO-39 using a voltage divider with R1 = 5.1 kOhm and R2 = 1.55 kOhm.
+Take a look at the [batteryCalc](https://github.com/sebastiano123-c/DroneIno/tree/main/test/batteryCalc.cpp) file to calculate the voltage divider.
 
 Consider that each of the 3 cells of the battery can have a maximum voltage of 4.2V, thus the total battery voltage should be 4.2V*3 = 12.6V.
 **Warning:** *Do not discharge the battery's cells under 3V, thus never let our battery go under the 3V*3 = 9V.*
@@ -184,7 +185,9 @@ The battery specifications are the same as before.
 Here I use a 1n4007 diode D1, which drops the battery voltage about 0.7V.
 The Vin pin is the 5V pin. This can be problem if you need 5V for some component.
 In this case, you can also add a voltage regulator (Vreg) after the diode and tune it to give 5V.
-The voltage divider is composed by the resistances R1 = 5.1kOhm and R2 = 1.22kOhm.
+I recommend to use the voltage divider composed by the resistances R1 = 5.32kOhm (series of a 5.1kOhm and 0.22Ohm) and R2 = 2kOhm.
+With this you will obtain a maximum input voltage of 3.25V.
+Otherwise, take a look at the [batteryCalc](https://github.com/sebastiano123-c/DroneIno/tree/main/test/batteryCalc.cpp) file to calculate the voltage divider.
 For the LEDs, R3 = 330Ohm.
 
 _Note_: with this scheme BE VERY CAREFUL, when connecting the USB cable disconnect the battery otherwise the battery will be damaged.
@@ -223,7 +226,7 @@ _Note_: with this scheme BE VERY CAREFUL, when connecting the USB cable disconne
  +-|-|-->|3V3+|   |    |  R3 ### ESP32 DevKit ### | |               |      +|====||==++                     
    | |   |GND-|<--+    |  |                       | |               |      -|====++                        
    | |   #gyro#        | (LED)                    | |               ##ESC-4##                              
-   | +----------------+--+------------------------+ |                                                          
+   | +----------------+---+-----------------------+ |                                                          
    +------------------------------------------------+                                                           
 </pre>
 

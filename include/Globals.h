@@ -185,22 +185,19 @@ float DANGER_BATTERY_VOLTAGE     = DANGER_CELL_VOLTAGE *              // (V) bat
                                    BATTERY_NUMBER_OF_CELLS;
 uint8_t DANGEROUS_BATTERY_LEVEL  = false;                             // when reaching DANGER_BATTERY_VOLTAGE, this become true
 /**
- *     (DIGITAL PINS ACCURACY)
- *     Boards measure the pin inputs signals with a certain digit precision, which is adcBits (ADC stands for analog to digital converter).
- *     maximumWidth is the maximum width the board can measure.
+ *    (DIGITAL PINS ACCURACY)
+ *    Boards measure the pin inputs signals with a certain digit precision, which is adcBits (ADC stands for analog to digital converter).
+ *    maximumWidth is the maximum width the board can measure.
  */
 uint8_t adcBits                  = 12;                                    // (bits) of width when measuring the voltage
 float maximumWidth               = pow(2., (float)adcBits)-1;             // maximum width that the pin can read
 /**
- *     (CONVERSIONS)
- *     Microcontrollers calculates the input voltage giving a signal output in the range (0., maximumWidth).
- *     fromVtoWidth converts the width to voltage of the signal.
- *     This signal is by the way dropped by your voltage partitor. Thus, maxBatteryLevelDropped is the measure of maximum voltage after the partitor
- *     The correction factor is calculated because some boards accepts 5v input, others 3v3.
- *     Finally, minBatteryLevelThreshold is the board minimum voltage under which it is not safe to go.
+ *    (CONVERSIONS)
+ *    Microcontrollers calculates the input voltage giving a signal output in the range (0., maximumWidth).
+ *    fromVtoWidth converts the width to voltage of the signal.
+ *    This signal is by the way dropped by your voltage partitor and, if present, by a diode.
+ *    Finally, minBatteryLevelThreshold is the board minimum voltage under which it is not safe to go.
  */ 
-float pinVoltageMax             = (MAX_BATTERY_VOLTAGE - DIODE_DROP) * TOTAL_DROP;
-float pinVoltageMin             = (DANGER_BATTERY_VOLTAGE - DIODE_DROP) * TOTAL_DROP;
 float fromWidthToV              = (BOARD_LIMIT_VOLTAGE / maximumWidth) / (TOTAL_DROP);    
 /**
  *     (BATTERY COMPENSATION*)
