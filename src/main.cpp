@@ -332,7 +332,7 @@
 
 
       // GPS
-      #if GPS!=OFF
+      #if GPS != OFF
          setupGPS();
       #endif
 
@@ -370,7 +370,9 @@
       loopTimer = micros();  
 
       
-      if(DEBUG) Serial.println("Setup finished");
+      #if DEBUG
+         Serial.println("Setup finished");
+      #endif
 
    }
 

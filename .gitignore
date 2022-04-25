@@ -16,4 +16,9 @@ Compass.h
 include/wifi/serial.web_serial.h
 
 #hardware
-hardware
+/hardware
+
+#images
+myDroneIno-front-view.jpg
+myDroneIno-up-side-view.jpg
+myDroneIno-up-view.jpg
