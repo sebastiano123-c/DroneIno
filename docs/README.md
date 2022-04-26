@@ -47,6 +47,7 @@ Make sure to do all the passages described here below.
 - [**Documentation**](#documentation)
   - [**ESP32 D1 R32 - Circuit scheme**](#esp32-d1-r32---circuit-scheme)
   - [**ESP32 DevKit V1 - Circuit scheme**](#esp32-devkit-v1---circuit-scheme)
+  - [**Hardware**](#hardware)
   - [**Pinmap**](#pinmap)
   - [**Configuration**](#configuration)
   - [**Setup**](#setup)
@@ -231,6 +232,9 @@ _Note_: with this scheme BE VERY CAREFUL, when connecting the USB cable disconne
 </pre>
 
 After building the circuit, place it on the drone and proceed with the following passages.
+
+## **Hardware**
+For each circuit I provide a [circuit-housing](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/hardware) to be printed using a 3D printer for drones of te type F450. 
 
 ## **Pinmap**
 Check that your pinmap corresponds to the one defined in the [pinmap](https://github.com/sebastiano123-c/DroneIno/tree/main/DroneIno/include/pinmaps) folder, otherwise change it.

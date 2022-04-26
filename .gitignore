@@ -15,10 +15,8 @@ Compass.h
 #wifi
 include/wifi/serial.web_serial.h
 
-#hardware
-/hardware
-
 #images
+ESP32-DevKit-flying.jpg
 myDroneIno-front-view.jpg
 myDroneIno-up-side-view.jpg
 myDroneIno-up-view.jpg
