@@ -13,7 +13,7 @@
  * @brief Measures the receiver input signal length. 
  * @todo Use pwm to read the receivers signals, avoid digitalRead.
  */
-void myISR(){
+void IRAM_ATTR myISR(){
 
   currentTime = micros();
 
