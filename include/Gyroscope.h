@@ -33,7 +33,7 @@ void setGyroscopeRegisters(){
   error = Wire.endTransmission();                              //End the transmission and register the exit status.
   while (error != 0) {                                             //Stay in this loop because the MPU-6050 did not respond.
     error = 1;                                                     //Set the error status to 1.
-    ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - ledcRead(pwmLedChannel)));
+    ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));
     Serial.print("GYROSCOPE ERROR at address: ");
     Serial.println(GYRO_ADDRESS);
     vTaskDelay(80/portTICK_PERIOD_MS);                             //Simulate a 250Hz refresc rate as like the main loop.
@@ -137,12 +137,12 @@ void calibrateGyroscope(){
   for (calInt = 0; calInt < 2000; calInt ++){                       //Take 2000 readings for calibration.
     
     if(calInt % 25 == 0){                                           //Change the led status to indicate calibration.
-      ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - ledcRead(pwmLedChannel)));
+      ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));
       #if DEBUG
         Serial.print(".");
       #endif
     } else
-      ledcWrite(pwmLedBatteryChannel, abs(MAX_DUTY_CYCLE - ledcRead(pwmLedChannel)));
+      ledcWrite(pwmLedBatteryChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));
 
     
     readGyroscopeStatus();                                           //Read the gyro output.

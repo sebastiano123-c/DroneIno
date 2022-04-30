@@ -185,7 +185,7 @@ void calculateLatLonGPSGA(){
 
 void calculatePIDFromGPS(){
     if (GPSSatNumber < 8)
-        ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - ledcRead(pwmLedChannel)));                // change the LED on the STM32 to indicate GPS reception.
+        ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));                // change the LED on the STM32 to indicate GPS reception.
 
     else ledcWrite(pwmLedChannel, 0);                                                           // turn the LED on the STM solid on (LED function is inverted)
 

@@ -12,7 +12,7 @@
  */
 
 
-void myISR();                                                 // see ISR.h
+void myISR();//void*dummy);                                                 // see ISR.h
 
 
 void setupPins();                                             // see Initialize.h

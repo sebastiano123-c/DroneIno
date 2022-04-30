@@ -13,11 +13,12 @@
  * @brief Measures the receiver input signal length. 
  * @todo Use pwm to read the receivers signals, avoid digitalRead.
  */
-void IRAM_ATTR myISR(){
+void IRAM_ATTR myISR(){//void *dummy){
 
   currentTime = micros();
 
   // channel 1                                               
+//   if(abs((int)ledcRead(pwmInputChannel1) - MAX_DUTY_CYCLE) < 1e-9){                //Is RECEIVER input high?
   if(digitalRead(PIN_RECEIVER_1) == HIGH){                                  //Is RECEIVER input high?
       if(lastChannel1 == 0){                                                //Input 8 changed from 0 to 1.
           lastChannel1 = 1;                                                   //Remember current input state.
@@ -31,7 +32,8 @@ void IRAM_ATTR myISR(){
 
 
   // channel 2                                              
-  if(digitalRead(PIN_RECEIVER_2) == HIGH){                                 //Is RECEIVER input high?
+//   if(abs((int)ledcRead(pwmInputChannel2) - MAX_DUTY_CYCLE) < 1e-9){                //Is RECEIVER input high?
+    if(digitalRead(PIN_RECEIVER_2) == HIGH){                                 //Is RECEIVER input high?
       if(lastChannel2 == 0){                                                //Input 9 changed from 0 to 1.
           lastChannel2 = 1;                                                   //Remember current input state.
           timer2 = currentTime;                                               //Set timer2 to currentTime.
@@ -44,7 +46,8 @@ void IRAM_ATTR myISR(){
 
 
   // channel 3                                              
-  if(digitalRead(PIN_RECEIVER_3) == HIGH){                                 //Is RECEIVER input high?
+//   if(abs((int)ledcRead(pwmInputChannel3) - MAX_DUTY_CYCLE) < 1e-9){                //Is RECEIVER input high?
+    if(digitalRead(PIN_RECEIVER_3) == HIGH){                                 //Is RECEIVER input high?
       if(lastChannel3 == 0){                                                //Input 10 changed from 0 to 1.
           lastChannel3 = 1;                                                   //Remember current input state.
           timer3 = currentTime;                                               //Set timer3 to currentTime.
@@ -57,7 +60,8 @@ void IRAM_ATTR myISR(){
 
 
   // channel 4                                              
-  if(digitalRead(PIN_RECEIVER_4) == HIGH){                                 //Is RECEIVER input high?
+//   if(abs((int)ledcRead(pwmInputChannel4) - MAX_DUTY_CYCLE) < 1e-9){                //Is RECEIVER input high?
+    if(digitalRead(PIN_RECEIVER_4) == HIGH){                                 //Is RECEIVER input high?
       if(lastChannel4 == 0){                                                //Input 11 changed from 0 to 1.
           lastChannel4 = 1;                                                   //Remember current input state.
           timer4 = currentTime;                                               //Set timer4 to currentTime.
@@ -70,6 +74,7 @@ void IRAM_ATTR myISR(){
 
   
   // channel 0 is the FLIGHT MODE                                              
+//   if(abs((int)ledcRead(pwmInputChannel5) - MAX_DUTY_CYCLE) < 1e-9){                //Is RECEIVER input high?
   if(digitalRead(PIN_RECEIVER_5) == HIGH){                          //Is RECEIVER input high?
       if(lastChannel5 == 0){                                                //Input 11 changed from 0 to 1.
           lastChannel5 = 1;                                                   //Remember current input state.

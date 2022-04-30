@@ -5,6 +5,7 @@
 .vscode/ipch
 .vscode
 
+# test
 test/*
 !test/DroneIno.zip
 !batteryCalc.cpp 
@@ -12,11 +13,16 @@ test/*
 # gps
 Compass.h
 
-#wifi
+# wifi
 include/wifi/serial.web_serial.h
 
-#images
+# images
 ESP32-DevKit-flying.jpg
 myDroneIno-front-view.jpg
 myDroneIno-up-side-view.jpg
 myDroneIno-up-view.jpg
+
+# pinmaps
+/include/pinmaps/pinmap.OFF.h
+/include/pinmaps/pinmap.ATmega32.h
+/include/pinmaps/pinmap.ESP32CAM.h

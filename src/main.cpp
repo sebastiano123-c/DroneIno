@@ -61,7 +61,10 @@
 #include <Wire.h>
 #include <EEPROM.h>
 #include <driver/adc.h>
-
+#include "driver/ledc.h"    // for ledc led fading (nothing to do with ulp)
+#include "driver/mcpwm.h"
+#include "soc/mcpwm_reg.h"
+#include "soc/mcpwm_struct.h"
 
 //    (DRONEINO FILES)
 #include <Constants.h>
@@ -182,9 +185,6 @@
       EEPROM.begin(EEPROM_SIZE);
 
       
-      calibrationMsg();                                    // introduction
-
-      
       initEEPROM();                                        // see Initialize.h
 
 
@@ -204,11 +204,14 @@
 
 
       // wait until the rx is connected
-      waitController();                                    // wait until the receiver is active.
+      // waitController();                                    // wait until the receiver is active.
 
 
       // set pin precision
       initBattery();             
+
+
+      calibrationMsg();                                    // introduction
 
 
       pidOutputPitch = 0;                                  // make setEscPulses to work

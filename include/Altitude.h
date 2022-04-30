@@ -110,7 +110,7 @@ float samplePressure = 0.0f;
 
     while(error != 0){
       Serial.printf("ALTITUDE SENSOR ERROR, not found\n");
-      ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - ledcRead(pwmLedChannel)));
+      ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));
     }
 
     readTrim();                                     

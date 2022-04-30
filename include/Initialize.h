@@ -61,6 +61,7 @@ void setupWireI2C(){
   
 }
 
+
 /** 
  * @brief Definition of all the pinModes.
  */
@@ -73,18 +74,29 @@ void setupPins(){
   ledcAttachPin(PIN_SECOND_LED, pwmLedBatteryChannel);
 
 
-  // ESCs pinmode  
-  //     ledc ESC PWM setups
-  ledcSetup(pwmChannel1, freq, resolution);                                         // ESC 1 pinmode
-  ledcSetup(pwmChannel2, freq, resolution);                                         // ESC 2 pinmode 
-  ledcSetup(pwmChannel3, freq, resolution);                                         // ESC 3 pinmode 
-  ledcSetup(pwmChannel4, freq, resolution);                                         // ESC 4 pinmode 
+  // ESCs 
+  mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, PIN_ESC_1 ); 
+  mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1A, PIN_ESC_2 );
+  mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, PIN_ESC_3 );
+  mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM1A, PIN_ESC_4 );
 
-  //      attach pin to channel
-  ledcAttachPin(PIN_ESC_1, pwmChannel1);
-  ledcAttachPin(PIN_ESC_2, pwmChannel2);
-  ledcAttachPin(PIN_ESC_3, pwmChannel3);
-  ledcAttachPin(PIN_ESC_4, pwmChannel4);
+  mcpwm_config_t pwm_config = {};
+  pwm_config.frequency = 500;                                                           //frequency = 500Hz, i.e. for every motor time period is 2ms
+  pwm_config.cmpr_a = 0;                                                                //duty cycle of PWMxA = 0
+  pwm_config.cmpr_b = 0;                                                                //duty cycle of PWMxb = 0
+  pwm_config.counter_mode = MCPWM_UP_COUNTER;
+  pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
+
+  mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);                                 //Configure PWM0A timer 0 with above settings
+  mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_1, &pwm_config);                                 //Configure PWM0A timer 1 with above settings
+  mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_0, &pwm_config);                                 //Configure PWM0A timer 1 with above settings
+  mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_1, &pwm_config);                                 //Configure PWM0A timer 1 with above settings
+
+  // remove the motor beep
+  mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 1000);
+  mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, 1000);
+  mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A, 1000);
+  mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_1, MCPWM_OPR_A, 1000);
 
 
   // RECEIVER pinmode
@@ -100,12 +112,6 @@ void setupPins(){
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_3), myISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_4), myISR, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_RECEIVER_5), myISR, CHANGE);
-
-  // remove the motor beep
-  ledcWrite(pwmChannel1, 1000);
-  ledcWrite(pwmChannel2, 1000);
-  ledcWrite(pwmChannel3, 1000);
-  ledcWrite(pwmChannel4, 1000);
 
 
   // BATTERY LEVEL pinmode

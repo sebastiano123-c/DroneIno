@@ -96,27 +96,35 @@ void waitController(){
 
   #else
 
-    while(receiverInputChannel3 < 980 && receiverInputChannel3 > 1020 && receiverInputChannel4 < 1400)
+    while(receiverInputChannel3 < 980 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400)
     {
   
       receiverInputChannel3 = convertReceiverChannel(3);                 //Convert the actual receiver signals for throttle to the standard 1000 - 2000us
       receiverInputChannel4 = convertReceiverChannel(4);                 //Convert the actual receiver signals for yaw to the standard 1000 - 2000us
       
-        start ++;                                                          //While waiting increment start with every loop.
+      start ++;                                                          //While waiting increment start with every loop.
 
-        switch (start)
-        {
-        case 125:
+      switch (start) {
+        case 10:
 
-          ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                        //Change the led status to indicate calibration.
+          //Change the led status to indicate calibration.
+          ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));
           start = 0;  
           break;
         
         default:
-          ledcWrite(pwmLedChannel, 0);
           break;
-        }
+      }
+
+      #if UPLOADED_SKETCH == CALIBRATION || DEBUG == true
+        Serial.println("waiting for controller...");
+      #endif
+
+      delay(10);
       
-    }   
+    }
+    
+    ledcWrite(pwmLedChannel, 0);                                          // turn off the led anyway
+
   #endif
 }

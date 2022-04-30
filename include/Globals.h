@@ -159,6 +159,7 @@ const int pwmInputChannel1       = 6;                            // RC-controlle
 const int pwmInputChannel2       = 7;                            // RC-controller input2 pwm channel 
 const int pwmInputChannel3       = 8;                            // RC-controller input3 pwm channel 
 const int pwmInputChannel4       = 9;                            // RC-controller input4 pwm channel 
+const int pwmInputChannel5       = 10;                            // RC-controller input4 pwm channel 
 /**
  *    (PWM SPECIFICS)
  */
