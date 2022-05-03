@@ -100,25 +100,7 @@ void calculatePID(){
  * 
  */
 void printPIDGainParameters(){
-  Serial.printf(" Roll ");
-  Serial.printf("%f ,",PID_P_GAIN_ROLL);
-  Serial.printf("%f ,",PID_I_GAIN_ROLL);
-  Serial.printf("%f ,",PID_D_GAIN_ROLL);
-  Serial.printf(" Pitch ");
-  Serial.printf("%f ,",PID_P_GAIN_PITCH);
-  Serial.printf("%f ,",PID_I_GAIN_PITCH);
-  Serial.printf("%f ,",PID_D_GAIN_PITCH);
-  Serial.printf(" Yaw ");
-  Serial.printf("%f ,",PID_P_GAIN_YAW);
-  Serial.printf("%f ,",PID_I_GAIN_YAW);
-  Serial.printf("%f ,",PID_D_GAIN_YAW);
-  Serial.printf(" Filter ");
-  Serial.printf("%f ,",GYROSCOPE_ROLL_FILTER);
-  Serial.printf("%f ,",GYROSCOPE_ROLL_CORR);
-  Serial.printf("%f ,",GYROSCOPE_PITCH_CORR);
-  Serial.printf(" Alt ");
-  Serial.printf("%f ,",PID_P_GAIN_ALTITUDE);
-  Serial.printf("%f ,",PID_I_GAIN_ALTITUDE);
-  Serial.printf("%f ,",PID_D_GAIN_ALTITUDE);
-  Serial.println();
+      Serial.printf(" Pr: %.2f, Ir: %.5f, Dr: %.2f, ", PID_P_GAIN_ROLL, PID_I_GAIN_ROLL, PID_D_GAIN_ROLL);
+      Serial.printf(" Pp: %.2f, Ip: %.5f, Dp: %.2f, ", PID_P_GAIN_PITCH, PID_I_GAIN_PITCH, PID_D_GAIN_PITCH);
+      Serial.printf(" Py: %.3f, Iy: %.5f, Dy: %.2f \n", PID_P_GAIN_YAW, PID_I_GAIN_YAW, PID_D_GAIN_YAW);
 }

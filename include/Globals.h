@@ -37,7 +37,7 @@
  *    (ROLL PID)
  */
 float PID_P_GAIN_ROLL            = 1.1;                      //Gain setting for the roll P-controller (1.3)
-float PID_I_GAIN_ROLL            = 0.002;                    //Gain setting for the roll I-controller  (0.0002)
+float PID_I_GAIN_ROLL            = 0.003;                    //Gain setting for the roll I-controller  (0.0002)
 float PID_D_GAIN_ROLL            = 10.0;                     //Gain setting for the roll D-controller (10.0)
 int PID_MAX_ROLL                 = 400;                      //Maximum output of the PID-controller   (+/-)
 /**
@@ -50,7 +50,7 @@ int PID_MAX_PITCH                = PID_MAX_ROLL;             //Maximum output of
 /**
  *    (YAW PID)
  */                                       
-float PID_P_GAIN_YAW             = 1.5;                      //Gain setting for the pitch P-controller. (2.0)
+float PID_P_GAIN_YAW             = 1.;                      //Gain setting for the pitch P-controller. (2.0)
 float PID_I_GAIN_YAW             = 0.04;                     //Gain setting for the pitch I-controller. (0.04)
 float PID_D_GAIN_YAW             = 0.0;                      //Gain setting for the pitch D-controller. (0.0)
 int PID_MAX_YAW                  = 400;                      //Maximum output of the PID-controller     (+/-)

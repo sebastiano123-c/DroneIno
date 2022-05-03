@@ -34,6 +34,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/IDE-PlatformIO-orange" /> 
   <img src="https://img.shields.io/badge/PIO core-5-red" />
+  <img src="https://img.shields.io/badge/platform-espressif32@2.0.0-green" />
   <img src="https://img.shields.io/badge/cpp-11-blue" /> 
 </p>
 

@@ -57,3 +57,13 @@
 #if GPS == BN_880
   #include "sensors/gps.BN_880.h"
 #endif
+
+
+/**
+ *  MOTOR PULS 
+ */
+#ifdef MOTOR_PULSE_BY_MCPWM
+   #include "driver/mcpwm.h"
+   #include "soc/mcpwm_reg.h"
+   #include "soc/mcpwm_struct.h"
+#endif

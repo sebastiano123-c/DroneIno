@@ -20,10 +20,10 @@ void IRAM_ATTR myISR(){//void *dummy){
   // channel 1                                               
 //   if(abs((int)ledcRead(pwmInputChannel1) - MAX_DUTY_CYCLE) < 1e-9){                //Is RECEIVER input high?
   if(digitalRead(PIN_RECEIVER_1) == HIGH){                                  //Is RECEIVER input high?
-      if(lastChannel1 == 0){                                                //Input 8 changed from 0 to 1.
-          lastChannel1 = 1;                                                   //Remember current input state.
-          timer1 = currentTime;                                               //Set timer1 to currentTime.
-      }
+    if(lastChannel1 == 0){                                                //Input 8 changed from 0 to 1.
+        lastChannel1 = 1;                                                   //Remember current input state.
+        timer1 = currentTime;                                               //Set timer1 to currentTime.
+    }
   }
   else if(lastChannel1 == 1){                                             //Input 8 is not high and changed from 1 to 0.
       lastChannel1 = 0;                                                     //Remember current input state.
@@ -38,25 +38,25 @@ void IRAM_ATTR myISR(){//void *dummy){
           lastChannel2 = 1;                                                   //Remember current input state.
           timer2 = currentTime;                                               //Set timer2 to currentTime.
       }
-  }
-  else if(lastChannel2 == 1){                                             //Input 9 is not high and changed from 1 to 0.
-      lastChannel2 = 0;                                                     //Remember current input state.
-      trimCh[2].actual = currentTime - timer2;                             //Channel 2 is currentTime - timer2.
-  }
+    }
+    else if(lastChannel2 == 1){                                             //Input 9 is not high and changed from 1 to 0.
+        lastChannel2 = 0;                                                     //Remember current input state.
+        trimCh[2].actual = currentTime - timer2;                             //Channel 2 is currentTime - timer2.
+    }
 
 
   // channel 3                                              
 //   if(abs((int)ledcRead(pwmInputChannel3) - MAX_DUTY_CYCLE) < 1e-9){                //Is RECEIVER input high?
     if(digitalRead(PIN_RECEIVER_3) == HIGH){                                 //Is RECEIVER input high?
-      if(lastChannel3 == 0){                                                //Input 10 changed from 0 to 1.
-          lastChannel3 = 1;                                                   //Remember current input state.
-          timer3 = currentTime;                                               //Set timer3 to currentTime.
-      }
-  }
-  else if(lastChannel3 == 1){                                             //Input 10 is not high and changed from 1 to 0.
-      lastChannel3 = 0;                                                     //Remember current input state.
-      trimCh[3].actual = currentTime - timer3;                             //Channel 3 is currentTime - timer3.
-  }
+        if(lastChannel3 == 0){                                                //Input 10 changed from 0 to 1.
+            lastChannel3 = 1;                                                   //Remember current input state.
+            timer3 = currentTime;                                               //Set timer3 to currentTime.
+        }
+    }
+    else if(lastChannel3 == 1){                                             //Input 10 is not high and changed from 1 to 0.
+        lastChannel3 = 0;                                                     //Remember current input state.
+        trimCh[3].actual = currentTime - timer3;                             //Channel 3 is currentTime - timer3.
+    }
 
 
   // channel 4                                              
@@ -66,11 +66,11 @@ void IRAM_ATTR myISR(){//void *dummy){
           lastChannel4 = 1;                                                   //Remember current input state.
           timer4 = currentTime;                                               //Set timer4 to currentTime.
       }
-  }
-  else if(lastChannel4 == 1){                                             //Input 11 is not high and changed from 1 to 0.
-      lastChannel4 = 0;                                                     //Remember current input state.
-      trimCh[4].actual = currentTime - timer4;                             //Channel 4 is currentTime - timer4.
-  }
+    }
+    else if(lastChannel4 == 1){                                             //Input 11 is not high and changed from 1 to 0.
+        lastChannel4 = 0;                                                     //Remember current input state.
+        trimCh[4].actual = currentTime - timer4;                             //Channel 4 is currentTime - timer4.
+    }
 
   
   // channel 0 is the FLIGHT MODE                                              
@@ -80,9 +80,9 @@ void IRAM_ATTR myISR(){//void *dummy){
           lastChannel5 = 1;                                                   //Remember current input state.
           timer5 = currentTime;                                               //Set timer4 to currentTime.
       }
-  }
-  else if(lastChannel5 == 1){                                             //Input 11 is not high and changed from 1 to 0.
-      lastChannel5 = 0;                                                     //Remember current input state.
-      trimCh[0].actual = currentTime - timer5;                             //Channel 4 is currentTime - timer4.
-  }
+    }
+    else if(lastChannel5 == 1){                                             //Input 11 is not high and changed from 1 to 0.
+        lastChannel5 = 0;                                                     //Remember current input state.
+        trimCh[0].actual = currentTime - timer5;                             //Channel 4 is currentTime - timer4.
+    }
 }

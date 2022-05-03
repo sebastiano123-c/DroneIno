@@ -105,7 +105,7 @@ void waitController(){
       start ++;                                                          //While waiting increment start with every loop.
 
       switch (start) {
-        case 10:
+        case 25:
 
           //Change the led status to indicate calibration.
           ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));

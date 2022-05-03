@@ -278,10 +278,22 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
         else esc4 = 1000;                                                            //If motor 4 is not requested set the pulse for the ESC to 1000us (off).
 
         // write to ESCs
-        mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, (uint32_t)esc1);//((float)esc1/2000.*(float)MAX_DUTY_CYCLE));
-        mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, (uint32_t)esc2);//((float)esc2/2000.*(float)MAX_DUTY_CYCLE));
-        mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A, (uint32_t)esc3);//((float)esc3/2000.*(float)MAX_DUTY_CYCLE));
-        mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_1, MCPWM_OPR_A, (uint32_t)esc4);//((float)esc4/2000.*(float)MAX_DUTY_CYCLE));
+        #if defined(MOTOR_PULSE_BY_MCPWM)
+
+          mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, (uint32_t)esc1);//((float)esc1/2000.*(float)MAX_DUTY_CYCLE));
+          mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, (uint32_t)esc2);//((float)esc2/2000.*(float)MAX_DUTY_CYCLE));
+          mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A, (uint32_t)esc3);//((float)esc3/2000.*(float)MAX_DUTY_CYCLE));
+          mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_1, MCPWM_OPR_A, (uint32_t)esc4);//((float)esc4/2000.*(float)MAX_DUTY_CYCLE));
+          
+        #elif defined(MOTOR_PULSE_BY_LEDC)
+
+          ledcWrite(pwmChannel1, (uint32_t)((float)esc1/2000.*(float)MAX_DUTY_CYCLE));
+          ledcWrite(pwmChannel2, (uint32_t)((float)esc2/2000.*(float)MAX_DUTY_CYCLE));
+          ledcWrite(pwmChannel3, (uint32_t)((float)esc3/2000.*(float)MAX_DUTY_CYCLE));
+          ledcWrite(pwmChannel4, (uint32_t)((float)esc4/2000.*(float)MAX_DUTY_CYCLE));
+
+        #endif
+
 
         //For balancing the propellors it's possible to use the accelerometer to measure the vibrations.
         if(eepromData[31] == 1){                                                     //The MPU-6050 is installed

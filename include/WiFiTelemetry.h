@@ -28,8 +28,16 @@
  * 
  */
 
+#if WIFI_TELEMETRY == OFF
 
-#if WIFI_TELEMETRY == NATIVE
+void setupWiFiTelemetry(){
+      return;
+    }
+    void sendWiFiTelemetry(){
+      return;
+    }
+    
+#elif WIFI_TELEMETRY == NATIVE
 
   /**
    *    (ESP32 BROWSER TAGS)
@@ -364,7 +372,7 @@
 
 #elif WIFI_TELEMETRY == ESP_CAM
   
-  // HardwareSerial Serial2(2); 
+  HardwareSerial SUART(2); 
 
   /**
    * @brief Setup the UART communication with ESP32-CAM.
@@ -372,8 +380,11 @@
    * 
    */
   void setupWiFiTelemetry(){
-      Serial2.begin(WIFI_BAUD_RATE, SERIAL_8N1, PIN_RX1, PIN_TX1);
-      // Serial.println("Serial2 enabled");
+      SUART.begin(WIFI_BAUD_RATE, SERIAL_8N1, PIN_RX1, PIN_TX1);
+
+      #if DEBUG
+        Serial.println("SUART enabled");
+      #endif
   }
   
 
@@ -396,10 +407,10 @@
     sptr += sprintf(sptr, "%x,", flightMode);
     sptr += sprintf(sptr, "%.1f,", batteryVoltage);
     sptr += sprintf(sptr, "%.1f,", altitudeMeasure);
-    sptr += sprintf(sptr, "%i,", trimCh[1].actual);
-    sptr += sprintf(sptr, "%i,", trimCh[2].actual);
-    sptr += sprintf(sptr, "%i,", trimCh[4].actual);
-    sptr += sprintf(sptr, "%i,", trimCh[3].actual);
+    sptr += sprintf(sptr, "%i,", esc1);//trimCh[1].actual);
+    sptr += sprintf(sptr, "%i,", esc2);//trimCh[2].actual);
+    sptr += sprintf(sptr, "%i,", esc3);//trimCh[4].actual);
+    sptr += sprintf(sptr, "%i,", esc4);//trimCh[3].actual);
     sptr += sprintf(sptr, "%f,", (float)gyroTemp/340. + 36.53f);
     sptr += sprintf(sptr, "%.7f,", latitudeGPS);
     sptr += sprintf(sptr, "%.7f,", longitudeGPS);
@@ -411,7 +422,7 @@
     // print in csv format
     stringToPrint = (const char*)staticCharToPrint;
 
-    Serial2.println(stringToPrint);
+    SUART.println(stringToPrint);
 
     // print
     // Serial.println(stringToPrint);
@@ -425,13 +436,13 @@
    */
   void readDataTransfer(){
   
-    if(Serial2.available() > 0){
+    if(SUART.available() > 0){
       // declair index array
       int indices[dataControllerSize];
       String str = "";
       
       // read from serial
-      str = Serial2.readStringUntil('\n');
+      str = SUART.readStringUntil('\n');
 
       // find position of the last <
       int posStart = str.lastIndexOf('<') + 1;
@@ -484,8 +495,9 @@
       
       // print 
       #if DEBUG  
-        // Serial.println("..............");
-        // printPIDGainParameters();
+        Serial.println(str);
+        Serial.println("..............");
+        printPIDGainParameters();
       #endif
     }
   }
@@ -507,9 +519,7 @@
     }
     
     // reading from ESP32-CAM
-    if(Serial2.available()){
-      readDataTransfer();
-    }
+    readDataTransfer();
   }
   
 #endif

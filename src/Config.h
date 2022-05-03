@@ -145,7 +145,17 @@
  */
 // #define UPLOADED_SKETCH             SETUP         
 // #define UPLOADED_SKETCH             CALIBRATION         
-#define UPLOADED_SKETCH             FLIGHT_CONTROLLER        
+#define UPLOADED_SKETCH             FLIGHT_CONTROLLER
+/**
+ *      (MOTOR PULSE PROVIDER)
+ *      Motor pulses are nothing more than a time in us sent to the ESCs.
+ *      There are mainly two ways in ESP32 to it: using MCPWM library or LEDC library.
+ *      LEDC is the most secure, is the one I have used until now. On the other hand, MCPWM seems to be
+ *      designed properly for motor control. So far, I noticed that MCPWM, in some ways, has a bigger energy cost
+ *      than LEDC (researches are now on the way).
+ */
+// #define MOTOR_PULSE_BY_MCPWM              // NOT TESTED YET
+#define MOTOR_PULSE_BY_LEDC              
 /**
  *      (DEBUG MODE)
  *      Works only when the UPLOADED_SKETCH is FLIGHT_CONTROLLER.
@@ -261,11 +271,12 @@
  *      Using WiFi a telemtry system is done, making everything simple and easy reach.
  *      Use it to fine-tune your PID or fix gyroscope set point and altitude hold PID parameters.
  *      Using this you can adjust on the fly these parameters and much more:
- *          *) NATIVE uses the ESP32 wifi AP,
- *          *) ESP_CAM uses the ESP32CAM wifi.
+ *          *) OFF, no WiFi;
+ *          *) NATIVE, uses the ESP32 wifi AP;
+ *          *) ESP_CAM, uses the ESP32CAM wifi.
  *      See https://github.com/sebastiano123-c/Esp32-cam-telemetry for more details.
  */
-#define WIFI_TELEMETRY              ESP_CAM                   // (NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
+#define WIFI_TELEMETRY              ESP_CAM                   // (OFF, NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
 #define WIFI_BAUD_RATE              115200                    // (9600, 57600, 115200)
 
 

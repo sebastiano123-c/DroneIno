@@ -60,11 +60,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <EEPROM.h>
-#include <driver/adc.h>
-#include "driver/ledc.h"    // for ledc led fading (nothing to do with ulp)
-#include "driver/mcpwm.h"
-#include "soc/mcpwm_reg.h"
-#include "soc/mcpwm_struct.h"
+
 
 //    (DRONEINO FILES)
 #include <Constants.h>

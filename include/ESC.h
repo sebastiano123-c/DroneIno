@@ -98,15 +98,21 @@ void setEscPulses(){
   }
 
   // write to ESCs
-  // ledcWrite(pwmChannel1, (uint32_t)((float)esc1/2000.*(float)MAX_DUTY_CYCLE));
-  // ledcWrite(pwmChannel2, (uint32_t)((float)esc2/2000.*(float)MAX_DUTY_CYCLE));
-  // ledcWrite(pwmChannel3, (uint32_t)((float)esc3/2000.*(float)MAX_DUTY_CYCLE));
-  // ledcWrite(pwmChannel4, (uint32_t)((float)esc4/2000.*(float)MAX_DUTY_CYCLE));
+  #if defined(MOTOR_PULSE_BY_MCPWM)
+
     mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, (uint32_t)esc1);//((float)esc1/2000.*(float)MAX_DUTY_CYCLE));
     mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, (uint32_t)esc2);//((float)esc2/2000.*(float)MAX_DUTY_CYCLE));
     mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A, (uint32_t)esc3);//((float)esc3/2000.*(float)MAX_DUTY_CYCLE));
     mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_1, MCPWM_OPR_A, (uint32_t)esc4);//((float)esc4/2000.*(float)MAX_DUTY_CYCLE));
 
+  #elif defined(MOTOR_PULSE_BY_LEDC)
+
+    ledcWrite(pwmChannel1, (uint32_t)((float)esc1/2000.*(float)MAX_DUTY_CYCLE));
+    ledcWrite(pwmChannel2, (uint32_t)((float)esc2/2000.*(float)MAX_DUTY_CYCLE));
+    ledcWrite(pwmChannel3, (uint32_t)((float)esc3/2000.*(float)MAX_DUTY_CYCLE));
+    ledcWrite(pwmChannel4, (uint32_t)((float)esc4/2000.*(float)MAX_DUTY_CYCLE));
+
+  #endif
 
   #if DEBUG == true //&& UPLOADED_SKETCH == FLIGHT_CONTROLLER
     // Serial.printf("%u   %u   %u   %u   %i\n", 

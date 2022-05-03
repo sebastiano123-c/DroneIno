@@ -74,30 +74,51 @@ void setupPins(){
   ledcAttachPin(PIN_SECOND_LED, pwmLedBatteryChannel);
 
 
-  // ESCs 
-  mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, PIN_ESC_1 ); 
-  mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1A, PIN_ESC_2 );
-  mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, PIN_ESC_3 );
-  mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM1A, PIN_ESC_4 );
+  // ESCs
+  #if defined(MOTOR_PULSE_BY_MCPWM)                                           
 
-  mcpwm_config_t pwm_config = {};
-  pwm_config.frequency = 500;                                                           //frequency = 500Hz, i.e. for every motor time period is 2ms
-  pwm_config.cmpr_a = 0;                                                                //duty cycle of PWMxA = 0
-  pwm_config.cmpr_b = 0;                                                                //duty cycle of PWMxb = 0
-  pwm_config.counter_mode = MCPWM_UP_COUNTER;
-  pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
+    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, PIN_ESC_1 ); 
+    mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM1A, PIN_ESC_2 );
+    mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM0A, PIN_ESC_3 );
+    mcpwm_gpio_init(MCPWM_UNIT_1, MCPWM1A, PIN_ESC_4 );
 
-  mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);                                 //Configure PWM0A timer 0 with above settings
-  mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_1, &pwm_config);                                 //Configure PWM0A timer 1 with above settings
-  mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_0, &pwm_config);                                 //Configure PWM0A timer 1 with above settings
-  mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_1, &pwm_config);                                 //Configure PWM0A timer 1 with above settings
+    mcpwm_config_t pwm_config = {};
+    pwm_config.frequency = 250;                                                           //frequency = 250Hz, i.e. for every motor time period is 4ms
+    pwm_config.cmpr_a = 0;                                                                //duty cycle of PWMxA = 0
+    pwm_config.cmpr_b = 0;                                                                //duty cycle of PWMxb = 0
+    pwm_config.counter_mode = MCPWM_UP_COUNTER;
+    pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
 
-  // remove the motor beep
-  mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 1000);
-  mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, 1000);
-  mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A, 1000);
-  mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_1, MCPWM_OPR_A, 1000);
+    mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);                                 //Configure PWM0A timer 0 with above settings
+    mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_1, &pwm_config);                                 //Configure PWM0A timer 1 with above settings
+    mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_0, &pwm_config);                                 //Configure PWM0A timer 1 with above settings
+    mcpwm_init(MCPWM_UNIT_1, MCPWM_TIMER_1, &pwm_config);                                 //Configure PWM0A timer 1 with above settings
 
+    // remove the motor beep
+    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_0, MCPWM_OPR_A, 1000);
+    mcpwm_set_duty_in_us(MCPWM_UNIT_0, MCPWM_TIMER_1, MCPWM_OPR_A, 1000);
+    mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_0, MCPWM_OPR_A, 1000);
+    mcpwm_set_duty_in_us(MCPWM_UNIT_1, MCPWM_TIMER_1, MCPWM_OPR_A, 1000);
+
+  #elif defined(MOTOR_PULSE_BY_LEDC)
+
+    ledcSetup(pwmChannel1, freq, resolution);                                             // esc 1
+    ledcSetup(pwmChannel2, freq, resolution);                                             // esc 2
+    ledcSetup(pwmChannel3, freq, resolution);                                             // esc 3
+    ledcSetup(pwmChannel4, freq, resolution);                                             // esc 4
+
+    ledcAttachPin(PIN_ESC_1, pwmChannel1);                                                // attach pin esc 1
+    ledcAttachPin(PIN_ESC_2, pwmChannel2);                                                // attach pin esc 2
+    ledcAttachPin(PIN_ESC_3, pwmChannel3);                                                // attach pin esc 3
+    ledcAttachPin(PIN_ESC_4, pwmChannel4);                                                // attach pin esc 4
+
+    // remove the motor beep
+    ledcWrite(pwmChannel1, 1000);
+    ledcWrite(pwmChannel2, 1000);
+    ledcWrite(pwmChannel3, 1000);
+    ledcWrite(pwmChannel4, 1000);
+
+  #endif
 
   // RECEIVER pinmode
   pinMode(PIN_RECEIVER_1, INPUT_PULLUP);
