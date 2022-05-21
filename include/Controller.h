@@ -96,7 +96,14 @@ void waitController(){
 
   #else
 
-    while(receiverInputChannel3 < 980 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400)
+
+
+    #if UPLOADED_SKETCH == CALIBRATION || DEBUG == true
+      Serial.print("waiting for controller...");
+    #endif
+
+    // while(receiverInputChannel3 < 980 || receiverInputChannel3 > 1020 || receiverInputChannel4 < 1400)
+    while(trimCh[1].actual < 990 || trimCh[2].actual < 990 || trimCh[3].actual < 990 || trimCh[4].actual < 990)
     {
   
       receiverInputChannel3 = convertReceiverChannel(3);                 //Convert the actual receiver signals for throttle to the standard 1000 - 2000us
@@ -117,7 +124,7 @@ void waitController(){
       }
 
       #if UPLOADED_SKETCH == CALIBRATION || DEBUG == true
-        Serial.println("waiting for controller...");
+        Serial.print(".");
       #endif
 
       delay(10);

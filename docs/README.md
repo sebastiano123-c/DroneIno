@@ -399,6 +399,8 @@ Tap the **turn on** button to start the streaming.
 
 If you want to save *automatically* the PID parameters, you'll need to insert a SD card to store them, see the following paragraph.
 
+_Note 2:_ DroneIno signals the correct interpretation of the message with a led blinking.
+
 ### **SD card for data storage**
 You can also save your flight data on a SD card. All you need is:
 - a SD card formatted in FAT32 to put into your ESP32-CAM;
@@ -528,7 +530,6 @@ MPU6050 | gyro | 5
 BMP280 | baro | 3.3
 FSi6 | RC receiv. | 4.8 - 6 
 BN 880 | GPS | 3.3 - 5
-
 
 # **Author**
 Sebastiano Cocchi

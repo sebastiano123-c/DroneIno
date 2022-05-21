@@ -67,3 +67,15 @@
    #include "soc/mcpwm_reg.h"
    #include "soc/mcpwm_struct.h"
 #endif
+
+/**
+ *  AUTOTUNE PID 
+ */
+#if AUTOTUNE_PID_GYROSCOPE == true
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <vector>
+  #define _USE_MATH_DEFINES
+  #include <cmath>
+  #include <string>
+#endif
