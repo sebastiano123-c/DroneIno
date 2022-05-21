@@ -32,7 +32,7 @@ void setPID(){
   else if(receiverInputChannel2 < 1492)pidPitchSetpoint = receiverInputChannel2 - 1492;
 
   pidPitchSetpoint -= pitchLevelAdjust;                                  //Subtract the angle correction from the standardized receiver pitch input value.
-  pidPitchSetpoint /= 3.0;                                                 //Divide the setpoint for the PID pitch controller by 3 to get angles in degrees.
+  pidPitchSetpoint /= 3.0;                                               //Divide the setpoint for the PID pitch controller by 3 to get angles in degrees.
 
   //The PID set point in degrees per second is determined by the yaw receiver input.
   //In the case of deviding by 3 the max yaw rate is aprox 164 degrees per second ( (500-8)/3 = 164d/s ).
@@ -58,11 +58,11 @@ void calculatePID(){
 
   //Roll calculations
   pidErrorTemp = gyroRollInput - pidRollSetpoint;
-  pidIMemRoll += PID_I_GAIN_ROLL * pidErrorTemp;
-  if(pidIMemRoll > PID_MAX_ROLL)pidIMemRoll = PID_MAX_ROLL;
-  else if(pidIMemRoll < PID_MAX_ROLL * -1)pidIMemRoll = PID_MAX_ROLL * -1;
+  pidIMemRoll += pidErrorTemp;
+  if(pidIMemRoll > PID_MAX_ROLL*PID_I_GAIN_ROLL)pidIMemRoll = PID_MAX_ROLL;
+  else if(pidIMemRoll < PID_MAX_ROLL * (-PID_I_GAIN_ROLL))pidIMemRoll = PID_MAX_ROLL * -1;
 
-  pidOutputRoll = PID_P_GAIN_ROLL * pidErrorTemp + pidIMemRoll + PID_D_GAIN_ROLL * (pidErrorTemp - pidLastRollDError);
+  pidOutputRoll = PID_P_GAIN_ROLL * pidErrorTemp + PID_I_GAIN_ROLL*pidIMemRoll + PID_D_GAIN_ROLL * (pidErrorTemp - pidLastRollDError);
   if(pidOutputRoll > PID_MAX_ROLL)pidOutputRoll = PID_MAX_ROLL;
   else if(pidOutputRoll < PID_MAX_ROLL * -1)pidOutputRoll = PID_MAX_ROLL * -1;
 
@@ -92,6 +92,21 @@ void calculatePID(){
 
   pidLastYawDError = pidErrorTemp;
 
+  #if DEBUG && defined(DEBUG_PID)
+    printInputSignalsPID();
+  #endif
+
+}
+
+
+/**
+ * @brief Prints the PID signal input values.
+ * 
+ */
+void printInputSignalsPID(){
+  Serial.printf("Ry:%f, Rr:%f Re:%f, ",gyroRollInput, pidRollSetpoint,gyroRollInput - pidRollSetpoint);
+  Serial.printf("Py:%f, Pr:%f Pe:%f, ",gyroPitchInput, pidPitchSetpoint,gyroPitchInput - pidPitchSetpoint);
+  Serial.printf("Yy:%f, Yr:%f Ye:%f\n",gyroYawInput, pidYawSetpoint,gyroYawInput - pidYawSetpoint);
 }
 
 

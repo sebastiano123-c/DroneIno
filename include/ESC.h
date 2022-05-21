@@ -114,13 +114,13 @@ void setEscPulses(){
 
   #endif
 
-  #if DEBUG == true //&& UPLOADED_SKETCH == FLIGHT_CONTROLLER
-    // Serial.printf("%u   %u   %u   %u   %i\n", 
-    //   (float)esc1/2000.*MAX_DUTY_CYCLE, 
-    //   (float)esc2/2000.*MAX_DUTY_CYCLE, 
-    //   (float)esc3/2000.*MAX_DUTY_CYCLE, 
-    //   (float)esc4/2000.*MAX_DUTY_CYCLE,
-    //   escCorr);
+  #if DEBUG && defined(DEBUG_ESC)
+    Serial.printf("%u   %u   %u   %u   %i\n", 
+      (uint32_t)((float)esc1/2000.*(float)MAX_DUTY_CYCLE), 
+      (uint32_t)((float)esc2/2000.*(float)MAX_DUTY_CYCLE), 
+      (uint32_t)((float)esc3/2000.*(float)MAX_DUTY_CYCLE), 
+      (uint32_t)((float)esc4/2000.*(float)MAX_DUTY_CYCLE),
+      escCorr);
     
     // Serial.printf("%i   %i   %i   %i \n", 
     //   esc1, 

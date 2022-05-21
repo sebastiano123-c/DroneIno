@@ -20,10 +20,10 @@ void initBattery(){
   pinPulseWidth = (float)analogRead(PIN_BATTERY_LEVEL);          // get pulse width on pin
   batteryVoltage = pinPulseWidth * fromWidthToV + DIODE_DROP;    // convert pulse width to vols
 
-  // #if DEBUG == true 
-  //   Serial.print("initBattery: OK; voltage: ");
-  //   Serial.println(batteryVoltage);
-  // #endif
+  #if DEBUG == true 
+    Serial.print("initBattery: OK; voltage: ");
+    Serial.println(batteryVoltage);
+  #endif
   
 }
 
@@ -50,9 +50,9 @@ void readBatteryVoltage(){
     ledcWrite(pwmLedBatteryChannel, MAX_DUTY_CYCLE);
   }
 
-  // #if DEBUG == true
-  //   printBatteryVoltage();
-  // #endif
+  #if DEBUG && defined(DEBUG_BATTERY)
+    printBatteryVoltage();
+  #endif
 }
 
 
@@ -61,6 +61,5 @@ void readBatteryVoltage(){
  * 
  */
 void printBatteryVoltage(){
-  // Serial.print(analogRead(PIN_BATTERY_LEVEL));
   Serial.printf("pinPulseWidth: %f,  batteryVoltage: %f V, TOTAL_DROP: %f, batteryPercentage: %f\n", pinPulseWidth, batteryVoltage, TOTAL_DROP, batteryPercentage);
 }

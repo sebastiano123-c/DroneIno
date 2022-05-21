@@ -152,7 +152,7 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
    */
   void blinkLed(){
 
-      Serial.println("\nBlinking leds...");
+      Serial.println("\nBlinking leds...\n");
 
       while (Serial.available() == 0){
 
@@ -176,6 +176,8 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
         vTaskDelay(100/portTICK_PERIOD_MS);
 
       }
+
+      dialInstructions();
 
       msg = Serial.read();
       

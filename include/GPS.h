@@ -264,7 +264,7 @@ void calculatePIDFromGPS(){
       GPSRollAdjust = ((float)GPSRollAdjustNorth * cos(gyroAxis[3] * 0.017453)) + ((float)GPSPitchAdjustNorth * cos((gyroAxis[3] - 90) * 0.017453));
       GPSPitchAdjust = ((float)GPSPitchAdjustNorth * cos(gyroAxis[3] * 0.017453)) + ((float)GPSRollAdjustNorth * cos((gyroAxis[3] + 90) * 0.017453));
 
-      //Limit the maximum correction to 300. This way we still have full controll with the pitch and roll stick on the transmitter.
+      //Limit the maximum correction to 300. This way we still have full control with the pitch and roll stick on the transmitter.
       if (GPSRollAdjust > 300) GPSRollAdjust = 300;
       if (GPSRollAdjust < -300) GPSRollAdjust = -300;
       if (GPSPitchAdjust > 300) GPSPitchAdjust = 300;
