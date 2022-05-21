@@ -5,13 +5,12 @@
 .vscode/ipch
 .vscode
 
-# test
-test/*
-!test/DroneIno.zip
-!batteryCalc.cpp 
+# docs
+docs/*
 
-# gps
+# include
 Compass.h
+AutoPID.h
 
 # wifi
 include/wifi/serial.web_serial.h
@@ -26,3 +25,8 @@ myDroneIno-up-view.jpg
 /include/pinmaps/pinmap.OFF.h
 /include/pinmaps/pinmap.ATmega32.h
 /include/pinmaps/pinmap.ESP32CAM.h
+
+# test
+test/*
+!test/DroneIno.zip
+!batteryCalc.cpp 

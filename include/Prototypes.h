@@ -127,16 +127,32 @@ void configureReceiverTrims();                                // see Initialize.
 
     void calculatePID();                                      // see PID.h
 
+    void printInputSignalsPID();
+
     void printPIDGainParameters();
+
 
     void readBatteryVoltage();                                // see Battery.h
 
+    void printBatteryVoltage();                               
 
-    void printBatteryVoltage();                               // see Battery.h
 
     void setupGPS();                                          // see GPS.h
 
     void readGPS();                                           // see GPS.h
+
+
+    void initAutoPID(std::vector<int> structure,
+    std::vector<std::vector<float>> &z,
+    std::vector<std::vector<float>> &a,
+    std::vector<std::vector<float>> &bias,
+    std::vector<std::vector<float>> &deltaBias,
+    std::vector<std::vector<std::vector<float>>> &weights,
+    std::vector<std::vector<std::vector<float>>> &deltaWeights,
+    float randomAmplitude,
+    int finesse);                                       // see AutoPID.h
+
+    void autotunePID();
 
 
     #if WIFI_TELEMETRY == NATIVE

@@ -37,8 +37,8 @@
  *    (ROLL PID)
  */
 float PID_P_GAIN_ROLL            = 1.1;                      //Gain setting for the roll P-controller (1.3)
-float PID_I_GAIN_ROLL            = 0.003;                    //Gain setting for the roll I-controller  (0.0002)
-float PID_D_GAIN_ROLL            = 10.0;                     //Gain setting for the roll D-controller (10.0)
+float PID_I_GAIN_ROLL            = 0.003;                    //Gain setting for the roll I-controller  (0.04)
+float PID_D_GAIN_ROLL            = 11.0;                     //Gain setting for the roll D-controller (18.0)
 int PID_MAX_ROLL                 = 400;                      //Maximum output of the PID-controller   (+/-)
 /**
  *    (PITCH PID)
@@ -50,8 +50,8 @@ int PID_MAX_PITCH                = PID_MAX_ROLL;             //Maximum output of
 /**
  *    (YAW PID)
  */                                       
-float PID_P_GAIN_YAW             = 1.;                      //Gain setting for the pitch P-controller. (2.0)
-float PID_I_GAIN_YAW             = 0.04;                     //Gain setting for the pitch I-controller. (0.04)
+float PID_P_GAIN_YAW             = 1.5;                      //Gain setting for the pitch P-controller. (4.0)
+float PID_I_GAIN_YAW             = 0.02;                     //Gain setting for the pitch I-controller. (0.02)
 float PID_D_GAIN_YAW             = 0.0;                      //Gain setting for the pitch D-controller. (0.0)
 int PID_MAX_YAW                  = 400;                      //Maximum output of the PID-controller     (+/-)
 /**
@@ -85,7 +85,28 @@ int32_t pressureRotatingMem[50], pressureTotalAvarage;
 uint8_t pressureRotatingMemLocation;
 uint8_t manualAltitudeChange;
 int16_t manualThrottle;
-
+/**
+ *    (AUTOPID) 
+ * 
+ *    Define the number of neurons for each layer  
+ */
+std::vector<int> structure       = {3, 4, 3};                 // 
+/**
+ *    Define the learning type 
+ */
+const char* learningType         = "online";
+/**
+ *    Then this is an automatic allocation. 
+ */
+int counterLoopBPNN;
+const int numberOfLayers         = structure.size();          // define number of layers  
+std::vector<std::vector<float>> zL(numberOfLayers);           // define the layers input states             
+std::vector<std::vector<float>> aL(numberOfLayers);           // define the layers output states               
+std::vector<std::vector<float>> bias(numberOfLayers-1);       // define the bias vectors (rows of the matrix)
+std::vector<std::vector<std::vector<float>>>                                                                                       
+                             weights(numberOfLayers-1);       // define the weights matrices (rows of the tensor)
+std::vector<std::vector<float>> deltaBias(numberOfLayers-1);  // define the deltas of the gradients: has the same dimension of bias and weights
+std::vector<std::vector<std::vector<float>>> deltaWeights(numberOfLayers-1);
 
 
 /**
@@ -258,11 +279,13 @@ const char *password             = "DroneIno";
 const int refreshRate            = 200;                                   // (ms) the refresh rate of the page
 int refreshCounter               = 0;
 /**
- *    (RX)
+ *    (UART)
  *    Defines the number of elements and the that ESP32 waits to receive from telemetry system
  */
-const int dataControllerSize     = 12;
-float dataController[dataControllerSize];
+const int numChars = 2000;
+char receivedChars[numChars];
+char tempChars[numChars];                           // temporary array for use when parsing
+boolean newData = false;
 
 
 
@@ -345,4 +368,4 @@ float GPSPitchAdjustNorth, GPSPitchAdjust, GPSRollAdjustNorth, GPSRollAdjust;
 float latGPSAdjust, lonGPSAdjust, GPSManAdjustHeading;
 float latitudeGPS, longitudeGPS;
 
-const char* timeUTC = "";
+const char* timeUTC = "None";
