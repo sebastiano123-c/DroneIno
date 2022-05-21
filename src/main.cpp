@@ -294,6 +294,7 @@
  */
 #elif UPLOADED_SKETCH == FLIGHT_CONTROLLER
 
+
    void setup() {
 
       if(DEBUG) Serial.begin(BAUD_RATE);                   // use serial only if debugging mode
@@ -354,7 +355,7 @@
       
       
       start = 0;                                           // Set start back to 0.
-      flightMode = 1;                                      // start without any mode (except for autoleveling if true)                                 
+      flightMode = 1;                                      // start without any mode (except for auto-leveling if true)                                 
 
 
       initBattery();                                       // see Battery.h
@@ -367,6 +368,10 @@
 
       //Set the timer for the next loop.
       loopTimer = micros();  
+
+      #if AUTOTUNE_PID_GYROSCOPE== true
+         initAutoPID(structure, zL, aL, bias, deltaBias, weights, deltaWeights, 0.3f, 10000);
+      #endif
 
       
       #if DEBUG
@@ -437,6 +442,11 @@
       sendWiFiTelemetry();
 
 
+      #if AUTOTUNE_PID_GYROSCOPE == true
+         autotunePID();
+      #endif
+
+
       // finish the loop
       if(micros() - loopTimer > 4050)
                ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);  // turn on the LED if the loop time exceeds 4050us
@@ -456,6 +466,7 @@
    #include <PID.h>
    #include <Altitude.h>
    #include <GPS.h>
+   #include <AutoPID.h>
    // #include <Compass.h>
 
 #else 
