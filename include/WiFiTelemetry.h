@@ -424,8 +424,8 @@ void writeDataTransfer() {
   char *sptr = staticCharToPrint;
 
   // fill data structure before send
-  sptr += sprintf(sptr, "<%f,", angleRoll);
-  sptr += sprintf(sptr, "%f,", anglePitch);
+  sptr += sprintf(sptr, "<%.3f,", gyroYawInput);//angleRoll);
+  sptr += sprintf(sptr, "%.3f,", anglePitch);
   sptr += sprintf(sptr, "%x,", flightMode);
   sptr += sprintf(sptr, "%.1f,", batteryVoltage);
   sptr += sprintf(sptr, "%.1f,", altitudeMeasure);
@@ -434,12 +434,9 @@ void writeDataTransfer() {
   sptr += sprintf(sptr, "%i,", esc3); // trimCh[4].actual);
   sptr += sprintf(sptr, "%i,", esc4); // trimCh[3].actual);
   sptr += sprintf(sptr, "%.1f,", (float)gyroTemp / 340. + 36.53f);
-  // sptr += sprintf(sptr, "%.7f,", aL[structure.size() - 1][0]);
-  // sptr += sprintf(sptr, "%.7f,", aL[structure.size() - 1][1]);
-  // sptr += sprintf(sptr, "%.7f>", aL[structure.size() - 1][2]);
   sptr += sprintf(sptr, "%.7f,", latitudeGPS);
   sptr += sprintf(sptr, "%.7f,", longitudeGPS);
-  sptr += sprintf(sptr, "%s>\n", timeUTC);
+  sptr += sprintf(sptr, "%s\n>", timeUTC);
 
   // close the string
   *sptr++ = 0;
@@ -500,26 +497,26 @@ void parseData() { // split the data into its parts
   char *strtokIndx; // this is used by strtok() as an index
 
   // fill data structure after receiving
-    strtokIndx = strtok(tempChars,","); PID_P_GAIN_ROLL     = atof(strtokIndx);
-    strtokIndx = strtok(NULL, ",");     PID_I_GAIN_ROLL     = atof(strtokIndx);
-    strtokIndx = strtok(NULL, ",");     PID_D_GAIN_ROLL     = atof(strtokIndx);
+    strtokIndx = strtok(tempChars,","); PGainRoll     = atof(strtokIndx);
+    strtokIndx = strtok(NULL, ",");     IGainRoll     = atof(strtokIndx);
+    strtokIndx = strtok(NULL, ",");     DGainRoll     = atof(strtokIndx);
 
-    PID_P_GAIN_PITCH    = PID_P_GAIN_ROLL;
-    PID_I_GAIN_PITCH    = PID_I_GAIN_ROLL;
-    PID_D_GAIN_PITCH    = PID_D_GAIN_ROLL;
+    PGainPitch    = PGainRoll;
+    IGainPitch    = IGainRoll;
+    DGainPitch    = DGainRoll;
 
-    strtokIndx = strtok(NULL, ",");     PID_P_GAIN_YAW      = atof(strtokIndx);
-    strtokIndx = strtok(NULL, ",");     PID_I_GAIN_YAW      = atof(strtokIndx);
-    strtokIndx = strtok(NULL, ",");     PID_D_GAIN_YAW      = atof(strtokIndx);
+    strtokIndx = strtok(NULL, ",");     PGainYaw      = atof(strtokIndx);
+    strtokIndx = strtok(NULL, ",");     IGainYaw      = atof(strtokIndx);
+    strtokIndx = strtok(NULL, ",");     DGainYaw      = atof(strtokIndx);
 
     strtokIndx = strtok(NULL, ",");     GYROSCOPE_ROLL_FILTER = atof(strtokIndx);
     GYROSCOPE_PITCH_FILTER  = GYROSCOPE_ROLL_FILTER;
     strtokIndx = strtok(NULL, ",");     GYROSCOPE_ROLL_CORR = atof(strtokIndx);
     strtokIndx = strtok(NULL, ",");     GYROSCOPE_PITCH_CORR  = atof(strtokIndx);
 
-    strtokIndx = strtok(NULL, ",");     PID_P_GAIN_ALTITUDE  = atof(strtokIndx);
-    strtokIndx = strtok(NULL, ",");     PID_I_GAIN_ALTITUDE  = atof(strtokIndx);
-    strtokIndx = strtok(NULL, ",");     PID_D_GAIN_ALTITUDE  = atof(strtokIndx);
+    strtokIndx = strtok(NULL, ",");     PGainAltitude  = atof(strtokIndx);
+    strtokIndx = strtok(NULL, ",");     IGainAltitude  = atof(strtokIndx);
+    strtokIndx = strtok(NULL, ",");     DGainAltitude  = atof(strtokIndx);
 
     
     // signal the right reception of the message

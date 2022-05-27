@@ -254,8 +254,8 @@ void calculatePIDFromGPS(){
       //Calculate the GPS pitch and roll correction as if the nose of the multicopter is facing north.
       //The Proportional part = (float)GPSLatError * GPS_P_GAIN.
       //The Derivative part = (float)GPSLatAvarage * GPS_D_GAIN.
-      GPSPitchAdjustNorth = (float)GPSLatError * GPS_P_GAIN + (float)GPSLatAvarage * GPS_D_GAIN;
-      GPSRollAdjustNorth = (float)GPSLonError * GPS_P_GAIN + (float)GPSLonAvarage * GPS_D_GAIN;
+      GPSPitchAdjustNorth = (float)GPSLatError * PGainGPS + (float)GPSLatAvarage * DGainGPS;
+      GPSRollAdjustNorth = (float)GPSLonError * PGainGPS + (float)GPSLonAvarage * DGainGPS;
 
       if (!latNorth)GPSPitchAdjustNorth *= -1;                                                   //Invert the pitch adjustmet because the quadcopter is flying south of the equator.
       if (!lonEast)GPSRollAdjustNorth *= -1;                                                     //Invert the roll adjustmet because the quadcopter is flying west of the prime meridian.

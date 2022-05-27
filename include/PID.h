@@ -59,43 +59,48 @@ void calculatePID(){
   //Roll calculations
   pidErrorTemp = gyroRollInput - pidRollSetpoint;
   pidIMemRoll += pidErrorTemp;
-  if(pidIMemRoll > PID_MAX_ROLL*PID_I_GAIN_ROLL)pidIMemRoll = PID_MAX_ROLL;
-  else if(pidIMemRoll < PID_MAX_ROLL * (-PID_I_GAIN_ROLL))pidIMemRoll = PID_MAX_ROLL * -1;
+  if(pidIMemRoll > PID_MAX_ROLL*IGainRoll)pidIMemRoll = PID_MAX_ROLL;
+  else if(pidIMemRoll < PID_MAX_ROLL * (-IGainRoll))pidIMemRoll = PID_MAX_ROLL * -1;
 
-  pidOutputRoll = PID_P_GAIN_ROLL * pidErrorTemp + PID_I_GAIN_ROLL*pidIMemRoll + PID_D_GAIN_ROLL * (pidErrorTemp - pidLastRollDError);
+  pidOutputRoll = (PGainRoll * pidErrorTemp) + (IGainRoll * pidIMemRoll) + (DGainRoll * (pidErrorTemp - pidLastRollDError));
   if(pidOutputRoll > PID_MAX_ROLL)pidOutputRoll = PID_MAX_ROLL;
   else if(pidOutputRoll < PID_MAX_ROLL * -1)pidOutputRoll = PID_MAX_ROLL * -1;
 
   pidLastRollDError = pidErrorTemp;
 
+
   //Pitch calculations
   pidErrorTemp = gyroPitchInput - pidPitchSetpoint;
-  pidIMemPitch += PID_I_GAIN_PITCH * pidErrorTemp;
-  if(pidIMemPitch > PID_MAX_PITCH)pidIMemPitch = PID_MAX_PITCH;
-  else if(pidIMemPitch < PID_MAX_PITCH * -1)pidIMemPitch = PID_MAX_PITCH * -1;
+  pidIMemPitch += pidErrorTemp;
+  if(pidIMemPitch > PID_MAX_PITCH*IGainPitch)pidIMemPitch = PID_MAX_PITCH;
+  else if(pidIMemPitch < PID_MAX_PITCH * (-IGainPitch))pidIMemPitch = PID_MAX_PITCH * -1;
 
-  pidOutputPitch = PID_P_GAIN_PITCH * pidErrorTemp + pidIMemPitch + PID_D_GAIN_PITCH * (pidErrorTemp - pidLastPitchDError);
+  pidOutputPitch = (PGainPitch * pidErrorTemp) + (IGainPitch * pidIMemPitch) + (DGainPitch * (pidErrorTemp - pidLastPitchDError));
   if(pidOutputPitch > PID_MAX_PITCH)pidOutputPitch = PID_MAX_PITCH;
   else if(pidOutputPitch < PID_MAX_PITCH * -1)pidOutputPitch = PID_MAX_PITCH * -1;
 
   pidLastPitchDError = pidErrorTemp;
 
+
   //Yaw calculations
   pidErrorTemp = gyroYawInput - pidYawSetpoint;
-  pidIMemYaw += PID_I_GAIN_YAW * pidErrorTemp;
-  if(pidIMemYaw > PID_MAX_YAW)pidIMemYaw = PID_MAX_YAW;
-  else if(pidIMemYaw < PID_MAX_YAW * -1)pidIMemYaw = PID_MAX_YAW * -1;
+  pidIMemYaw += pidErrorTemp;
+  if(pidIMemYaw > PID_MAX_YAW * IGainYaw)pidIMemYaw = PID_MAX_YAW;
+  else if(pidIMemYaw < PID_MAX_YAW * (-IGainYaw))pidIMemYaw = PID_MAX_YAW * -1;
 
-  pidOutputYaw = PID_P_GAIN_YAW * pidErrorTemp + pidIMemYaw + PID_D_GAIN_YAW * (pidErrorTemp - pidLastYawDError);
+  pidOutputYaw = (PGainYaw * pidErrorTemp) + (IGainYaw * pidIMemYaw) + (DGainYaw * (pidErrorTemp - pidLastYawDError));
   if(pidOutputYaw > PID_MAX_YAW)pidOutputYaw = PID_MAX_YAW;
   else if(pidOutputYaw < PID_MAX_YAW * -1)pidOutputYaw = PID_MAX_YAW * -1;
 
   pidLastYawDError = pidErrorTemp;
 
   #if DEBUG && defined(DEBUG_PID)
-    printInputSignalsPID();
+    printPIDGainParameters();
   #endif
 
+  #if DEBUG && defined(DEBUG_PID_SIGNALS)
+    printPIDGainParameters();
+  #endif
 }
 
 
@@ -115,7 +120,8 @@ void printInputSignalsPID(){
  * 
  */
 void printPIDGainParameters(){
-      Serial.printf(" Pr: %.2f, Ir: %.5f, Dr: %.2f, ", PID_P_GAIN_ROLL, PID_I_GAIN_ROLL, PID_D_GAIN_ROLL);
-      Serial.printf(" Pp: %.2f, Ip: %.5f, Dp: %.2f, ", PID_P_GAIN_PITCH, PID_I_GAIN_PITCH, PID_D_GAIN_PITCH);
-      Serial.printf(" Py: %.3f, Iy: %.5f, Dy: %.2f \n", PID_P_GAIN_YAW, PID_I_GAIN_YAW, PID_D_GAIN_YAW);
+      Serial.printf(" Pr: %.2f, Ir: %.5f, Dr: %.2f, ", PGainRoll, IGainRoll, DGainRoll);
+      Serial.printf(" Pp: %.2f, Ip: %.5f, Dp: %.2f, ", PGainPitch, IGainPitch, DGainPitch);
+      Serial.printf(" Py: %.3f, Iy: %.5f, Dy: %.2f, ", PGainYaw, IGainYaw, DGainYaw);
+      Serial.printf(" Fi: %.5f, Pcor: %.2f, Rcor: %.2f \n", GYROSCOPE_ROLL_FILTER, GYROSCOPE_PITCH_CORR, GYROSCOPE_ROLL_CORR);
 }

@@ -17,12 +17,19 @@ void initEEPROM(){
   EEPROM.begin(EEPROM_SIZE);
   vTaskDelay(50/portTICK_PERIOD_MS);
 
-  //if(DEBUG) printEEPROM();
+  #if(DEBUG)
+    printEEPROM();
+  #endif
 
   for(start = 0; start <= 35; start++) eepromData[start] = EEPROM.read(start);
  
   //Check the EEPROM signature to make sure that the setup program is executed.
-  while(eepromData[33] != 'J' || eepromData[34] != 'M' || eepromData[35] != 'B') vTaskDelay(10/portTICK_PERIOD_MS);
+  while(eepromData[33] != 'J' || eepromData[34] != 'M' || eepromData[35] != 'B'){
+    vTaskDelay(10/portTICK_PERIOD_MS);
+    #if DEBUG || UPLOADED_SKETCH == CALIBRATION
+      Serial.printf("\nEEPROM not initialized\n");
+    #endif
+  }
 
 }
 
@@ -41,6 +48,8 @@ void configureReceiverTrims(){
     trimCh[start].low = (eepromData[channel * 2 + 15] << 8) | eepromData[channel * 2 + 14];  //Store the low value for the specific receiver input channel
     trimCh[start].center = (eepromData[channel * 2 - 1] << 8) | eepromData[channel * 2 - 2]; //Store the center value for the specific receiver input channel
     trimCh[start].high = (eepromData[channel * 2 + 7] << 8) | eepromData[channel * 2 + 6];   //Store the high value for the specific receiver input channel
+
+    // Serial.printf("ch:%i \t low:%i \t center:%i \t high:%i \n ", start, trimCh[start].low,  trimCh[start].center, trimCh[start].high);
 
   }
   
@@ -179,7 +188,8 @@ void printEEPROM(){
   Serial.println("");
   Serial.println("EEPROM data:");
   Serial.println("");
-  for (int i = 0; i < EEPROM_SIZE; i++){
-    Serial.printf("EEPROM[%i] => %i\n", i, eepromData[i]);
+  for(int i = 0; i < EEPROM_SIZE; i++){
+    Serial.printf("EEPROM[%i] -> ", i);
+    Serial.println(EEPROM.read(i));
   }
 }

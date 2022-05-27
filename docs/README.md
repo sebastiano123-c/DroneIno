@@ -56,10 +56,12 @@ Make sure to do all the passages described here below.
     - [**Propellers calibration**](#propellers-calibration)
   - [**Flight controller**](#flight-controller)
     - [**Start and stop commands**](#start-and-stop-commands)
-  - [**PID tuning**](#pid-tuning)
+  - [**PID manual tuning**](#pid-manual-tuning)
     - [**Step 1: reset variables**](#step-1-reset-variables)
     - [**Step 2: yaw tuning**](#step-2-yaw-tuning)
     - [**Step 3: roll/pitch tuning**](#step-3-rollpitch-tuning)
+  - [**PID auto-tuning**](#pid-auto-tuning)
+    - [**How auto-tuning works: back propagation (BP) neural network (NN)**](#how-auto-tuning-works-back-propagation-bp-neural-network-nn)
 - [**DroneInoTelemetry web app**](#droneinotelemetry-web-app)
   - [**Connection using only ESP32**](#connection-using-only-esp32)
   - [**Connection using ESP32-CAM**](#connection-using-esp32-cam)
@@ -305,7 +307,7 @@ Move the left stick:
 If this is done correctly, move to the following step.
 Otherwise, you may have problem in the RC signals, thus check it using the CALIBRATION.
 
-## **PID tuning**
+## **PID manual tuning**
 PID may be different from case to case and plays a very important role in the flight stability.
 PID controls:
 - roll movement;
@@ -329,11 +331,11 @@ PID_MAX_YAW                 400
 </pre>
 
 ### **Step 2: yaw tuning**
-Increment the yaw **D** parameter in steps of 2.0, upload the sketch and start the drone. Hold _**firmly**_ in your hand the copter, possibly stay on a soft surface, like a carpet.
+Increment the yaw **P** parameter in steps of 0.5, upload the sketch and start the drone. Hold _**firmly**_ in your hand the copter, possibly stay on a soft surface, like a carpet.
 Move the throttle until it seems to take fly and test its movements while the drone is still in safe in your hand.
-Increment the **D** until the drone scrambles. Reduce the **D** at the value it acts quietly.
+Increment the **P** until the drone scrambles. Reduce the **P** at the value it acts quietly.
 
-Do the same with the **P**, incrementing in steps of 0.5.
+Do the same with the **I**, incrementing in steps of 0.005.
 
 ### **Step 3: roll/pitch tuning**
 This part must be done in an open space, like your garden.
@@ -341,21 +343,39 @@ You can try to fly your drone and look at its behavior.
 
 <ins>_Stay low, the throttle can act violently at this point_</ins>
 
-Increment the roll **D** parameter in steps of 2.0, upload the sketch and start the drone. 
+Increment the roll **P** parameter in steps of 0.5, upload the sketch and start the drone. 
 
 You may observe that the copter acts unpredictably.
 Increment the value until this behavior reduces.
 
-Do the same with the **P**, incrementing in steps of 0.2.
+Do the same with the **D** and **I**, incrementing in steps of 0.002.
 
 After a while you may observe that the behavior depends widely on the PID parameters, and you may find your own way to set properly these parameters.
 
-<!--## **WiFi telemetry (developing)**
- I have developed a WiFi telemetry system exploiting the ESP32 native WiFi as access point (AP).
-After connecting to DroneInoTelemetry network using the password "DroneIno", dial in a browser search bar "192.168.4.1".
-After few seconds you will see the telemetry data like pitch, roll, battery and flight mode.
-You can also adjust fly the PID settings.
-To better improve the WiFi range install an external antenna. -->
+## **PID auto-tuning**
+_NOW ON DEVELOPING_
+If you are tired of manually tune the PIDs of the quadcopter you should try the auto-tuning PID feature. (I recommend you to set at least once the PID manually to see the behaviour of each parameter).
+
+Procedure: Upload the CALIBRATION sketch (as usual by `#define UPLOADED_SKETCH CALIBRATION` in the config.h).
+After the initial dialogue, press `p` on the serial monitor. It will print the values of the PID provided by the neural network (NN).
+Now, roll and rotate with your hands (_the motors must be TURNED OFF_) the drone around the three axis to train the NN. 
+You will see that the parameters change. 
+Do that until the integrative parameters for both the PIDs are less than 0.09.
+
+Pressing ENTER the loop stops and the weights of the NN are saved in the flash memory.
+On the serial will appear the estimated weights and biases. If they are ALL zeroes the NN has faced a gradient vanishing problem, so you have to try other `learningRate` and `momentumFactor` (defined in the Globals.h) and retry the training.
+
+Once you have calculated your weights, set in the config.h file AUTOTUNE_PID_GYROSCOPE to true and upload the FLIGHT_CONTROLLER sketch.
+The weights are automatically taken from the memory, so you do not need to train the NN anymore.
+Now DroneIno can fly.
+
+### **How auto-tuning works: back propagation (BP) neural network (NN)**
+There are two NN, one for the roll (pitch) and one for the yaw.
+I have used the back propagation ([BP](https://ieeexplore.ieee.org/abstract/document/8711864?casa_token=nNSTnIzV2pgAAAAA:gUgufp3ZQUK4LI0KIL-O82qP37pqxUCWW9m2jjZNu-OwocdGd5XzIk15_gERvh70LP_ESG8)) online gradient descent learning method.
+
+(_TODO: spiegazione_)
+
+
 
 # **DroneInoTelemetry web app**
 DroneInoTelemetry is a web app that makes everything simple and easy reach.
@@ -522,6 +542,7 @@ D1 ensures that the PC is safe while both battery and pc are connected to the ES
 </pre>
 
 # **Appendix C: components voltages**
+<pre>
 Name | type | voltage (V) 
 --- | --- | --- | ---
 ESP32 Vin | board | 3.3 - 11.7
@@ -530,6 +551,7 @@ MPU6050 | gyro | 5
 BMP280 | baro | 3.3
 FSi6 | RC receiv. | 4.8 - 6 
 BN 880 | GPS | 3.3 - 5
+</pre>
 
 # **Author**
 Sebastiano Cocchi

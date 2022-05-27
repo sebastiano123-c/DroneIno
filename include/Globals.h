@@ -23,7 +23,7 @@
 
 /**
  * -----------------------------------------------------------------------------------------------------------
- * PID
+ * PID:
  * 
  * 
  *    @brief PID parameters for roll, pitch, yaw and altitude.
@@ -36,36 +36,32 @@
  * 
  *    (ROLL PID)
  */
-float PID_P_GAIN_ROLL            = 1.1;                      //Gain setting for the roll P-controller (1.3)
-float PID_I_GAIN_ROLL            = 0.003;                    //Gain setting for the roll I-controller  (0.04)
-float PID_D_GAIN_ROLL            = 11.0;                     //Gain setting for the roll D-controller (18.0)
-int PID_MAX_ROLL                 = 400;                      //Maximum output of the PID-controller   (+/-)
+float PGainRoll                  = PID_P_GAIN_ROLL;               //Gain setting for the roll P-controller (1.3)
+float IGainRoll                  = PID_I_GAIN_ROLL;               //Gain setting for the roll I-controller  (0.04)
+float DGainRoll                  = PID_D_GAIN_ROLL;               //Gain setting for the roll D-controller (18.0)
 /**
  *    (PITCH PID)
  */                                             
-float PID_P_GAIN_PITCH           = PID_P_GAIN_ROLL;          //Gain setting for the pitch P-controller
-float PID_I_GAIN_PITCH           = PID_I_GAIN_ROLL;          //Gain setting for the pitch I-controller
-float PID_D_GAIN_PITCH           = PID_D_GAIN_ROLL;          //Gain setting for the pitch D-controller
-int PID_MAX_PITCH                = PID_MAX_ROLL;             //Maximum output of the PID-controller   (+/-)
+float PGainPitch                 = PID_P_GAIN_PITCH;              //Gain setting for the pitch P-controller
+float IGainPitch                 = PID_I_GAIN_PITCH;              //Gain setting for the pitch I-controller
+float DGainPitch                 = PID_D_GAIN_PITCH;              //Gain setting for the pitch D-controller
 /**
  *    (YAW PID)
  */                                       
-float PID_P_GAIN_YAW             = 1.5;                      //Gain setting for the pitch P-controller. (4.0)
-float PID_I_GAIN_YAW             = 0.02;                     //Gain setting for the pitch I-controller. (0.02)
-float PID_D_GAIN_YAW             = 0.0;                      //Gain setting for the pitch D-controller. (0.0)
-int PID_MAX_YAW                  = 400;                      //Maximum output of the PID-controller     (+/-)
+float PGainYaw                   = PID_P_GAIN_YAW;                //Gain setting for the pitch P-controller. (4.0)
+float IGainYaw                   = PID_I_GAIN_YAW;                //Gain setting for the pitch I-controller. (0.02)
+float DGainYaw                   = PID_D_GAIN_YAW;                //Gain setting for the pitch D-controller. (0.0)
 /**
  *    (ALTITUDE PID)
  */
-float PID_P_GAIN_ALTITUDE        = 1.4;                      //Gain setting for the altitude P-controller (default = 1.4).
-float PID_I_GAIN_ALTITUDE        = 0.3;                      //Gain setting for the altitude I-controller (default = 0.2).
-float PID_D_GAIN_ALTITUDE        = 0.75;                     //Gain setting for the altitude D-controller (default = 0.75).
-int PID_MAX_ALTITUDE             = 400;                      //Maximum output of the PID-controller (+/-).
+float PGainAltitude              = PID_P_GAIN_ALTITUDE;           //Gain setting for the altitude P-controller (default = 1.4).
+float IGainAltitude              = PID_I_GAIN_ALTITUDE;           //Gain setting for the altitude I-controller (default = 0.2).
+float DGainAltitude              = PID_D_GAIN_ALTITUDE;           //Gain setting for the altitude D-controller (default = 0.75).
 /**
  *    (GPS PID) 
  */
-float GPS_P_GAIN                 = 2.7;                      //Gain setting for the GPS P-controller (default = 2.7).
-float GPS_D_GAIN                 = 6.5;                      //Gain setting for the GPS D-controller (default = 6.5).
+float PGainGPS                   = PID_P_GAIN_GPS;                //Gain setting for the GPS P-controller (default = 2.7).
+float DGainGPS                   = PID_D_GAIN_GPS;                //Gain setting for the GPS D-controller (default = 6.5).
 /**
  *    (PID UNDECLARED VARIABLES) 
  */
@@ -81,37 +77,76 @@ float pidIMemAltitude, pidAltitudeSetpoint, pidAltitudeInput, pidOutputAltitude;
 uint8_t parachuteRotatingMemLocation;
 int32_t parachuteBuffer[35], parachuteThrottle;
 float pressureParachutePrevious;
-int32_t pressureRotatingMem[50], pressureTotalAvarage;
+int32_t pressureRotatingMem[50], pressureTotalAverage;
 uint8_t pressureRotatingMemLocation;
 uint8_t manualAltitudeChange;
 int16_t manualThrottle;
-/**
- *    (AUTOPID) 
- * 
- *    Define the number of neurons for each layer  
- */
-std::vector<int> structure       = {3, 4, 3};                 // 
-/**
- *    Define the learning type 
- */
-const char* learningType         = "online";
-/**
- *    Then this is an automatic allocation. 
- */
-int counterLoopBPNN;
-const int numberOfLayers         = structure.size();          // define number of layers  
-std::vector<std::vector<float>> zL(numberOfLayers);           // define the layers input states             
-std::vector<std::vector<float>> aL(numberOfLayers);           // define the layers output states               
-std::vector<std::vector<float>> bias(numberOfLayers-1);       // define the bias vectors (rows of the matrix)
-std::vector<std::vector<std::vector<float>>>                                                                                       
-                             weights(numberOfLayers-1);       // define the weights matrices (rows of the tensor)
-std::vector<std::vector<float>> deltaBias(numberOfLayers-1);  // define the deltas of the gradients: has the same dimension of bias and weights
-std::vector<std::vector<std::vector<float>>> deltaWeights(numberOfLayers-1);
 
 
 /**
  * -----------------------------------------------------------------------------------------------------------
- * GYROSCOPE
+ * AUTOPID:    
+ * 
+ *    AutoPID uses a back-propagation neural network (BPNN) for the pitch/roll PID and yaw PID.
+ *    Both NN are defined by the layer structure here below, defining the number of neurons for each layer.
+ */
+std::vector<int> structure       = {4, 5, 3};                 // inputs: 1-set point, 2-gyroscope, 3-error, 4-error speed
+/**
+ *    The NN uses a online learning method, i.e. at the end every forward propagation (feeding the NN with inputs) the 
+ *    BP process propagates the error backwards to change the weights of the NN. 
+ */
+const char* learningType         = "online";                  // do not change
+/**
+ *    The non linearity of the NN is represented by the activation functions defined for the input->hidden layer and hidden->ouput layer here below.
+ */
+std::vector<const char*> 
+            activationFunctionN  = {"tanh", "SoftPlus"};      // others: logistic, ReLU, PReLU, ELU, identity, SoftPlus, tanh
+/**
+ *    For each NN define the learning rate and momentum factor.
+ *    Their combination must be set carefully: the NN must converge and be stable to the point.
+ *    I recommend not to change them despite you know what you are doing.
+ */
+float learningRateRoll           = 0.000001f;//0.00005f;
+float momentumFactorRoll         = 0.995f;//0.995f;
+float learningRateYaw            = 0.0001f;//0.00005f;
+float momentumFactorYaw          = 0.995f;//0.995f;
+/**
+ *    Straight forward declaration of the weights and biases.
+ *    Weights and biases for the roll's neural network.
+ */
+const int numberOfLayers         = structure.size();              // define number of layers  
+std::vector<std::vector<float>> zLRoll(numberOfLayers);           // define the layers input states             
+std::vector<std::vector<float>> aLRoll(numberOfLayers);           // define the layers output states               
+std::vector<std::vector<float>> biasRoll(numberOfLayers-1);       // define the bias vectors (rows of the matrix)
+std::vector<std::vector<std::vector<float>>>                                                                                       
+                             weightsRoll(numberOfLayers-1);       // define the weights matrices (rows of the tensor)
+std::vector<std::vector<float>> deltaBiasRoll(numberOfLayers-1);  // define the deltas of the gradients: has the same dimension of bias and weights
+std::vector<std::vector<std::vector<float>>> deltaWeightsRoll(numberOfLayers-1);
+/**
+ *    Weights and biases for the yaw's neural network.
+ */
+std::vector<std::vector<float>> zLYaw(numberOfLayers);           // define the layers input states             
+std::vector<std::vector<float>> aLYaw(numberOfLayers);           // define the layers output states               
+std::vector<std::vector<float>> biasYaw(numberOfLayers-1);       // define the bias vectors (rows of the matrix)
+std::vector<std::vector<std::vector<float>>>                                                                                       
+                             weightsYaw(numberOfLayers-1);       // define the weights matrices (rows of the tensor)
+std::vector<std::vector<float>> deltaBiasYaw(numberOfLayers-1);  // define the deltas of the gradients: has the same dimension of bias and weights
+std::vector<std::vector<std::vector<float>>> deltaWeightsYaw(numberOfLayers-1);
+/**
+ *    Misc. variables. 
+ */
+float yKRoll, yK_1Roll = .0f;
+float uKRoll, uK_1Roll = .0f, eKRoll = .0f, eK_1Roll = .0f, eK_2Roll = .0f;
+float yKPitch, yK_1Pitch = .0f;
+float uKPitch, uK_1Pitch = .0f, eKPitch = .0f, eK_1Pitch = .0f, eK_2Pitch = .0f;
+float yKYaw, yK_1Yaw = .0f;
+float uKYaw, uK_1Yaw = .0f, eKYaw = .0f, eK_1Yaw = .0f, eK_2Yaw = .0f;
+float sgnError;
+
+
+/**
+ * -----------------------------------------------------------------------------------------------------------
+ * GYROSCOPE:
  * 
  * 
  *    (HIGH-LOW FILTER)
@@ -133,15 +168,18 @@ float GYROSCOPE_PITCH_CORR       = 0.;                         // (-1.65.) after
  *    (DATASHEET)
  *    Here are reported the gyroscope datasheet relevant quantities and some other constants used.
  */
+
 const int gyroFrequency          = 250;                         // (Hz)
 const float gyroSensibility      = 65.5;                                
 const int correctionPitchRoll    = 15;                          // correction for the pitch and roll
 float convDegToRad               = 180.0 / PI;                  // convertion between degrees and radians  
-float travelCoeff                = 1/((float)gyroFrequency *    // converts gyro into an angular distance
+float travelCoeff                = 1.0f/((float)gyroFrequency * // converts gyro into an angular distance
                                    gyroSensibility);     
 float travelCoeffToRad           = travelCoeff / convDegToRad;  // converts gyro distance in radians
-float anglePitchOffset           = 0;                           // NOT touch, for future improvements
-float angleRollOffset            = 0;                           // NOT touch, for future improvements
+float anglePitchOffset           = 0.0f;                        // NOT touch, for future improvements
+float angleRollOffset            = 0.0f;                        // NOT touch, for future improvements
+float filterHigh = 0.7f;
+float filterLow = 1.0f-filterHigh;
 /**
  *    (GYROSCOPE UNDECLARED VARIABLES)
  */
@@ -215,9 +253,9 @@ uint8_t adcBits                  = 12;                                    // (bi
 float maximumWidth               = pow(2., (float)adcBits)-1;             // maximum width that the pin can read
 /**
  *    (CONVERSIONS)
- *    Microcontrollers calculates the input voltage giving a signal output in the range (0., maximumWidth).
+ *    Micro-controllers calculates the input voltage giving a signal output in the range (0., maximumWidth).
  *    fromVtoWidth converts the width to voltage of the signal.
- *    This signal is by the way dropped by your voltage partitor and, if present, by a diode.
+ *    This signal is by the way dropped by your voltage divider and, if present, by a diode.
  *    Finally, minBatteryLevelThreshold is the board minimum voltage under which it is not safe to go.
  */ 
 float fromWidthToV              = (BOARD_LIMIT_VOLTAGE / maximumWidth) / (TOTAL_DROP);    
@@ -225,7 +263,7 @@ float fromWidthToV              = (BOARD_LIMIT_VOLTAGE / maximumWidth) / (TOTAL_
  *     (BATTERY COMPENSATION*)
  *     WORK IN PROGRESS: use these parameters only, or vary by small steps
  *     In the first flight use the parameters here.
- *     STUDY THIS: After a complete flight experience, using the esp-cam telemetryAnalysis tool, you can analyse the data readings saved on your SD.
+ *     STUDY THIS: After a complete flight experience, using the esp-cam telemetryAnalysis tool, you can analyses the data readings saved on your SD.
  *     The analysis program fits the battery data (the plot on the bottom right) and gives you the m rect pendency and the intercept b.
  *     Use put here the results.
  */

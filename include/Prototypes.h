@@ -107,6 +107,9 @@ void configureReceiverTrims();                                // see Initialize.
 
     void printGPSSerialLine();                                // see GPS.h
 
+    void calibrateAutoPID(std::vector<int> structure);
+    void calculatePID();                                      // see PID.h
+
 #elif UPLOADED_SKETCH == FLIGHT_CONTROLLER
 
 
@@ -140,19 +143,6 @@ void configureReceiverTrims();                                // see Initialize.
     void setupGPS();                                          // see GPS.h
 
     void readGPS();                                           // see GPS.h
-
-
-    void initAutoPID(std::vector<int> structure,
-    std::vector<std::vector<float>> &z,
-    std::vector<std::vector<float>> &a,
-    std::vector<std::vector<float>> &bias,
-    std::vector<std::vector<float>> &deltaBias,
-    std::vector<std::vector<std::vector<float>>> &weights,
-    std::vector<std::vector<std::vector<float>>> &deltaWeights,
-    float randomAmplitude,
-    int finesse);                                       // see AutoPID.h
-
-    void autotunePID();
 
 
     #if WIFI_TELEMETRY == NATIVE

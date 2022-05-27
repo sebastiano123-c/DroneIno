@@ -42,6 +42,7 @@ int loopCounter, vibrationCounter;
 boolean firstAngle;
 long accAvVector,  accVectorNorm[20], vibrationTotalResult;
 
+
   /**
    * @brief Setup the serial communication.
    * 
@@ -51,6 +52,7 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
     Serial.begin(BAUD_RATE);                             // begin
 
   }
+
 
   /**
    * @brief Dials the instructions.
@@ -67,6 +69,7 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
     Serial.println("   a: print altitude readings.");
     Serial.println("   b: print battery readings.");
     Serial.println("   s: print GPS readings.");
+    Serial.println("   p: calibrate autoPID.");
     Serial.println("   1: check rotation / vibrations for motor 1 (right front CCW).");
     Serial.println("   2: check rotation / vibrations for motor 2 (right rear CW).");
     Serial.println("   3: check rotation / vibrations for motor 3 (left rear CCW).");
@@ -75,6 +78,7 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
     Serial.println();
 
   }
+
 
   /**
    * @brief Print the commands
@@ -102,7 +106,6 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
   void getSerialMsg(){
     if(Serial.available() > 0){
       msg = Serial.read();                                                               //Read the incoming byte.
-      vTaskDelay(100/portTICK_PERIOD_MS);                                                //Wait for any other bytes to come in
       while(Serial.available() > 0) loopCounter = Serial.read();                         //Empty the Serial buffer.
       flag = true;                                                                       //Set the new request flag.
       loopCounter = 0;                                                                   //Reset the loopCounter variable.
@@ -143,6 +146,9 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
       }
       vibrationCounter = 0;                                                              //Reset the vibrationCounter variable.
     }
+    
+    vTaskDelay(100/portTICK_PERIOD_MS);                                                //Wait for any other bytes to come in
+
   }
 
 
@@ -189,32 +195,35 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
    * 
    */
   void printSignals(){
+
+    convertAllSignals();
+    
     Serial.print("Start:");
     Serial.print(start);
-
-    Serial.print("  Throttle:");
-    if(trimCh[3].actual - 1480 < 0)Serial.print("vvv");
-    else if(trimCh[3].actual - 1520 > 0)Serial.print("^^^");
-    else Serial.print("-+-");
-    Serial.print(trimCh[3].actual);
-
-    Serial.print("  Yaw:");
-    if(trimCh[4].actual - 1480 < 0)Serial.print("<<<");
-    else if(trimCh[4].actual - 1520 > 0)Serial.print(">>>");
-    else Serial.print("-+-");
-    Serial.print(trimCh[4].actual);
     
     Serial.print("  Roll:");
-    if(trimCh[1].actual - 1480 < 0)Serial.print("<<<");
-    else if(trimCh[1].actual - 1520 > 0)Serial.print(">>>");
+    if(receiverInputChannel1 - 1480 < 0)Serial.print("<<<");
+    else if(receiverInputChannel1 - 1520 > 0)Serial.print(">>>");
     else Serial.print("-+-");
-    Serial.print(trimCh[1].actual);
+    Serial.print(receiverInputChannel1);
 
     Serial.print("  Pitch:");
-    if(trimCh[2].actual - 1480 < 0)Serial.print("^^^");
-    else if(trimCh[2].actual - 1520 > 0)Serial.print("vvv");
+    if(receiverInputChannel2 - 1480 < 0)Serial.print("^^^");
+    else if(receiverInputChannel2 - 1520 > 0)Serial.print("vvv");
     else Serial.print("-+-");
-    Serial.print(trimCh[2].actual);
+    Serial.print(receiverInputChannel2);
+
+    Serial.print("  Throttle:");
+    if(receiverInputChannel3 - 1480 < 0)Serial.print("vvv");
+    else if(receiverInputChannel3 - 1520 > 0)Serial.print("^^^");
+    else Serial.print("-+-");
+    Serial.print(receiverInputChannel3);
+
+    Serial.print("  Yaw:");
+    if(receiverInputChannel4 - 1480 < 0)Serial.print("<<<");
+    else if(receiverInputChannel4 - 1520 > 0)Serial.print(">>>");
+    else Serial.print("-+-");
+    Serial.print(receiverInputChannel4);
 
     Serial.print("  Flight mode:");
     if(trimCh[0].actual - 1480 < 0)Serial.print("^^^");
@@ -331,3 +340,328 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
         }
       }
   }
+
+
+  void calibrateAutoPID(std::vector<int> structure){
+
+    Serial.println("Train the neural network to calibrate the PID parameters.");
+
+    // initialize the auto pid objects
+      initAutoPID(structure, zLRoll, aLRoll, biasRoll, deltaBiasRoll, weightsRoll, deltaWeightsRoll, 200, {"roll-bias","roll-weights"});// pitch has the same values
+      initAutoPID(structure, zLYaw, aLYaw, biasYaw, deltaBiasYaw, weightsYaw, deltaWeightsYaw, 200, {"yaw-bias","yaw-weights"});
+
+
+    calibrateGyroscope();                                 // calibrate gyroscope
+    
+    
+    while (Serial.available() == 0){                      // if no char is sent to the serial, autotune PID
+      convertAllSignals();
+      calculateAnglePRY();
+      calculatePID();
+      autotunePID();
+    }
+
+    // save the weights on the EEPROM
+    Serial.printf("\n Saving weights on EEPROM...\n");
+
+    int memoryAddress = 0;              // the starting index of memory
+    int kk, ii, jj;
+
+    preferences.begin("roll-bias", false);
+    preferences.clear();// Remove all preferences under the opened namespace
+
+    char numChar[20 + sizeof(char)];
+
+    // roll biases
+    for(jj = 1; jj < structure.size(); jj++){
+      Serial.printf("Roll bias layer%i: \n", jj);
+        for (ii = 0; ii < structure[jj]; ii++) {
+            Serial.printf("%f ",biasRoll[jj-1][ii]);
+            sprintf(numChar, "%i", memoryAddress);
+            preferences.putFloat(numChar, biasRoll[jj-1][ii]);
+            memoryAddress++;
+        }
+         Serial.printf("\n");
+      }
+
+    Serial.printf("\n\n");
+    preferences.end();
+    preferences.begin("roll-weights", false);
+    preferences.clear();// Remove all preferences under the opened namespace
+    memoryAddress = 0;
+
+    // roll weights
+    for(jj = 1; jj < structure.size(); jj++){
+      Serial.printf("Roll weights layer%i: \n", jj);
+      for (kk = 0; kk < structure[jj-1]; kk++){
+          for (ii = 0; ii < structure[jj]; ii++) {
+              Serial.printf("%f ",weightsRoll[jj-1][kk][ii]);
+              sprintf(numChar, "%i", memoryAddress);
+              preferences.putFloat(numChar, weightsRoll[jj-1][kk][ii]);
+              memoryAddress++;
+          }
+          Serial.printf("\n");
+        }
+        Serial.printf("\n\n");
+    }
+
+    preferences.end();
+    preferences.begin("yaw-bias", false);
+    preferences.clear();// Remove all preferences under the opened namespace
+    memoryAddress = 0;
+
+    // yaw biases
+    for(jj = 1; jj < structure.size(); jj++){
+      Serial.printf("Yaw bias layer%i: \n", jj);
+        for (ii = 0; ii < structure[jj]; ii++) {
+            Serial.printf("%f ",biasYaw[jj-1][ii]);
+            sprintf(numChar, "%i", memoryAddress);
+            preferences.putFloat(numChar, biasYaw[jj-1][ii]);
+            memoryAddress++;
+        }
+         Serial.printf("\n");
+      }
+
+    Serial.printf("\n\n");
+    preferences.end();
+    preferences.begin("yaw-weights", false);
+    preferences.clear();// Remove all preferences under the opened namespace
+    memoryAddress = 0;
+
+    // yaw weights
+  for(jj = 1; jj < structure.size(); jj++){
+      Serial.printf("Yaw weights layer%i: \n", jj);
+     for (kk = 0; kk < structure[jj-1]; kk++){
+        for (ii = 0; ii < structure[jj]; ii++) {
+            Serial.printf("%f ",weightsYaw[jj-1][kk][ii]);
+            sprintf(numChar, "%i", memoryAddress);
+            preferences.putFloat(numChar, weightsYaw[jj-1][kk][ii]);
+            memoryAddress++;
+        }
+        Serial.printf("\n");
+      }
+      Serial.printf("\n\n");
+  }
+  preferences.end();
+  
+
+  // read preferences
+  preferences.begin("roll-weights", true);
+  memoryAddress=0;
+    
+  for(jj = 1; jj < structure.size(); jj++){
+  Serial.printf("Print roll weights layer%i: \n", jj);
+    for (kk = 0; kk < structure[jj-1]; kk++){
+      for (ii = 0; ii < structure[jj]; ii++) {
+        sprintf(numChar, "%i", memoryAddress);
+        float f = preferences.getFloat(numChar, 0.0f);
+        Serial.printf("%f ",f);
+        memoryAddress++;
+      }
+      Serial.printf("\n");
+    }
+    Serial.printf("\n\n");
+  }
+  preferences.end();
+
+  preferences.begin("yaw-weights", true);
+  memoryAddress=0;
+  
+  for(jj = 1; jj < structure.size(); jj++){
+    Serial.printf("Print Yaw weights layer%i: \n", jj);
+     for (kk = 0; kk < structure[jj-1]; kk++){
+        for (ii = 0; ii < structure[jj]; ii++) {
+          sprintf(numChar, "%i", memoryAddress);
+          float f = preferences.getFloat(numChar, 0.0f);
+          Serial.printf("%f ",f);
+          memoryAddress++;
+        }
+        Serial.printf("\n");
+      }
+      Serial.printf("\n\n");
+    }
+    preferences.end();
+
+
+    Serial.printf("\n NN saved on flash memory \n \n");
+
+    dialInstructions();
+
+    msg = Serial.read();
+  }
+
+
+
+
+
+
+
+
+
+  // void calibrateAutoPID(std::vector<int> structure){
+
+  //   Serial.println("Train the neural network to calibrate the PID parameters.");
+
+  //   // initialize the auto pid objects
+  //   initAutoPID(structure, zLRoll, aLRoll, biasRoll, deltaBiasRoll, weightsRoll, deltaWeightsRoll, 500, {"roll-bias", "roll-weights"});  // pitch has the same values
+  //   initAutoPID(structure, zLYaw, aLYaw, biasYaw, deltaBiasYaw, weightsYaw, deltaWeightsYaw, 500, {"yaw-bias", "yaw-weights"});
+
+
+  //   calibrateGyroscope();                                 // calibrate gyroscope
+    
+    
+  //   while (Serial.available() == 0){                      // if no char is sent to the serial, autotune PID
+  //     convertAllSignals();
+  //     calculateAnglePRY();
+  //     calculatePID();
+  //     autotunePID();
+  //   }
+
+  //   // save the weights on the EEPROM
+  //   Serial.printf("\n Saving weights on EEPROM...\n");
+
+  //   int memoryAddress = 0;              // the starting index of memory
+  //   int kk, ii, jj;
+
+  //   preferences.begin("roll-weights", false);
+  //   preferences.clear();// Remove all preferences under the opened namespace
+
+  //   char numChar[20 + sizeof(char)];
+
+  // // roll over the structure vector
+  // std::vector<int>::iterator itInt = structure.begin();
+  // ++itInt;
+  // jj = 1;
+
+  // while(itInt != structure.end())
+  // {
+  //   // 1) save bias vector
+  //   for (ii = 0; ii < *itInt; ii++)
+  //   {
+  //     sprintf(numChar, "%i", memoryAddress);
+  //     preferences.putFloat(numChar, biasRoll[jj-1][ii]);
+  //     memoryAddress++;
+  //   }
+
+  //   // 2) save weight matrix
+  //   for (kk = 0; kk < *(itInt - 1); kk++)
+  //   {
+  //     for (ii = 0; ii < *itInt; ii++)
+  //     {
+  //       sprintf(numChar, "%i", memoryAddress);
+  //       preferences.putFloat(numChar, weightsRoll[jj-1][kk][ii]);
+  //       memoryAddress++;
+  //     }
+
+  //   }
+  //   jj++;
+  //   ++itInt;
+  // }
+  // preferences.end();
+
+
+  //   preferences.end();
+  //   preferences.begin("yaw-weights", false);
+  //   preferences.clear();// Remove all preferences under the opened namespace
+  //   memoryAddress = 0;
+
+  //   itInt = structure.begin();
+  //   ++itInt;
+  //   jj = 1;
+
+  //   while(itInt != structure.end())
+  //   {
+  //     // 1) save bias vector
+  //     for (ii = 0; ii < *itInt; ii++)
+  //     {
+  //       sprintf(numChar, "%i", memoryAddress);
+  //       preferences.putFloat(numChar, biasYaw[jj-1][ii]);
+  //       memoryAddress++;
+  //     }
+
+  //     // 2) save weight matrix
+  //     for (kk = 0; kk < *(itInt - 1); kk++)
+  //     {
+  //       for (ii = 0; ii < *itInt; ii++)
+  //       {
+  //         sprintf(numChar, "%i", memoryAddress);
+  //         preferences.putFloat(numChar, weightsYaw[jj-1][kk][ii]);
+  //         memoryAddress++;
+  //       }
+
+  //     }
+  //     jj++;
+  //     ++itInt;
+  //   }
+  //   preferences.end();
+
+
+  //   // read preferences
+  //   preferences.begin("roll-weights", true);
+  //   memoryAddress=0;
+    
+  //   for(jj = 1; jj < structure.size(); jj++){
+
+  //     // 1) read bias
+  //     Serial.printf("\nRoll bias for layer %i: \n", jj);
+  //     for (ii = 0; ii < structure[jj]; ii++)
+  //     {
+  //       sprintf(numChar, "%i", memoryAddress);
+  //       Serial.printf("%f ", preferences.getFloat(numChar, 0.0f));
+  //       memoryAddress++;
+  //     }
+
+  //     // 2) read weight matrix
+  //     Serial.printf("\nRoll weights for layer %i: \n", jj);
+  //     for (kk = 0; kk < structure[jj-1]; kk++)
+  //     {
+  //       for (ii = 0; ii < structure[jj]; ii++)
+  //       {
+  //         sprintf(numChar, "%i", memoryAddress);
+  //         Serial.printf("%f ", preferences.getFloat(numChar, 0.0f));
+  //         memoryAddress++;
+  //       }
+  //       Serial.printf("\n");
+  //     }
+  //     Serial.printf("\n\n");
+  //   }
+  //   preferences.end();
+
+  //   // read yaw bias and weights
+  //   preferences.begin("yaw-weights", true);
+  //   memoryAddress=0;
+    
+  //   for(jj = 1; jj < structure.size(); jj++){
+
+  //     // 1) read bias
+  //     Serial.printf("\nYaw bias for layer %i: \n", jj);
+  //     for (ii = 0; ii < structure[jj]; ii++)
+  //     {
+  //       sprintf(numChar, "%i", memoryAddress);
+  //       Serial.printf("%f ", preferences.getFloat(numChar, 0.0f));
+  //       memoryAddress++;
+  //     }
+
+  //     // 2) read weight matrix
+  //     Serial.printf("\nYaw weights for layer %i: \n", jj);
+  //     for (kk = 0; kk < structure[jj-1]; kk++)
+  //     {
+  //       for (ii = 0; ii < structure[jj]; ii++)
+  //       {
+  //         sprintf(numChar, "%i", memoryAddress);
+  //         Serial.printf("%f ", preferences.getFloat(numChar, 0.0f));
+  //         memoryAddress++;
+  //       }
+  //       Serial.printf("\n");
+  //     }
+  //     Serial.printf("\n\n");
+  //   }
+  //   preferences.end();
+
+
+  //   Serial.printf("\n NN saved on flash memory \n \n");
+
+  //   dialInstructions();
+
+  //   msg = Serial.read();
+  // }

@@ -143,9 +143,9 @@
  *      Then, upload with CALIBRATION and calibrate ESC and check that each components behaves in the correct way.
  *      Finally upload with FLIGHT_CONTROLLER and start to fly.
  */
-// #define UPLOADED_SKETCH             SETUP
+#define UPLOADED_SKETCH             SETUP
 // #define UPLOADED_SKETCH             CALIBRATION
-#define UPLOADED_SKETCH             FLIGHT_CONTROLLER
+// #define UPLOADED_SKETCH             FLIGHT_CONTROLLER
 /**
  *      (MOTOR PULSE PROVIDER)
  *      Motor pulses are nothing more than a time in us sent to the ESCs.
@@ -164,12 +164,13 @@
  *
  *      Then uncomment the section you want to debug for the serial print.
  */
-#define DEBUG                       false                    // (true, false) true enable serial prints for debugging
+#define DEBUG                      false                    // (true, false) true enable serial prints for debugging
 // #define DEBUG_GYRO
 // #define DEBUG_BATTERY
 // #define DEBUG_ESC
 // #define DEBUG_AUTOPID
 // #define DEBUG_PID
+// #define DEBUG_PID_SIGNALS
 // #define DEBUG_WIFI_SEND
 // #define DEBUG_WIFI_REC
 /**
@@ -177,8 +178,7 @@
  */
 #define BAUD_RATE                   115200                   // (9600, 57600, 115200)
 #define WIRE_CLOCK                  400000L                  // (100000L, 400000L) 400000L is suggested
-#define EEPROM_SIZE                 36                       // EEPROM size for the allocatable memory
-
+#define EEPROM_SIZE                 36                       // EEPROM size for the byte variables
 
 
 /**
@@ -191,10 +191,64 @@
  */
 #define AUTO_LEVELING               true                     // (true, false)
 #define GYROSCOPE                   MPU6050                  // (MPU6050) unique for now
+
+
+
 /**
+ * -----------------------------------------------------------------------------------------------------------
+ * PID
+ * 
+ * 
+ *    @brief PID parameters for roll, pitch, yaw and altitude.
+ *    @note Roll and pitch parameters have the same values.
+ * 
+ *    P = proportional -> P_output = (gyro - receiver) * P_gain
+ *    I = integral     -> I_output = I_output + (gyro - receiver) * I_gain
+ *    D = derivative   -> D_output = (gyro - receiver - (gyro_prev - receiver_prev) ) * D_gain 
+ * 
+ * 
+ *    (AUTO PID)
+ * 
  *      Auto-tune PID allow DroneIno to adjust on run the PID parameters to best fit the environmental changes.
+ *      If false, the following PID values are set. If true the drone auto calibrates the parameters
  */
-#define AUTOTUNE_PID_GYROSCOPE      false
+#define AUTOTUNE_PID_GYROSCOPE      false                      // (false, true), "true" is now on testing.
+/**
+ *    (MANUAL PID)
+ * 
+ *      ROLL
+ */
+#define PID_P_GAIN_ROLL             0.656f                    //Gain setting for the roll P-controller (1.3)
+#define PID_I_GAIN_ROLL             0.022f                    //Gain setting for the roll I-controller  (0.04)
+#define PID_D_GAIN_ROLL             0.772f                    //Gain setting for the roll D-controller (18.0)
+#define PID_MAX_ROLL                400                       //Maximum output of the PID-controller   (+/-)
+/**
+ *      PITCH
+ */                                             
+#define PID_P_GAIN_PITCH            PID_P_GAIN_ROLL           //Gain setting for the pitch P-controller
+#define PID_I_GAIN_PITCH            PID_I_GAIN_ROLL           //Gain setting for the pitch I-controller
+#define PID_D_GAIN_PITCH            PID_D_GAIN_ROLL           //Gain setting for the pitch D-controller
+#define PID_MAX_PITCH               PID_MAX_ROLL              //Maximum output of the PID-controller   (+/-)
+/**
+ *      YAW
+ */                                       
+#define PID_P_GAIN_YAW              6.5f                      //Gain setting for the pitch P-controller. (4.0)
+#define PID_I_GAIN_YAW              0.022f                    //Gain setting for the pitch I-controller. (0.02)
+#define PID_D_GAIN_YAW              0.0f                      //Gain setting for the pitch D-controller. (0.0)
+#define PID_MAX_YAW                 400                       //Maximum output of the PID-controller     (+/-)
+/**
+ *      ALTITUDE
+ */
+#define PID_P_GAIN_ALTITUDE         1.4f                      //Gain setting for the altitude P-controller (default = 1.4).
+#define PID_I_GAIN_ALTITUDE         0.3f                      //Gain setting for the altitude I-controller (default = 0.2).
+#define PID_D_GAIN_ALTITUDE         0.75f                     //Gain setting for the altitude D-controller (default = 0.75).
+#define PID_MAX_ALTITUDE            400                       //Maximum output of the PID-controller (+/-).
+/**
+ *      GPS 
+ */
+#define PID_P_GAIN_GPS              2.7f                      //Gain setting for the GPS P-controller (default = 2.7).
+#define PID_D_GAIN_GPS              6.5f                      //Gain setting for the GPS D-controller (default = 6.5).
+
 
 
 /**
@@ -288,5 +342,5 @@
  *          *) ESP_CAM, uses the ESP32CAM wifi.
  *      See https://github.com/sebastiano123-c/Esp32-cam-telemetry for more details.
  */
-#define WIFI_TELEMETRY              ESP_CAM                   // (OFF, NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
+#define WIFI_TELEMETRY              NATIVE                   // (OFF, NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
 #define WIFI_BAUD_RATE              115200                    // (9600, 57600, 115200)

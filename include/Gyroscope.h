@@ -7,20 +7,16 @@
  * 
  * @copyright Copyright (c) 2022
  * 
+ * There is a large variation in the values as the sensor starts up, especially in the yaw data.
+ * The gyroscope sensor drift stops after around 13 seconds, probably due to the completion of an integrated auto-calibration process.
+ * In some occasions take up to 40 seconds to complete its calibration. Therefore we should take this delay into account in our program.
+ * If we want to use the yaw data, the robot should wait for around 40 seconds before beginning to use the sensor and starting the main program.
+ * Since it is very unlikely to wait this amount of time
+ * 
  */
 
-// void setupMPU(){
-//   Wire.setClock(WIRE_CLOCK);
-//   Wire.begin();
-//   Wire.beginTransmission(gyroAddress);                        //Start communication with the MPU-6050.
-//   int error = Wire.endTransmission();                              //End the transmission and register the exit status.
-//   while (error != 0) {                                          //Stay in this loop because the MPU-6050 did not respond.
-//     error = 1;                                                  //Set the error status to 1.
-//     digitalWrite(PIN_BATTERY_LED, !digitalRead(PIN_BATTERY_LED));
-//     delay(40);                                                   //Simulate a 250Hz refresc rate as like the main loop.
-//     Serial.println("MPU6050 ERROR.");
-//   }
-// }
+#define CALINT_MAX        2000        // number of acquisition for the calibration
+#define CALINT_DELAY_MS   5          // (ms) time delay for each acquisition
 
 /**
  * @brief Try a first communication with the gyroscope
@@ -43,36 +39,59 @@ void setGyroscopeRegisters(){
 
   //Setup the MPU-6050
   #if GYRO_ADDRESS == MPU_6050_ADDRESS
-    Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search.
-    Wire.write(PWR_MGMT_1);                                     //We want to write to the PWR_MGMT_1 register (6B hex)
-    Wire.write(0x00);                                           //Set the register bits as 00000000 to activate the gyro
-    Wire.endTransmission();                                     //End the transmission with the gyro.
+  //   Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search.
+  //   Wire.write(PWR_MGMT_1);                                     //We want to write to the PWR_MGMT_1 register (6B hex)
+  //   Wire.write(0x00);                                           //Set the register bits as 00000000 to activate the gyro
+  //   Wire.endTransmission();                                     //End the transmission with the gyro.
 
-    Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search.
-    Wire.write(GYRO_CONFIG);                                    //We want to write to the GYRO_CONFIG register (1B hex)
-    Wire.write(GYRO_REGISTERS_BITS);                            //Set the register bits as 00001000 (500dps full scale)
-    Wire.endTransmission();                                     //End the transmission with the gyro
+  //   Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search.
+  //   Wire.write(GYRO_CONFIG);                                    //We want to write to the GYRO_CONFIG register (1B hex)
+  //   Wire.write(GYRO_REGISTERS_BITS);                            //Set the register bits as 00001000 (500dps full scale)
+  //   Wire.endTransmission();                                     //End the transmission with the gyro
 
-    Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search.
-    Wire.write(ACCEL_CONFIG);                                   //We want to write to the ACCEL_CONFIG register (1A hex)
-    Wire.write(ACC_REGISTERS_BITS);                             //Set the register bits as 00010000 (+/- 8g full scale range)
-    Wire.endTransmission();                                     //End the transmission with the gyro
+  //   Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search.
+  //   Wire.write(ACCEL_CONFIG);                                   //We want to write to the ACCEL_CONFIG register (1A hex)
+  //   Wire.write(ACC_REGISTERS_BITS);                             //Set the register bits as 00010000 (+/- 8g full scale range)
+  //   Wire.endTransmission();                                     //End the transmission with the gyro
 
-    //Let's perform a random register check to see if the values are written correct
-    Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search
-    Wire.write(GYRO_CONFIG);                                    //Start reading @ register GYRO_CONFIG
-    Wire.endTransmission();                                     //End the transmission
-    Wire.requestFrom(GYRO_ADDRESS, 1);                           //Request 1 bytes from the gyro
-    while(Wire.available() < 1);                                //Wait until the 6 bytes are received
-    if(Wire.read() != GYRO_REGISTERS_BITS){                     //Check if the value is 0x08
-      ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                      //Turn on the warning led
-      while(1)vTaskDelay(10/portTICK_PERIOD_MS);                //Stay in this loop for ever
-    }
+  //   //Let's perform a random register check to see if the values are written correct
+  //   Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search
+  //   Wire.write(GYRO_CONFIG);                                    //Start reading @ register GYRO_CONFIG
+  //   Wire.endTransmission();                                     //End the transmission
+  //   Wire.requestFrom(GYRO_ADDRESS, 1);                           //Request 1 bytes from the gyro
+  //   while(Wire.available() < 1);                                //Wait until the 6 bytes are received
+  //   if(Wire.read() != GYRO_REGISTERS_BITS){                     //Check if the value is 0x08
+  //     ledcWrite(pwmLedChannel, MAX_DUTY_CYCLE);                      //Turn on the warning led
+  //     while(1)vTaskDelay(10/portTICK_PERIOD_MS);                //Stay in this loop for ever
+  //   }
 
-    Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search
-    Wire.write(0x1A);                                           //We want to write to the CONFIG register (1A hex)
-    Wire.write(DIGITAL_LOW_PASS_FILTER);                        //Set the register bits as 00000011 (Set Digital Low Pass Filter to ~43Hz)
-    Wire.endTransmission();                                     //End the transmission with the gyro    
+  //   Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the address found during search
+  //   Wire.write(0x1A);                                           //We want to write to the CONFIG register (1A hex)
+  //   Wire.write(DIGITAL_LOW_PASS_FILTER);                        //Set the register bits as 00000011 (Set Digital Low Pass Filter to ~43Hz)
+  //   Wire.endTransmission();                                     //End the transmission with the gyro
+
+
+  Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the MPU-6050.
+  Wire.write(0x6B);                                            //We want to write to the PWR_MGMT_1 register (6B hex).
+  Wire.write(0x00);                                            //Set the register bits as 00000000 to activate the gyro.
+  Wire.endTransmission();                                      //End the transmission with the gyro.
+
+  Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the MPU-6050.
+  Wire.write(0x1B);                                            //We want to write to the GYRO_CONFIG register (1B hex).
+  Wire.write(0x08);                                            //Set the register bits as 00001000 (500dps full scale).
+  Wire.endTransmission();                                      //End the transmission with the gyro.
+
+  Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the MPU-6050.
+  Wire.write(0x1C);                                            //We want to write to the ACCEL_CONFIG register (1A hex).
+  Wire.write(0x10);                                            //Set the register bits as 00010000 (+/- 8g full scale range).
+  Wire.endTransmission();                                      //End the transmission with the gyro.
+
+  Wire.beginTransmission(GYRO_ADDRESS);                        //Start communication with the MPU-6050.
+  Wire.write(0x1A);                                            //We want to write to the CONFIG register (1A hex).
+  Wire.write(0x03);                                            //Set the register bits as 00000011 (Set Digital Low Pass Filter to ~43Hz).
+  Wire.endTransmission();                                      //End the transmission with the gyro.
+
+
   #endif
 }
 
@@ -106,12 +125,13 @@ void readGyroscopeStatus(){
   
   #endif
 
-  if(calInt >= 1000){
+  if(calInt == CALINT_MAX){
     gyroAxis[1] -= gyroAxisCalibration[1];                       //Only compensate after the calibration.
     gyroAxis[2] -= gyroAxisCalibration[2];                       //Only compensate after the calibration.
     gyroAxis[3] -= gyroAxisCalibration[3];                       //Only compensate after the calibration.
     accAxis[1]  -= accAxisCalibration[1];
     accAxis[2]  -= accAxisCalibration[2];
+    accAxis[3]  -= accAxisCalibration[3];
   }
 
 }
@@ -123,20 +143,20 @@ void readGyroscopeStatus(){
 void calibrateGyroscope(){
  
   #if DEBUG || UPLOADED_SKETCH != FLIGHT_CONTROLLER 
-    Serial.printf("\nCalibrating gyroscope... Please wait 8s\n");
+    Serial.printf("\nCalibrating gyroscope... Please wait %is\n", CALINT_MAX*CALINT_DELAY_MS/1000 );
   #endif
 
-  accAxisCalibration[1] = 0;
-  accAxisCalibration[2] = 0;
-  accAxisCalibration[3] = 0;
-  gyroAxisCalibration[1] = 0;                                       //Ad roll value to gyro_roll_cal.
-  gyroAxisCalibration[2] = 0;                                       //Ad pitch value to gyro_pitch_cal.
-  gyroAxisCalibration[3] = 0;                                       //Ad yaw value to gyro_yaw_cal.
+  accAxisCalibration[1] = 0.;
+  accAxisCalibration[2] = 0.;
+  accAxisCalibration[3] = 0.;
+  gyroAxisCalibration[1] = 0.;                                       //Ad roll value to gyro_roll_cal.
+  gyroAxisCalibration[2] = 0.;                                       //Ad pitch value to gyro_pitch_cal.
+  gyroAxisCalibration[3] = 0.;                                       //Ad yaw value to gyro_yaw_cal.
   
   vTaskDelay(1000/portTICK_PERIOD_MS);                              //Wait before continuing.
   
   //Let's take multiple gyro data samples so we can determine the average gyro offset (calibration).
-  for (calInt = 0; calInt < 1000; calInt ++){                       //Take 2000 readings for calibration.
+  for (calInt = 0; calInt < CALINT_MAX; calInt ++){                       //Take 2000 readings for calibration.
     
     if(calInt % 25 == 0){                                           //Change the led status to indicate calibration.
       ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));
@@ -151,25 +171,27 @@ void calibrateGyroscope(){
     
     // although inefficient, the division is done inside the loop due to overflow issues 
     // (which is not a problem since we are in the setup)
-    gyroAxisCalibration[1] += (double)gyroAxis[1]/1000.;                     // gyro roll calibration to set the zero
-    gyroAxisCalibration[2] += (double)gyroAxis[2]/1000.;                     // gyro pitch calibration to set the zero
-    gyroAxisCalibration[3] += (double)gyroAxis[3]/1000.;                     // gyro yaw calibration to set the zero
+    gyroAxisCalibration[1] += (double)gyroAxis[1]/(double)CALINT_MAX;                     // gyro roll calibration to set the zero
+    gyroAxisCalibration[2] += (double)gyroAxis[2]/(double)CALINT_MAX;                     // gyro pitch calibration to set the zero
+    gyroAxisCalibration[3] += (double)gyroAxis[3]/(double)CALINT_MAX;                     // gyro yaw calibration to set the zero
 
-    accAxisCalibration[1] += (double)accAxis[1]/1000.;                       // roll acc calibration preventing drifts when hovering
-    accAxisCalibration[2] += (double)accAxis[2]/1000.;                       // pitch acc calibration preventing drifts when hovering
+    accAxisCalibration[1] += (double)accAxis[1]/(double)CALINT_MAX;                       // roll acc calibration preventing drifts when hovering
+    accAxisCalibration[2] += (double)accAxis[2]/(double)CALINT_MAX;                       // pitch acc calibration preventing drifts when hovering
+    accAxisCalibration[3] += (double)accAxis[2]/(double)CALINT_MAX;                       // pitch acc calibration preventing drifts when hovering
 
-    vTaskDelay(4/portTICK_PERIOD_MS);
+    vTaskDelay(CALINT_DELAY_MS/portTICK_PERIOD_MS);
 
   }
 
 }
+
 
 /** 
  * @brief Prints gyroscope readings
  */
 void printGyroscopeStatus(){
 
-  Serial.printf("Roll: %.4f\tPitch: %.4f\tYaw: %.4f  ", angleRoll, anglePitch, gyroAxis[3]/65.5f);
+  Serial.printf("Roll: %.4f\tPitch: %.4f\tYaw: %.4f \n ", angleRoll, anglePitch, gyroAxis[3]/65.5f);
 
   // Serial.print(" Fileter: ");
   // Serial.print(GYROSCOPE_ROLL_FILTER, 6);
@@ -177,8 +199,13 @@ void printGyroscopeStatus(){
   // Serial.print(GYROSCOPE_ROLL_CORR, 2);
   // Serial.print(" GYROSCOPE_PITCH_CORR: ");
   // Serial.print(GYROSCOPE_PITCH_CORR ,0);
+  // Serial.println();
 
-  Serial.println();
+  //  Serial.print("gyroYawInput:");
+  // Serial.print(gyroYawInput);
+  // Serial.print(",");
+  // Serial.print("gyroAxis[3]:");
+  // Serial.println((float)gyroAxis[3] / gyroSensibility);
 
 }
 
@@ -191,16 +218,15 @@ void calculateAnglePRY(){
   // first of all, read the gyro
   readGyroscopeStatus();
 
-  float filterHigh = 0.7f;
-  float filterLow = 1.0f-filterHigh;
   
   // gyroSensibility = [deg/sec] (check the datasheet of the MPU-6050 for more information).
   gyroRollInput = (gyroRollInput * filterHigh) +
                   (((float)gyroAxis[1] / gyroSensibility) * filterLow);                 //Gyro pid input is deg/sec.
   gyroPitchInput = (gyroPitchInput * filterHigh) + 
                   (((float)gyroAxis[2] / gyroSensibility) * filterLow);                 //Gyro pid input is deg/sec.
-  gyroYawInput = (gyroYawInput * filterHigh) +
-                  (((float)gyroAxis[3] / gyroSensibility) * filterLow);                 //Gyro pid input is deg/sec.
+  gyroYawInput = (gyroYawInput * 0.85f) +
+                  (((float)gyroAxis[3] / gyroSensibility) * 0.15f);                 //Gyro pid input is deg/sec.
+
 
   //Gyro angle calculations
   anglePitch += (float)gyroAxis[2] * travelCoeff;                                  //Calculate the traveled pitch angle and add it to the anglePitch variable.

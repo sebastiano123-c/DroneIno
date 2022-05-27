@@ -54,6 +54,9 @@ Clone this repo
 </code></pre>
 or download the .zip file.
 
+# **_New update_**
+Auto-tune the PID using an artificial neural network, take a [look](https://github.com/sebastiano123-c/DroneIno/wiki/PID#pid-auto-tuning).
+
 # **Description**
 Based on the [YMFC](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
 * gyroscope MPU6050;
@@ -80,6 +83,7 @@ The code is intended to be used with PlatformIO IDE.
                                     3) GPS (NOT TO USE AT THE MOMENT, DEVELOPING)
                                     4) WiFi telemetry system 
                                     5) SD flight data storage (only with ESP32-CAM)
+                                    6) Auto-tuning PID
 
 _Important:_ otherwise telemetry system is implemented using the native ESP32 WiFi, I strongly recommend to add DroneIno the [Esp32-cam-telemetry](https://github.com/sebastiano123-c/Esp32-cam-telemetry) for astonishing results (including video streaming and SD card storage).
 
@@ -90,7 +94,7 @@ Set the SWC switch of the transmitter to channel 5 and connect the receiver chan
 * SWC down: flight mode selected is GPS (**_NOT TO USE AT THE MOMENT_**). -->
 
 # **Documentation**
-See the full [documentation](https://github.com/sebastiano123-c/DroneIno/tree/main/docs) for the circuit scheme and the detailed construction steps.
+See the full [wiki](https://github.com/sebastiano123-c/DroneIno/wiki) documentation for the circuit scheme and the detailed construction steps.
 
 Here I will describe the main features of DroneIno.
 
@@ -134,6 +138,12 @@ See the complete [esp32-cam-telemetry](https://github.com/sebastiano123-c/Esp32-
 With esp32-cam-telemetry, you can also save your flight data on a SD card.
 All you need is a SD card formatted in FAT32 to put into your ESP32-CAM.
 
+
+# **Auto-tuning PID**
+If you are tired of manually tune the PIDs of the quadcopter you should try the [auto-tuning PID](https://github.com/sebastiano123-c/DroneIno/wiki/PID#pid-auto-tuning) feature.
+PID can be automatically set using a neural network (NN).
+The PIDs gains are continuously updated by a neural network (NN) and sent to the control system.
+You can try the NN in examples section at BPNN [lib](https://github.com/sebastiano123-c/DroneIno/tree/main/lib/BPNN).
 
 # **Roadmap**
 Future improvements:

@@ -60,7 +60,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <EEPROM.h>
-
+#include <Preferences.h>
+Preferences preferences;
 
 //    (DRONEINO FILES)
 #include <Constants.h>
@@ -175,6 +176,8 @@
  */
 #elif UPLOADED_SKETCH == CALIBRATION
 
+   #include <AutoPID.h>
+
    void setup(){
 
       Serial.begin(BAUD_RATE);                             // begin
@@ -200,7 +203,7 @@
 
 
       // wait until the rx is connected
-      // waitController();                                    // wait until the receiver is active.
+      waitController();                                    // wait until the receiver is active.
 
 
       // set pin precision
@@ -218,7 +221,6 @@
       loopTimer = micros();                                //Set the zeroTimer for the first loop.
       while(Serial.available()) msg = Serial.read();       //Empty the serial buffer.
       msg = 0;                                             //Set the data variable back to zero.
-      
 
    }
 
@@ -278,11 +280,16 @@
          printGPS();
       }
 
+      if(msg == 'p'){
+         // calculatePID();                                      // calculate the PIDs
+         calibrateAutoPID(structure);                                  // calibrate autoPID parameters
+      }
    } 
 
    #include <Calibration.h>
    #include <Battery.h>
    #include <Altitude.h>
+   #include <PID.h>
    #include <GPS.h>
 
 /**
@@ -293,6 +300,8 @@
  *    Now you can adjust the PID parameters.
  */
 #elif UPLOADED_SKETCH == FLIGHT_CONTROLLER
+
+   #include <AutoPID.h>
 
 
    void setup() {
@@ -352,7 +361,7 @@
 
       // wait until the rx is connected
       waitController();                                                           
-      
+
       
       start = 0;                                           // Set start back to 0.
       flightMode = 1;                                      // start without any mode (except for auto-leveling if true)                                 
@@ -369,11 +378,12 @@
       //Set the timer for the next loop.
       loopTimer = micros();  
 
-      #if AUTOTUNE_PID_GYROSCOPE== true
-         initAutoPID(structure, zL, aL, bias, deltaBias, weights, deltaWeights, 0.3f, 10000);
-      #endif
 
-      
+      // initialize the auto pid objects
+      initAutoPID(structure, zLRoll, aLRoll, biasRoll, deltaBiasRoll, weightsRoll, deltaWeightsRoll, 200, {"roll-bias","roll-weights"});// pitch has the same values
+      initAutoPID(structure, zLYaw, aLYaw, biasYaw, deltaBiasYaw, weightsYaw, deltaWeightsYaw, 200, {"yaw-bias","yaw-weights"});
+
+ 
       #if DEBUG
          Serial.println("Setup finished");
       #endif
@@ -442,9 +452,8 @@
       sendWiFiTelemetry();
 
 
-      #if AUTOTUNE_PID_GYROSCOPE == true
-         autotunePID();
-      #endif
+      // refine PIDs
+      autotunePID();
 
 
       // finish the loop
@@ -466,7 +475,6 @@
    #include <PID.h>
    #include <Altitude.h>
    #include <GPS.h>
-   #include <AutoPID.h>
    // #include <Compass.h>
 
 #else 

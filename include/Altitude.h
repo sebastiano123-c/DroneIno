@@ -230,13 +230,13 @@ float samplePressure = 0.0f;
    */
   void smoothPressureReadings(){
     //To get a smoother pressure value we will use a 20 location rotating memory.
-    pressureTotalAvarage -= pressureRotatingMem[pressureRotatingMemLocation];                          //Subtract the current memory position to make room for the new value.
+    pressureTotalAverage -= pressureRotatingMem[pressureRotatingMemLocation];                          //Subtract the current memory position to make room for the new value.
     pressureRotatingMem[pressureRotatingMemLocation] = pressure;                                      //Calculate the new change between the actual pressure and the previous measurement.
-    pressureTotalAvarage += pressureRotatingMem[pressureRotatingMemLocation];                          //Add the new value to the long term avarage value.
+    pressureTotalAverage += pressureRotatingMem[pressureRotatingMemLocation];                          //Add the new value to the long term avarage value.
     pressureRotatingMemLocation++;                                                                         //Increase the rotating memory location.
 
     if (pressureRotatingMemLocation == 20)pressureRotatingMemLocation = 0;                              //Start at 0 when the memory location 20 is reached.
-    actualPressureFast = (float)pressureTotalAvarage / 20.0;                                              //Calculate the average pressure of the last 20 pressure readings.
+    actualPressureFast = (float)pressureTotalAverage / 20.0;                                              //Calculate the average pressure of the last 20 pressure readings.
 
     //To get better results we will use a complementary fillter that can be adjusted by the fast average.
     actualPressureSlow = actualPressureSlow * (float)0.985 + actualPressureFast * (float)0.015;
@@ -327,14 +327,14 @@ void calculateAltitudeAdjustmentPID(float pressureForPID){//
 
   //In the following section the I-output is calculated. It's an accumulation of errors over time.
   //The time factor is removed as the program loop runs at 250Hz.
-  pidIMemAltitude += (PID_I_GAIN_ALTITUDE / 100.0) * pidErrorTemp;
+  pidIMemAltitude += (IGainAltitude / 100.0) * pidErrorTemp;
   if (pidIMemAltitude > PID_MAX_ALTITUDE)pidIMemAltitude = PID_MAX_ALTITUDE;
   else if (pidIMemAltitude < PID_MAX_ALTITUDE * -1)pidIMemAltitude = PID_MAX_ALTITUDE * -1;
   //In the following line the PID-output is calculated.
   //P = (PID_P_GAIN_ALTITUDE + pidErrorGainAltitude) * pidErrorTemp.
   //I = pidIMemAltitude += (PID_I_GAIN_ALTITUDE / 100.0) * pidErrorTemp (see above).
   //D = PID_D_GAIN_ALTITUDE * parachuteThrottle.
-  pidOutputAltitude = (PID_P_GAIN_ALTITUDE + pidErrorGainAltitude) * pidErrorTemp + pidIMemAltitude + PID_D_GAIN_ALTITUDE * parachuteThrottle;
+  pidOutputAltitude = (PGainAltitude + pidErrorGainAltitude) * pidErrorTemp + pidIMemAltitude + DGainAltitude * parachuteThrottle;
   //To prevent extreme PID-output the output must be limited.
   if (pidOutputAltitude > PID_MAX_ALTITUDE) pidOutputAltitude = PID_MAX_ALTITUDE;
   else if (pidOutputAltitude < PID_MAX_ALTITUDE * -1) pidOutputAltitude = PID_MAX_ALTITUDE * -1;
