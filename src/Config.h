@@ -143,9 +143,9 @@
  *      Then, upload with CALIBRATION and calibrate ESC and check that each components behaves in the correct way.
  *      Finally upload with FLIGHT_CONTROLLER and start to fly.
  */
-#define UPLOADED_SKETCH             SETUP
+// #define UPLOADED_SKETCH             SETUP
 // #define UPLOADED_SKETCH             CALIBRATION
-// #define UPLOADED_SKETCH             FLIGHT_CONTROLLER
+#define UPLOADED_SKETCH             FLIGHT_CONTROLLER
 /**
  *      (MOTOR PULSE PROVIDER)
  *      Motor pulses are nothing more than a time in us sent to the ESCs.
@@ -342,5 +342,5 @@
  *          *) ESP_CAM, uses the ESP32CAM wifi.
  *      See https://github.com/sebastiano123-c/Esp32-cam-telemetry for more details.
  */
-#define WIFI_TELEMETRY              NATIVE                   // (OFF, NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
+#define WIFI_TELEMETRY              OFF                   // (OFF, NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
 #define WIFI_BAUD_RATE              115200                    // (9600, 57600, 115200)

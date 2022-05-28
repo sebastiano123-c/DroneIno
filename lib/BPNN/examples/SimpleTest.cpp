@@ -1,8 +1,20 @@
+/**
+ * @file SimpleTest.cpp
+ * @author Sebastiano Cocchi
+ * @brief Simple test showing the working principle of the neural network.
+ * @version 0.1
+ * @date 2022-05-28
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ *  
+ * Compile: g++ SimpleTest.cpp -o SimpleTest.exe ../src/BPNN.a
+ * 
+ */
 #include <stdio.h>
 #include <vector>
 
-#include "BPNN.h"           // BPNN lib
-
+#include "../src/BPNN.h"           // BPNN lib
 /**
  *      Prototypes
  */
@@ -14,16 +26,31 @@ void init(std::vector<int> structure, std::vector<std::vector<float>> &z,
           std::vector<std::vector<float>> &deltaBias,
           std::vector<std::vector<std::vector<float>>> &weights,
           std::vector<std::vector<std::vector<float>>> &deltaWeights,
-          float randomAmplitude = 1.0f, int finesse = 1000); 
+          float randomAmplitude, int finesse); 
 
+/**
+ * Simple NN:
+ *      
+ *           / O \
+ *          /     \
+ *        O -- O -- O
+ *          \     /
+ *           \ O /
+ * 
+ *      in.   hid.   out.
+ * 
+ */
 /**
  *      Neural network specifics 
  */
 // define the number of neurons for each layer
 std::vector<int> structure = {1, 3, 1};
 
+    float input = 1.5f;
+    float desiredOutput = 0.7f;
+
 // define learning rate and momentum factor
-const float learningRate   = -0.21f;
+const float learningRate   = 0.21f;
 const float momentumFactor = 0.06f;
 
 // define the activation function type
@@ -52,19 +79,16 @@ std::vector<std::vector<std::vector<float>>> deltaWeights(numberOfLayers - 1);
 
 int main() {
 
-    float input = 1.5f;
-    float deisredOutput = 0.7f;
-
   // init BPNN arrays
-  init(structure, zL, aL, bias, deltaBias, weights, deltaWeights, 0.8f);
+  init(structure, zL, aL, bias, deltaBias, weights, deltaWeights, 0.8f, 10000);
 
 
   for (int i = 1; i < 200; i++) {
-    // expected values
-    forwardPropagation(structure, {1.5f}, zL, aL, bias, weights, activationType);
+    // forward prop
+    forwardPropagation(structure, {input}, zL, aL, bias, weights, activationType);
 
-    // input values
-    backPropagation(structure, {0.7}, zL, aL, bias, deltaBias, weights,
+    // backprop
+    backPropagation(structure, {aL[2][0] - desiredOutput}, zL, aL, bias, deltaBias, weights,
                     deltaWeights, learningRate, momentumFactor, "online", activationType);
 
 

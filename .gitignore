@@ -1,14 +1,5 @@
 # .pio
-#   build
-.pio/build/**
-!.pio/build/esp32dev/
-#   BPNN library
-!.pio/build/esp32dev/lib336
-!.pio/build/esp32dev/lib336/BPNN
-!.pio/build/esp32dev/lib336/libBPNN.a
-!.pio/build/esp32dev/lib336/BPNN/BPNN.cpp.o
-#   libdeps
-.pio/libdeps/
+.pio
 
 # .vscode
 .vscode
@@ -34,6 +25,7 @@ include/wifi/serial.web_serial.h
 # lib
 lib/BPNN/src/*
 !lib/BPNN/src/BPNN.h
+!lib/BPNN/src/BPNN.a
 lib/BPNN/docs/*
 
 # test
