@@ -13,6 +13,11 @@
  *  2) https://towardsdatascience.com/backpropagation-the-natural-proof-946c5abf63b1
  *
  *
+ * Compile the lib:
+ *     <path> C:\MinGW\bin\gcc -c BPNN.cpp -o BPNN.o
+ *     <path> C:\MinGW\bin\ar rcs BPNN.a BPNN.o
+ * 
+ * 
  * @copyright Copyright (c) 2022
  *
  */
