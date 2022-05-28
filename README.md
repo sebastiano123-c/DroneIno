@@ -38,15 +38,6 @@
   <img src="https://img.shields.io/badge/cpp-11-blue" /> 
 </p>
 
-<h2>
-<b><ins><i>Disclaimer</i></ins></b>
-</h2>
-The device you are programming can be dangerous, use this code if you are an expert at your own risk.
-Thus, *test it firstly without propellers*.
-
-Read carefully this [documentation](https://github.com/sebastiano123-c/DroneIno/tree/main/docs) before starting to fly.
-Make sure to do all the passages described there.
-
 
 # **Usage**
 Clone this repo
