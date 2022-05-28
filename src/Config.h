@@ -143,9 +143,9 @@
  *      Then, upload with CALIBRATION and calibrate ESC and check that each components behaves in the correct way.
  *      Finally upload with FLIGHT_CONTROLLER and start to fly.
  */
-// #define UPLOADED_SKETCH             SETUP
+#define UPLOADED_SKETCH             SETUP
 // #define UPLOADED_SKETCH             CALIBRATION
-#define UPLOADED_SKETCH             FLIGHT_CONTROLLER
+// #define UPLOADED_SKETCH             FLIGHT_CONTROLLER
 /**
  *      (MOTOR PULSE PROVIDER)
  *      Motor pulses are nothing more than a time in us sent to the ESCs.

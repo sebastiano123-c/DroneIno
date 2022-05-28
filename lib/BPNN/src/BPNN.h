@@ -28,6 +28,13 @@
 
 #define DEFAULT_ACTIVATION_FUNCTION "sigmoid"
 
+#ifndef LIB1_H_INCLUDED
+#define LIB1_H_INCLUDED
+
+#ifdef __cplusplus
+   extern "C" {
+#endif
+
 
 /**
  * @brief Forward propagation.
@@ -92,3 +99,9 @@ void backPropagation(
     float learningRate, float momentumFactor,
     const char *learningType,
     std::vector<const char *> activationFunctionName);
+
+#ifdef __cplusplus
+   }
+#endif
+
+#endif /* LIB1_H_INCLUDED */
