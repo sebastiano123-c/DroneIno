@@ -129,9 +129,9 @@ void readGyroscopeStatus(){
     gyroAxis[1] -= gyroAxisCalibration[1];                       //Only compensate after the calibration.
     gyroAxis[2] -= gyroAxisCalibration[2];                       //Only compensate after the calibration.
     gyroAxis[3] -= gyroAxisCalibration[3];                       //Only compensate after the calibration.
-    accAxis[1]  -= accAxisCalibration[1];
-    accAxis[2]  -= accAxisCalibration[2];
-    accAxis[3]  -= accAxisCalibration[3];
+    // accAxis[1]  -= accAxisCalibration[1];
+    // accAxis[2]  -= accAxisCalibration[2];
+    // accAxis[3]  -= accAxisCalibration[3];
   }
 
 }
@@ -161,7 +161,7 @@ void calibrateGyroscope(){
     if(calInt % 25 == 0){                                           //Change the led status to indicate calibration.
       ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));
       #if DEBUG || UPLOADED_SKETCH == CALIBRATION
-        Serial.print(".");
+        Serial.printf("%.1fs -", (float)(CALINT_MAX - calInt)*CALINT_DELAY_MS/1000.);
       #endif
     } else
       ledcWrite(pwmLedBatteryChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));
@@ -191,23 +191,10 @@ void calibrateGyroscope(){
  */
 void printGyroscopeStatus(){
 
-  Serial.printf("Roll: %.4f\tPitch: %.4f\tYaw: %.4f \n ", angleRoll, anglePitch, gyroAxis[3]/65.5f);
-
-  // Serial.print(" Fileter: ");
-  // Serial.print(GYROSCOPE_ROLL_FILTER, 6);
-  // Serial.print(" GYROSCOPE_ROLL_CORR: ");
-  // Serial.print(GYROSCOPE_ROLL_CORR, 2);
-  // Serial.print(" GYROSCOPE_PITCH_CORR: ");
-  // Serial.print(GYROSCOPE_PITCH_CORR ,0);
-  // Serial.println();
-
-  //  Serial.print("gyroYawInput:");
-  // Serial.print(gyroYawInput);
-  // Serial.print(",");
-  // Serial.print("gyroAxis[3]:");
-  // Serial.println((float)gyroAxis[3] / gyroSensibility);
+  Serial.printf("Roll: %.4f, Pitch: %.4f, Yaw: %.4f,  \t aX: %i, aY: %i, aZ: %i\n ", angleRoll, anglePitch, gyroAxis[3]/65.5f, accAxis[1], accAxis[2], accAxis[3]);
 
 }
+
 
 /**
  * @brief Calculate the pitch, roll and yaw angles from the previous gyroscope readings
