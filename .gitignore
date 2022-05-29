@@ -23,6 +23,7 @@ include/wifi/serial.web_serial.h
 /include/pinmaps/pinmap.ESP32CAM.h
 
 # lib
+lib/BPNN/examples/*
 lib/BPNN/src/*
 !lib/BPNN/src/BPNN.h
 !lib/BPNN/src/libBPNN.a

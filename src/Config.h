@@ -196,7 +196,7 @@
 
 /**
  * -----------------------------------------------------------------------------------------------------------
- * PID
+ * MANUAL PID:
  * 
  * 
  *    @brief PID parameters for roll, pitch, yaw and altitude.
@@ -206,16 +206,7 @@
  *    I = integral     -> I_output = I_output + (gyro - receiver) * I_gain
  *    D = derivative   -> D_output = (gyro - receiver - (gyro_prev - receiver_prev) ) * D_gain 
  * 
- * 
- *    (AUTO PID)
- * 
- *      Auto-tune PID allow DroneIno to adjust on run the PID parameters to best fit the environmental changes.
- *      If false, the following PID values are set. If true the drone auto calibrates the parameters
- */
-#define AUTOTUNE_PID_GYROSCOPE      false                      // (false, true), "true" is now on testing.
-/**
- *    (MANUAL PID)
- * 
+ *  
  *      ROLL
  */
 #define PID_P_GAIN_ROLL             0.656f                    //Gain setting for the roll P-controller (1.3)
@@ -248,6 +239,17 @@
  */
 #define PID_P_GAIN_GPS              2.7f                      //Gain setting for the GPS P-controller (default = 2.7).
 #define PID_D_GAIN_GPS              6.5f                      //Gain setting for the GPS D-controller (default = 6.5).
+
+
+
+/**
+ * ----------------------------------------------------------------------------------------------------------------------------
+ * AUTOMATIC PID:
+ * 
+ *      Auto-tune PID allow DroneIno to adjust on run the PID parameters to best fit the environmental changes.
+ *      If false, the following PID values are set. If true the drone auto calibrates the parameters
+ */
+#define AUTOTUNE_PID_GYROSCOPE      false                      // (false, true), "true" is now on testing.
 
 
 

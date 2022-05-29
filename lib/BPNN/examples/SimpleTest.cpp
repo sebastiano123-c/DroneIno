@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <vector>
 
-#include "../src/BPNN.hpp"           // BPNN lib
+#include "../src/BPNN.h"           // BPNN lib
 /**
  *      Prototypes
  */
