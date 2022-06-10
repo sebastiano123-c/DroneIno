@@ -45,8 +45,10 @@ Clone this repo
 </code></pre>
 or download the .zip file.
 
-# **_New update_**
-Auto-tune the PID using an artificial neural network, take a [look](https://github.com/sebastiano123-c/DroneIno/wiki/PID#pid-auto-tuning).
+<!-- # **_New update_** -->
+<h1 style="color:orange"><i><b>New update:</b> PID auto-tuning!</i></h1>
+
+Use the Artificial Neural Network (ANN) to get rid of the PID setting, take a closer look [here](https://github.com/sebastiano123-c/DroneIno/wiki/PID#pid-auto-tuning).
 
 # **Description**
 Based on the [YMFC](https://github.com/F4b1-/YMFC-AL-Flight-Controller-improved) project, DroneIno allows you to control a quadcopter with:
