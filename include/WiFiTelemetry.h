@@ -424,8 +424,8 @@ void writeDataTransfer() {
   char *sptr = staticCharToPrint;
 
   // fill data structure before send
-  sptr += sprintf(sptr, "<%.3f,", gyroYawInput);//angleRoll);
-  sptr += sprintf(sptr, "%.3f,", anglePitch);
+  sptr += sprintf(sptr, "<%.3f,", angleRoll);//PGainRoll);
+  sptr += sprintf(sptr, "%.3f,", angleRoll);//PGainYaw);
   sptr += sprintf(sptr, "%x,", flightMode);
   sptr += sprintf(sptr, "%.1f,", batteryVoltage);
   sptr += sprintf(sptr, "%.1f,", altitudeMeasure);

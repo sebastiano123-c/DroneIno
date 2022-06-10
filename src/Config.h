@@ -143,9 +143,9 @@
  *      Then, upload with CALIBRATION and calibrate ESC and check that each components behaves in the correct way.
  *      Finally upload with FLIGHT_CONTROLLER and start to fly.
  */
-#define UPLOADED_SKETCH             SETUP
+// #define UPLOADED_SKETCH             SETUP
 // #define UPLOADED_SKETCH             CALIBRATION
-// #define UPLOADED_SKETCH             FLIGHT_CONTROLLER
+#define UPLOADED_SKETCH             FLIGHT_CONTROLLER
 /**
  *      (MOTOR PULSE PROVIDER)
  *      Motor pulses are nothing more than a time in us sent to the ESCs.
@@ -156,7 +156,8 @@
  */
 // #define MOTOR_PULSE_BY_MCPWM              // NOT TESTED YET
 #define MOTOR_PULSE_BY_LEDC
-/**
+/**p
+ * 
  *      (DEBUG MODE)
  *      Works only when the UPLOADED_SKETCH is FLIGHT_CONTROLLER.
  *      If true, some serial prints are enabled.
@@ -168,7 +169,7 @@
 // #define DEBUG_GYRO
 // #define DEBUG_BATTERY
 // #define DEBUG_ESC
-// #define DEBUG_AUTOPID
+#define DEBUG_AUTOPID
 // #define DEBUG_PID
 // #define DEBUG_PID_SIGNALS
 // #define DEBUG_WIFI_SEND
@@ -249,7 +250,7 @@
  *      Auto-tune PID allow DroneIno to adjust on run the PID parameters to best fit the environmental changes.
  *      If false, the following PID values are set. If true the drone auto calibrates the parameters
  */
-#define AUTOTUNE_PID_GYROSCOPE      false                      // (false, true), "true" is now on testing.
+#define AUTOTUNE_PID_GYROSCOPE      true                      // (false, true), "true" is now on testing.
 
 
 
@@ -344,5 +345,5 @@
  *          *) ESP_CAM, uses the ESP32CAM wifi.
  *      See https://github.com/sebastiano123-c/Esp32-cam-telemetry for more details.
  */
-#define WIFI_TELEMETRY              OFF                   // (OFF, NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
+#define WIFI_TELEMETRY              ESP_CAM                   // (OFF, NATIVE, ESP_CAM) set NATIVE if you don't have an ESP32-CAM
 #define WIFI_BAUD_RATE              115200                    // (9600, 57600, 115200)

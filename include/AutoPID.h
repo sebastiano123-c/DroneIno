@@ -59,7 +59,7 @@ void initAutoPID(std::vector<int> &structure, std::vector<std::vector<float>> &z
 {
   // declare counters
   int ii, jj = -1, kk;
-  int memoryAddress = 0;        
+  int memoryAddress = 0;
   char numChar[20 + sizeof(char)];
 
   preferences.begin(memoryNamespace[0], true);
@@ -105,10 +105,10 @@ void initAutoPID(std::vector<int> &structure, std::vector<std::vector<float>> &z
 
   // 2) randomize the weight vector
   preferences.begin(memoryNamespace[1], true);
-  jj = -1, memoryAddress = 0;       // reset counters
+  jj = -1, memoryAddress = 0; // reset counters
 
   for (std::vector<int>::iterator itInt = structure.begin();
-      itInt != structure.end(); itInt++, jj++)
+       itInt != structure.end(); itInt++, jj++)
   {
     if (jj > -1)
     {
@@ -171,8 +171,8 @@ void autotunePID()
   //      Inputs : {pidRollSetpoint, gyroRollInput, pidLastRollDError,
   //      pidLastRollDError - eKRoll}
   forwardPropagation(structure,
-                     {pidRollSetpoint, gyroRollInput, pidLastRollDError,
-                      pidLastRollDError - eKRoll},
+                     {pidRollSetpoint/360.F, gyroRollInput/360.F, pidLastRollDError/360.F,
+                      (pidLastRollDError - eKRoll)/360.0F},
                      zLRoll, aLRoll, biasRoll, weightsRoll,
                      activationFunctionN);
 
@@ -185,10 +185,13 @@ void autotunePID()
       sgn((yKRoll - yK_1Roll) / (uKRoll - uK_1Roll)); // sgn(d y(k)/ d u(k))
   backPropagation(
       structure,
-      {sgnError * eKRoll * (eKRoll - eK_1Roll), sgnError * eKRoll * (eKRoll),
+      {(sgnError * eKRoll * (eKRoll - eK_1Roll)), sgnError * eKRoll * (eKRoll),
        sgnError * eKRoll * (eKRoll - 2.0f * eK_1Roll + eK_2Roll)},
       zLRoll, aLRoll, biasRoll, deltaBiasRoll, weightsRoll, deltaWeightsRoll,
       learningRateRoll, momentumFactorRoll, learningType, activationFunctionN);
+    
+  // Serial.printf("%f, %f, %f \n", (sgnError * eKRoll * (eKRoll - eK_1Roll))/3600.F, sgnError * eKRoll * (eKRoll)/70000.F,
+      //  sgnError * eKRoll * (eKRoll - 2.0f * eK_1Roll + eK_2Roll)/360.F);
 
   // YAW:
   //
@@ -196,9 +199,11 @@ void autotunePID()
   //      Inputs : {pidYawSetPoint, gyroYawInput, pidLastYawDError,
   //      pidLastYawDError - eKYaw}
   forwardPropagation(structure,
-                     {pidYawSetpoint, gyroYawInput, pidLastYawDError,
-                      pidLastYawDError - eKYaw},
+                     {pidYawSetpoint/360.F, gyroYawInput/360.F, pidLastYawDError/360.F,
+                      (pidLastYawDError - eKYaw)/360.F},
                      zLYaw, aLYaw, biasYaw, weightsYaw, activationFunctionN);
+
+  // Serial.printf("%f, %f, %f, %f \t \n ", pidYawSetpoint/360.F, gyroYawInput/360.F, pidLastYawDError/360.F, (pidLastYawDError - eKYaw)/360.0F);
 
   //      Back propagation propagates the error backwards to change the weights
   //      (learning).
@@ -212,10 +217,10 @@ void autotunePID()
                    sgnError * eKYaw * (eKYaw - 2.0f * eK_1Yaw + eK_2Yaw)},
                   zLYaw, aLYaw, biasYaw, deltaBiasYaw, weightsYaw,
                   deltaWeightsYaw, learningRateYaw, momentumFactorYaw,
-                  learningType, activationFunctionN); //-0.0000925f, .25f
+                  learningType, activationFunctionN);
 
   // update PIDs
-#if AUTOTUNE_PID_GYROSCOPE == true
+#if AUTOTUNE_PID_GYROSCOPE == true || UPLOADED_SKETCH == CALIBRATION
 
   PGainRoll = (isnan(abs(aLRoll[structure.size() - 1][0])) == false)
                   ? abs(aLRoll[structure.size() - 1][0])
@@ -233,11 +238,17 @@ void autotunePID()
   IGainPitch = IGainRoll;
   DGainPitch = DGainRoll;
 
-  PGainYaw = (isnan(abs(aLYaw[structure.size() - 1][0])) == false) ? abs(aLYaw[structure.size() - 1][0]) : PGainYaw;
-  IGainYaw = (isnan(abs(aLYaw[structure.size() - 1][1])) == false) ? abs(aLYaw[structure.size() - 1][1]) : IGainYaw;
+  PGainYaw = (isnan(abs(aLYaw[structure.size() - 1][0])) == false)
+                 ? abs(aLYaw[structure.size() - 1][0])
+                 : PGainYaw;
+  IGainYaw = (isnan(abs(aLYaw[structure.size() - 1][1])) == false)
+                 ? abs(aLYaw[structure.size() - 1][1])
+                 : IGainYaw;
   if (IGainYaw > 0.08)
     IGainYaw = 0.08; // limit the integrative
-  DGainYaw = (isnan(abs(aLYaw[structure.size() - 1][2])) == false) ? abs(aLYaw[structure.size() - 1][2]) : DGainYaw;
+  DGainYaw = (isnan(abs(aLYaw[structure.size() - 1][2])) == false)
+                 ? abs(aLYaw[structure.size() - 1][2])
+                 : DGainYaw;
 
 #endif
 
@@ -250,18 +261,6 @@ void autotunePID()
       (aLRoll[structure.size() - 1][0]), (aLRoll[structure.size() - 1][1]),
       (aLRoll[structure.size() - 1][2]), (aLYaw[structure.size() - 1][0]),
       (aLYaw[structure.size() - 1][1]), (aLYaw[structure.size() - 1][2]));
-  // Serial.printf("%.4f, %.4f, %.4f, %f \t %.4f, %.4f, %.4f
-  // \t",pidRollSetpoint, gyroRollInput, pidLastRollDError,
-  //                 pidLastRollDError - eKRoll, sgnError * eKRoll * (eKRoll -
-  //                 eK_1Roll),
-  //  sgnError * eKRoll * (eKRoll),
-  //  sgnError * eKRoll * (eKRoll - 2 * eK_1Roll + eK_2Roll));
-  // Serial.printf("%.4f, %.4f, %.4f, %f \t %.4f, %.4f, %.4f \n",pidYawSetpoint,
-  // gyroYawInput, pidLastYawDError,
-  //                 pidLastYawDError - eKYaw, sgnError * eKYaw * (eKYaw -
-  //                 eK_1Yaw),
-  //  sgnError * eKYaw * (eKYaw),
-  //  sgnError * eKYaw * (eKYaw - 2 * eK_1Yaw + eK_2Yaw));
 
 #endif
 

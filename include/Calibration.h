@@ -136,7 +136,7 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
 
       //Let's create a small delay so the message stays visible for 2.5 seconds.
       //We don't want the ESC's to beep and have to send a 1000us pulse to the ESC's.
-      for(vibrationCounter = 0; vibrationCounter < 625; vibrationCounter++){           //Do this loop 625 times
+      for(vibrationCounter = 0; vibrationCounter < 200; vibrationCounter++){           //Do this loop 625 times
         vTaskDelay(3/portTICK_PERIOD_MS);                                                                         //Wait 3000us.
         esc1 = 1000;                                                                     //Set the pulse for ESC 1 to 1000us.
         esc2 = 1000;                                                                     //Set the pulse for ESC 2 to 1000us.
@@ -345,6 +345,7 @@ long accAvVector,  accVectorNorm[20], vibrationTotalResult;
   void calibrateAutoPID(std::vector<int> structure){
 
     Serial.println("Train the neural network to calibrate the PID parameters.");
+    delay(2000);
 
     // initialize the auto pid objects
       initAutoPID(structure, zLRoll, aLRoll, biasRoll, deltaBiasRoll, weightsRoll, deltaWeightsRoll, 200, {"roll-bias","roll-weights"});// pitch has the same values

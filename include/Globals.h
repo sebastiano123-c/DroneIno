@@ -106,10 +106,10 @@ std::vector<const char*>
  *    Their combination must be set carefully: the NN must converge and be stable to the point.
  *    I recommend not to change them despite you know what you are doing.
  */
-float learningRateRoll           = 0.000001f;//0.00005f;
-float momentumFactorRoll         = 0.995f;//0.995f;
-float learningRateYaw            = 0.0001f;//0.00005f;
-float momentumFactorYaw          = 0.995f;//0.995f;
+float learningRateRoll           = 0.0000003F;//0.0000007F;
+float momentumFactorRoll         = 0.997F;//0.995F;
+float learningRateYaw            = 0.00003F;//0.00003F;
+float momentumFactorYaw          = 0.995F;//0.995F;
 /**
  *    Straight forward declaration of the weights and biases.
  *    Weights and biases for the roll's neural network.
@@ -172,7 +172,7 @@ float GYROSCOPE_PITCH_CORR       = 0.;                         // (-1.65.) after
 const int gyroFrequency          = 250;                         // (Hz)
 const float gyroSensibility      = 65.5;                                
 const int correctionPitchRoll    = 15;                          // correction for the pitch and roll
-float convDegToRad               = 180.0 / PI;                  // convertion between degrees and radians  
+float convDegToRad               = 180.0 / PI;                  // conversion between degrees and radians  
 float travelCoeff                = 1.0f/((float)gyroFrequency * // converts gyro into an angular distance
                                    gyroSensibility);     
 float travelCoeffToRad           = travelCoeff / convDegToRad;  // converts gyro distance in radians

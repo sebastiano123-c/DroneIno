@@ -129,6 +129,8 @@ void readGyroscopeStatus(){
     gyroAxis[1] -= gyroAxisCalibration[1];                       //Only compensate after the calibration.
     gyroAxis[2] -= gyroAxisCalibration[2];                       //Only compensate after the calibration.
     gyroAxis[3] -= gyroAxisCalibration[3];                       //Only compensate after the calibration.
+
+    // no need of calibrating the accelerometer. Otherwise gyro has no reference on the zero axis
     // accAxis[1]  -= accAxisCalibration[1];
     // accAxis[2]  -= accAxisCalibration[2];
     // accAxis[3]  -= accAxisCalibration[3];
@@ -161,7 +163,7 @@ void calibrateGyroscope(){
     if(calInt % 25 == 0){                                           //Change the led status to indicate calibration.
       ledcWrite(pwmLedChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));
       #if DEBUG || UPLOADED_SKETCH == CALIBRATION
-        Serial.printf("%.1fs -", (float)(CALINT_MAX - calInt)*CALINT_DELAY_MS/1000.);
+        Serial.printf("%.1fs - ", (float)(CALINT_MAX - calInt)*CALINT_DELAY_MS/1000.);
       #endif
     } else
       ledcWrite(pwmLedBatteryChannel, abs(MAX_DUTY_CYCLE - (int)ledcRead(pwmLedChannel)));
