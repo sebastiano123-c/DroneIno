@@ -169,7 +169,8 @@
 // #define DEBUG_GYRO
 // #define DEBUG_BATTERY
 // #define DEBUG_ESC
-#define DEBUG_AUTOPID
+// #define DEBUG_ALTITUDE
+// #define DEBUG_AUTOPID
 // #define DEBUG_PID
 // #define DEBUG_PID_SIGNALS
 // #define DEBUG_WIFI_SEND

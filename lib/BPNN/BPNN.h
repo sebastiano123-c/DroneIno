@@ -28,13 +28,13 @@
 
 #define DEFAULT_ACTIVATION_FUNCTION "sigmoid"
 
-#ifndef LIB1_H_INCLUDED
-#define LIB1_H_INCLUDED
+#ifndef BPNN_H
+#define BPNN_H
 
 #ifdef __cplusplus
-   extern "C" {
+extern "C"
+{
 #endif
-
 
 /**
  * @brief Forward propagation.
@@ -104,4 +104,4 @@ void backPropagation(
    }
 #endif
 
-#endif /* LIB1_H_INCLUDED */
+#endif /* BPNN_H */
